@@ -1,6 +1,8 @@
 class LessonProgress < ApplicationRecord
+  self.table_name = "lesson_progresses"
+
   belongs_to :user
-  belongs_to :lesson
+  belongs_to :lesson, class_name: "CourseLesson"
 
   validates :progress, presence: true, numericality: {
     only_integer: true,
@@ -11,11 +13,11 @@ class LessonProgress < ApplicationRecord
   validates :lesson, presence: true
 
   scope :completed, -> { where(completed: true) }
-  scope :in_progress, -> { where(completed: false).where('progress > 0') }
+  scope :in_progress, -> { where(completed: false).where("progress > 0") }
   scope :not_started, -> { where(progress: 0) }
 
   def complete!
-    update!(progress: 100, completed: true)
+    update!(progress: 100, completed: true, last_accessed_at: Time.current)
   end
 
   def in_progress?

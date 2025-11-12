@@ -1,24 +1,11 @@
-# README
+# LMS Rails API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+See main project documentation:
+- ../LMS_RAILS_MIGRATION_STATUS.md - Complete implementation status
+- ../CLAUDE.md - Development guidelines
+- ../COURSE_PROGRESS_DISTRIBUTION_ENDPOINT.md - Endpoint examples
 
-Things you may want to cover:
+## Quick Start
+rails server -p 3001
+# Server runs on port 3001
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...

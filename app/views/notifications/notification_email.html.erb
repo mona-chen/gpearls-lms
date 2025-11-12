@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #333;"><%= @subject %></h2>
+
+    <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
+      <%= @message.html_safe %>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
+      <p>This is an automated notification from the LMS system.</p>
+      <p>If you have any questions, please contact support.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -224,76 +224,7 @@
             <div id="error-message" class="error-message"></div>
             <div id="success-message" class="success-message"></div>
 
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="full_name">Full Name</label>
-                    <input
-                        type="text"
-                        id="full_name"
-                        name="full_name"
-                        placeholder="Enter your full name"
-                        required
-                        autocomplete="name"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="signup_email"
-                        placeholder="Enter your email"
-                        required
-                        autocomplete="email"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Create a strong password"
-                        required
-                        minlength="8"
-                        autocomplete="new-password"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="user_category">User Category (Optional)</label>
-                    <select id="user_category" name="user_category">
-                        <option value="">Select your category</option>
-                        <option value="Business Owner">Business Owner</option>
-                        <option value="Manager (Sales/Marketing/Customer)">Manager (Sales/Marketing/Customer)</option>
-                        <option value="Employee">Employee</option>
-                        <option value="Student">Student</option>
-                        <option value="Freelancer/Just looking">Freelancer/Just looking</option>
-                        <option value="Others">Others</option>
-                    </select>
-                </div>
-
-                <div class="checkbox-group">
-                    <input
-                        type="checkbox"
-                        id="terms"
-                        name="terms"
-                        required
-                    >
-                    <label for="terms">
-                        <span class="terms-text">
-                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>. I understand that my account will be created with LMS Student role.
-                        </span>
-                    </label>
-                </div>
-
-                <button type="submit" class="signup-button" id="signup-btn">
-                    <span class="loading-spinner" id="loading"></span>
-                    <span id="button-text">Create Account</span>
-                </button>
-            </form>
+            <%= render partial: 'onboarding/signup_form' %>
 
             <div class="login-link">
                 Already have an account? <a href="/login">Sign in</a>
@@ -302,94 +233,100 @@
     </div>
 
     <script>
-        document.getElementById('signup-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const fullName = document.getElementById('full_name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const userCategory = document.getElementById('user_category').value;
-            const terms = document.getElementById('terms').checked;
-
-            const errorDiv = document.getElementById('error-message');
-            const successDiv = document.getElementById('success-message');
-            const signupBtn = document.getElementById('signup-btn');
-            const loadingSpinner = document.getElementById('loading');
-            const buttonText = document.getElementById('button-text');
-
-            // Basic validation
-            if (!terms) {
-                errorDiv.textContent = 'Please accept the terms of service to continue.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            if (password.length < 8) {
-                errorDiv.textContent = 'Password must be at least 8 characters long.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            // Hide previous messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            // Show loading state
-            signupBtn.disabled = true;
-            loadingSpinner.style.display = 'inline-block';
-            buttonText.textContent = 'Creating account...';
-
-            try {
-                const response = await fetch('/api/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        full_name: fullName,
-                        signup_email: email,
-                        password: password,
-                        user_category: userCategory,
-                        verify_terms: terms ? 1 : 0
-                    })
+        // Frappe-style signup functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupForm = document.querySelector('.signup-form');
+            if (signupForm) {
+                signupForm.addEventListener('submit', function(e) {
+                    signup(e);
                 });
+            }
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Show success message
-                    successDiv.textContent = data.message || 'Account created successfully! Please check your email for verification.';
-                    successDiv.style.display = 'block';
-
-                    // Clear form
-                    document.getElementById('signup-form').reset();
-
-                    // Redirect to login after a delay
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                    }, 3000);
-                } else {
-                    // Show error message
-                    errorDiv.textContent = data.message || 'Failed to create account. Please try again.';
-                    errorDiv.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Signup error:', error);
-                errorDiv.textContent = 'Network error. Please check your connection and try again.';
-                errorDiv.style.display = 'block';
-            } finally {
-                // Reset button state
-                signupBtn.disabled = false;
-                loadingSpinner.style.display = 'none';
-                buttonText.textContent = 'Create Account';
+            const userCategorySelect = document.getElementById('user_category');
+            if (userCategorySelect) {
+                userCategorySelect.addEventListener('change', function(e) {
+                    styleCategory(e);
+                });
             }
         });
 
+        function styleCategory(e) {
+            const categoryColor = e.currentTarget.value ? 'var(--text-color)' : 'var(--text-muted)';
+            e.currentTarget.style.color = categoryColor;
+        }
+
+        function signup(e) {
+            e.preventDefault();
+            const email = (document.getElementById('signup_email').value || '').trim();
+            const fullName = (document.getElementById('signup_fullname').value || '').trim();
+
+            if (!email || !validateEmail(email) || !fullName) {
+                showStatus('<%= t('signup.valid_email_name_required') %>', 'red');
+                return false;
+            }
+
+            const formData = {
+                email: email,
+                full_name: fullName,
+                verify_terms: document.getElementById('signup-terms')?.checked ? 1 : 0,
+                user_category: document.getElementById('user_category')?.value || ''
+            };
+
+            fetch('/api/method/lms.lms.user.sign_up', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message && data.message.success) {
+                    showStatus('<%= t('signup.success') %>', 'green');
+                    // Redirect to login or dashboard
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showStatus(data.message || '<%= t('signup.error') %>', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Signup error:', error);
+                showStatus('<%= t('signup.error') %>', 'red');
+            });
+
+            return false;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showStatus(message, color) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+
+            // Hide both messages first
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (color === 'red') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+        }
+
         // Clear error message when user starts typing
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('input', function() {
-                document.getElementById('error-message').style.display = 'none';
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', function() {
+                    document.getElementById('error-message').style.display = 'none';
+                });
             });
         });
     </script>

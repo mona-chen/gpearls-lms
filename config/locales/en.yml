@@ -29,3 +29,32 @@
 
 en:
   hello: "Hello world"
+
+  # Onboarding
+  onboarding:
+    skip: "Skip"
+    get_started: "Get Started"
+    setup_content_message: "Lets start setting up your content on the LMS so that you can reclaim time and focus on growth."
+    create_course: "Create a Course"
+    add_chapter: "Add a Chapter"
+    add_lesson: "Add a Lesson"
+
+  # Signup
+  signup:
+    full_name: "Full Name"
+    full_name_placeholder: "Jane Doe"
+    email: "Email"
+    email_placeholder: "jane@example.com"
+    user_category: "User Category"
+    category: "Category"
+    business_owner: "Business Owner"
+    manager: "Manager (Sales/Marketing/Customer)"
+    employee: "Employee"
+    student: "Student"
+    freelancer: "Freelancer/Just looking"
+    others: "Others"
+    sign_up: "Sign up"
+    have_account: "Have an account? Login"
+    valid_email_name_required: "Valid email and name required"
+    success: "Account created successfully"
+    error: "An error occurred during signup"

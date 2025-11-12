@@ -20,7 +20,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -62,4 +62,30 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  # Include FactoryBot methods
+  config.include FactoryBot::Syntax::Methods
+
+  # Include authentication helpers
+  config.include AuthHelpers, type: :request
+
+  # Configure shoulda-matchers
+  Shoulda::Matchers.configure do |config|
+    config.integrate do |with|
+      with.test_framework :rspec
+      with.library :rails
+    end
+  end
+
+  # Database cleaner strategy
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
 end

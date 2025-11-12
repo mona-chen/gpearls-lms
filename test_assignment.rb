@@ -1,0 +1,1 @@
+puts "Model loaded: #{LmsAssignment.new.class}"; puts "Table exists: #{ActiveRecord::Base.connection.table_exists?("lms_assignments")}"; assignment = LmsAssignment.new(name: "Test", title: "Test", description: "Test"); puts "Basic validation: #{assignment.valid?}"

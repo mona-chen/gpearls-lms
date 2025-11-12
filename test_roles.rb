@@ -1,0 +1,1 @@
+puts "=== Role System Test ==="; role = Role.new(name: "Course Creator", role_name: "Course Creator", description: "User who can create and manage courses", status: "Active"); puts "Role valid: #{role.valid?}"; puts "Role errors: #{role.errors.full_messages.join(", ")}" if role.invalid?; role.save; puts "Role saved: #{role.persisted?}"

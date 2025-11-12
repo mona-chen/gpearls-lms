@@ -1,0 +1,57 @@
+# Sidekiq Configuration
+# Production settings for LMS payment processing
+
+:concurrency: 5
+:queues:
+  - default
+  - payments
+  - mailers
+
+# Payment-specific queue configuration
+:polling:
+  :concurrency: 2
+  :queues:
+    - payments
+
+# Scheduler configuration for periodic tasks
+:scheduler:
+  :schedule:
+    # Cleanup expired payment polls every hour
+    cleanup_expired_polls:
+      cron: "0 * * * *"
+      class: "Payments::TransactionPollingService"
+      queue: "payments"
+      description: "Clean up expired payment polls"
+
+# Error handling
+:dead_max_jobs: 1000
+:dead_timeout_in_seconds: 1800
+
+# Logging
+:logging:
+  :level: :info
+  :format: json
+
+# Web UI (optional - requires sidekiq-web gem)
+#:web:
+#  :host: localhost
+#  :port: 9492
+
+# Redis configuration
+#:redis:
+#  :url: redis://localhost:6379/0
+#  :namespace: lms_sidekiq
+
+# Development vs Production settings
+:development:
+  :concurrency: 2
+  :queues:
+    - default
+    - payments
+
+:production:
+  :concurrency: 10
+  :queues:
+    - default
+    - payments
+    - mailers

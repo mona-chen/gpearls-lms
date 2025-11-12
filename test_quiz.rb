@@ -1,0 +1,1 @@
+course = Course.first; user = User.first; if course && user; quiz = LmsQuiz.new(name: "Test Quiz", title: "Test Title", description: "Test Description", course: course, creator: user); puts "Quiz created: #{quiz.save ? "SUCCESS" : "FAILED"}"; puts "Quiz valid: #{quiz.valid?}"; else; puts "No course or user found"; end

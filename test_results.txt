@@ -1,0 +1,217 @@
+
+While loading ./spec/models/course_spec.rb an `exit` / `raise SystemExit` occurred, RSpec will now quit.
+Failure/Error: abort e.to_s.strip
+
+SystemExit:
+  Migrations are pending. To resolve this issue, run:
+
+          bin/rails db:migrate
+
+  You have 95 pending migrations:
+
+  db/migrate/20251012005423_create_certification_categories.rb
+  db/migrate/20251012010616_create_certificate_requests.rb
+  db/migrate/20251013142346_create_payments_table.rb
+  db/migrate/20251015070813_create_lms_settings.rb
+  db/migrate/20251015070909_create_lms_categories.rb
+  db/migrate/20251015071013_create_user_skills.rb
+  db/migrate/20251015071316_create_industries.rb
+  db/migrate/20251015071408_create_skills.rb
+  db/migrate/20251015071534_create_lms_courses.rb
+  db/migrate/20251015071955_create_lms_batches.rb
+  db/migrate/20251015072208_create_lms_enrollments.rb
+  db/migrate/20251015073005_create_users.rb
+  db/migrate/20251015073241_create_lms_quizzes.rb
+  db/migrate/20251015073427_create_lms_questions.rb
+  db/migrate/20251015073631_create_lms_quiz_questions.rb
+  db/migrate/20251015073832_create_lms_quiz_submissions.rb
+  db/migrate/20251015074058_create_lms_payments.rb
+  db/migrate/20251015080150_create_zoom_settings.rb
+  db/migrate/20251015080446_create_lms_assignments.rb
+  db/migrate/20251015080837_create_lms_assignment_submissions.rb
+  db/migrate/20251015081115_create_lms_certificates.rb
+  db/migrate/20251015085442_create_lms_certificate_requests.rb
+  db/migrate/20251015091737_create_lms_certificate_evaluations.rb
+  db/migrate/20251015092236_create_lms_live_classes.rb
+  db/migrate/20251015092407_create_lms_live_class_participants.rb
+  db/migrate/20251015093025_create_lms_batch_enrollments.rb
+  db/migrate/20251015093921_create_cohorts.rb
+  db/migrate/20251015094132_create_cohort_join_requests.rb
+  db/migrate/20251015094336_create_cohort_mentors.rb
+  db/migrate/20251015094546_create_cohort_staff.rb
+  db/migrate/20251015094818_create_cohort_subgroups.rb
+  db/migrate/20251015095110_create_lms_programs.rb
+  db/migrate/20251015095630_create_lms_assessments.rb
+  db/migrate/20251015095857_create_lms_exercises.rb
+  db/migrate/20251015100550_create_lms_program_courses.rb
+  db/migrate/20251015101544_create_lms_program_members.rb
+  db/migrate/20251015105247_create_lms_programming_exercises.rb
+  db/migrate/20251015110333_create_lms_test_cases.rb
+  db/migrate/20251015112402_create_education_details.rb
+  db/migrate/20251015113704_create_work_experiences.rb
+  db/migrate/20251015154950_create_exercise_submissions.rb
+  db/migrate/20251015155138_create_lms_programming_exercise_submissions.rb
+  db/migrate/20251015155306_create_lms_test_case_submissions.rb
+  db/migrate/20251015174623_create_lms_batch_feedbacks.rb
+  db/migrate/20251015174718_create_lms_batch_timetables.rb
+  db/migrate/20251015174829_create_lms_course_progresses.rb
+  db/migrate/20251015174951_create_lms_course_reviews.rb
+  db/migrate/20251015175742_create_lms_mentor_requests.rb
+  db/migrate/20251015175901_create_lms_badges.rb
+  db/migrate/20251015175958_create_lms_badge_assignments.rb
+  db/migrate/20251015180440_create_lms_lesson_notes.rb
+  db/migrate/20251015180542_create_lms_video_watch_durations.rb
+  db/migrate/20251015180730_create_lms_options.rb
+  db/migrate/20251015180829_create_certifications.rb
+  db/migrate/20251015181209_create_course_chapters.rb
+  db/migrate/20251015181314_create_course_evaluators.rb
+  db/migrate/20251015181746_create_course_instructors.rb
+  db/migrate/20251015181948_create_course_lessons.rb
+  db/migrate/20251015182130_create_evaluator_schedules.rb
+  db/migrate/20251015182447_create_lms_sources.rb
+  db/migrate/20251015182718_create_lms_sidebar_items.rb
+  db/migrate/20251015183016_create_lms_timetable_legends.rb
+  db/migrate/20251015183144_create_lms_timetable_templates.rb
+  db/migrate/20251015184606_create_batch_courses.rb
+  db/migrate/20251015184802_create_chapter_references.rb
+  db/migrate/20251015185014_create_cohort_web_pages.rb
+  db/migrate/20251015185425_create_exercise_latest_submissions.rb
+  db/migrate/20251015185756_create_lesson_references.rb
+  db/migrate/20251015190112_create_preferred_functions.rb
+  db/migrate/20251015190333_create_preferred_industries.rb
+  db/migrate/20251015190524_create_lms_batch_olds.rb
+  db/migrate/20251015193221_create_lms_course_interests.rb
+  db/migrate/20251015193424_create_lms_course_mentor_mappings.rb
+  db/migrate/20251015193714_create_lms_quiz_results.rb
+  db/migrate/20251015193937_create_lms_zoom_settings.rb
+  db/migrate/20251015200134_create_related_courses.rb
+  db/migrate/20251015200334_create_scheduled_flows.rb
+  db/migrate/20251015200638_create_payment_countries.rb
+  db/migrate/20251015202259_create_countries.rb
+  db/migrate/20251016024239_create_functions.rb
+  db/migrate/20251027072039_add_upcoming_to_lms_courses.rb
+  db/migrate/20251027120344_create_notifications.rb
+  db/migrate/20251027134740_create_lms_files.rb
+  db/migrate/20251027142541_create_lesson_progresses.rb
+  db/migrate/20251029235620_add_missing_fields_to_lms_categories.rb
+  db/migrate/20251029235658_add_category_to_lms_batches.rb
+  db/migrate/20251030001309_add_unique_index_to_course_chapter_name.rb
+  db/migrate/20251030001404_recreate_course_lesson_foreign_keys.rb
+  db/migrate/20251030002622_add_batch_id_to_batch_courses.rb
+  db/migrate/20251030002703_add_evaluator_id_to_batch_courses.rb
+  db/migrate/20251030003335_add_user_id_to_lms_batch_enrollments.rb
+  db/migrate/20251030003626_add_published_to_lms_batches.rb
+  db/migrate/20251030085858_create_job_opportunities.rb
+  db/migrate/20251030085859_add_current_lesson_to_lms_enrollments.rb
+  db/migrate/20251030085860_add_batch_id_to_lms_live_classes.rb
+# ./spec/rails_helper.rb:30:in `abort'
+# ./spec/rails_helper.rb:30:in `rescue in <top (required)>'
+# ./spec/rails_helper.rb:27:in `<top (required)>'
+# ./spec/models/course_spec.rb:1:in `<top (required)>'
+# ------------------
+# --- Caused by: ---
+# ActiveRecord::PendingMigrationError:
+#   
+#   
+#   Migrations are pending. To resolve this issue, run:
+#   
+#           bin/rails db:migrate
+#   
+#   You have 95 pending migrations:
+#   
+#   db/migrate/20251012005423_create_certification_categories.rb
+#   db/migrate/20251012010616_create_certificate_requests.rb
+#   db/migrate/20251013142346_create_payments_table.rb
+#   db/migrate/20251015070813_create_lms_settings.rb
+#   db/migrate/20251015070909_create_lms_categories.rb
+#   db/migrate/20251015071013_create_user_skills.rb
+#   db/migrate/20251015071316_create_industries.rb
+#   db/migrate/20251015071408_create_skills.rb
+#   db/migrate/20251015071534_create_lms_courses.rb
+#   db/migrate/20251015071955_create_lms_batches.rb
+#   db/migrate/20251015072208_create_lms_enrollments.rb
+#   db/migrate/20251015073005_create_users.rb
+#   db/migrate/20251015073241_create_lms_quizzes.rb
+#   db/migrate/20251015073427_create_lms_questions.rb
+#   db/migrate/20251015073631_create_lms_quiz_questions.rb
+#   db/migrate/20251015073832_create_lms_quiz_submissions.rb
+#   db/migrate/20251015074058_create_lms_payments.rb
+#   db/migrate/20251015080150_create_zoom_settings.rb
+#   db/migrate/20251015080446_create_lms_assignments.rb
+#   db/migrate/20251015080837_create_lms_assignment_submissions.rb
+#   db/migrate/20251015081115_create_lms_certificates.rb
+#   db/migrate/20251015085442_create_lms_certificate_requests.rb
+#   db/migrate/20251015091737_create_lms_certificate_evaluations.rb
+#   db/migrate/20251015092236_create_lms_live_classes.rb
+#   db/migrate/20251015092407_create_lms_live_class_participants.rb
+#   db/migrate/20251015093025_create_lms_batch_enrollments.rb
+#   db/migrate/20251015093921_create_cohorts.rb
+#   db/migrate/20251015094132_create_cohort_join_requests.rb
+#   db/migrate/20251015094336_create_cohort_mentors.rb
+#   db/migrate/20251015094546_create_cohort_staff.rb
+#   db/migrate/20251015094818_create_cohort_subgroups.rb
+#   db/migrate/20251015095110_create_lms_programs.rb
+#   db/migrate/20251015095630_create_lms_assessments.rb
+#   db/migrate/20251015095857_create_lms_exercises.rb
+#   db/migrate/20251015100550_create_lms_program_courses.rb
+#   db/migrate/20251015101544_create_lms_program_members.rb
+#   db/migrate/20251015105247_create_lms_programming_exercises.rb
+#   db/migrate/20251015110333_create_lms_test_cases.rb
+#   db/migrate/20251015112402_create_education_details.rb
+#   db/migrate/20251015113704_create_work_experiences.rb
+#   db/migrate/20251015154950_create_exercise_submissions.rb
+#   db/migrate/20251015155138_create_lms_programming_exercise_submissions.rb
+#   db/migrate/20251015155306_create_lms_test_case_submissions.rb
+#   db/migrate/20251015174623_create_lms_batch_feedbacks.rb
+#   db/migrate/20251015174718_create_lms_batch_timetables.rb
+#   db/migrate/20251015174829_create_lms_course_progresses.rb
+#   db/migrate/20251015174951_create_lms_course_reviews.rb
+#   db/migrate/20251015175742_create_lms_mentor_requests.rb
+#   db/migrate/20251015175901_create_lms_badges.rb
+#   db/migrate/20251015175958_create_lms_badge_assignments.rb
+#   db/migrate/20251015180440_create_lms_lesson_notes.rb
+#   db/migrate/20251015180542_create_lms_video_watch_durations.rb
+#   db/migrate/20251015180730_create_lms_options.rb
+#   db/migrate/20251015180829_create_certifications.rb
+#   db/migrate/20251015181209_create_course_chapters.rb
+#   db/migrate/20251015181314_create_course_evaluators.rb
+#   db/migrate/20251015181746_create_course_instructors.rb
+#   db/migrate/20251015181948_create_course_lessons.rb
+#   db/migrate/20251015182130_create_evaluator_schedules.rb
+#   db/migrate/20251015182447_create_lms_sources.rb
+#   db/migrate/20251015182718_create_lms_sidebar_items.rb
+#   db/migrate/20251015183016_create_lms_timetable_legends.rb
+#   db/migrate/20251015183144_create_lms_timetable_templates.rb
+#   db/migrate/20251015184606_create_batch_courses.rb
+#   db/migrate/20251015184802_create_chapter_references.rb
+#   db/migrate/20251015185014_create_cohort_web_pages.rb
+#   db/migrate/20251015185425_create_exercise_latest_submissions.rb
+#   db/migrate/20251015185756_create_lesson_references.rb
+#   db/migrate/20251015190112_create_preferred_functions.rb
+#   db/migrate/20251015190333_create_preferred_industries.rb
+#   db/migrate/20251015190524_create_lms_batch_olds.rb
+#   db/migrate/20251015193221_create_lms_course_interests.rb
+#   db/migrate/20251015193424_create_lms_course_mentor_mappings.rb
+#   db/migrate/20251015193714_create_lms_quiz_results.rb
+#   db/migrate/20251015193937_create_lms_zoom_settings.rb
+#   db/migrate/20251015200134_create_related_courses.rb
+#   db/migrate/20251015200334_create_scheduled_flows.rb
+#   db/migrate/20251015200638_create_payment_countries.rb
+#   db/migrate/20251015202259_create_countries.rb
+#   db/migrate/20251016024239_create_functions.rb
+#   db/migrate/20251027072039_add_upcoming_to_lms_courses.rb
+#   db/migrate/20251027120344_create_notifications.rb
+#   db/migrate/20251027134740_create_lms_files.rb
+#   db/migrate/20251027142541_create_lesson_progresses.rb
+#   db/migrate/20251029235620_add_missing_fields_to_lms_categories.rb
+#   db/migrate/20251029235658_add_category_to_lms_batches.rb
+#   db/migrate/20251030001309_add_unique_index_to_course_chapter_name.rb
+#   db/migrate/20251030001404_recreate_course_lesson_foreign_keys.rb
+#   db/migrate/20251030002622_add_batch_id_to_batch_courses.rb
+#   db/migrate/20251030002703_add_evaluator_id_to_batch_courses.rb
+#   db/migrate/20251030003335_add_user_id_to_lms_batch_enrollments.rb
+#   db/migrate/20251030003626_add_published_to_lms_batches.rb
+#   db/migrate/20251030085858_create_job_opportunities.rb
+#   db/migrate/20251030085859_add_current_lesson_to_lms_enrollments.rb
+#   db/migrate/20251030085860_add_batch_id_to_lms_live_classes.rb
+#   ./spec/rails_helper.rb:28:in `<top (required)>'

@@ -20,7 +20,6 @@ gem "aws-sdk-s3", "~> 1.120"
 gem "image_processing", "~> 1.2"
 
 # Background Processing & Caching
-gem "sidekiq", "~> 7.0"
 gem "redis", ">= 4.0.1"
 
 # Pagination & Search
@@ -33,6 +32,15 @@ gem "friendly_id", "~> 5.5"
 
 # Activity Tracking
 gem "public_activity", "~> 2.0"
+
+# Background Processing
+gem "sidekiq", "~> 7.0"
+gem "sidekiq-status", "~> 1.0"
+
+# Payment Processing
+gem "paystack", "~> 0.1"
+gem "stripe", "~> 8.0"
+gem "razorpay", "~> 2.0"
 
 # CORS support
 gem "rack-cors"
@@ -63,5 +71,3 @@ end
 group :test do
   gem "database_cleaner-active_record", "~> 2.1"
 end
-
-

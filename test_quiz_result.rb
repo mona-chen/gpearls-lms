@@ -1,0 +1,1 @@
+puts "=== LMS QuizResult Model Test ==="; result = LmsQuizResult.new(status: "Submitted", attempt_number: 1); puts "Status validation: #{result.errors.full_messages.include?("Status is not included in the list") ? "FAIL" : "PASS"}"; puts "Basic validation works: #{result.valid? ? "YES" : "NO (expected)"}"; puts "Required fields: #{result.errors.full_messages.join(", ")}"

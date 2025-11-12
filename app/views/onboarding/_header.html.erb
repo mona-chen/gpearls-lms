@@ -1,0 +1,84 @@
+<% onboarding_status = Onboarding::OnboardingService.call(user: current_user) %>
+
+<% if current_user&.has_role?("Moderator") && !onboarding_status[:is_onboarded] %>
+<div class="onboarding-parent">
+  <div class="container">
+    <div class="onboarding-skip"><%= t('onboarding.skip') %></div>
+    <div class="page-title">
+      <%= t('onboarding.get_started') %>
+    </div>
+    <div class="onboarding-subtitle">
+      <%= t('onboarding.setup_content_message') %>
+    </div>
+    <div class="onboarding-steps">
+      <a class="onboarding-steps-link" href="/courses/new-course/edit">
+        <svg class="icon icon-md mr-2">
+          <use href="<%= onboarding_status[:course_created] ? '#icon-green-check-circled' : '#icon-disabled-check' %>">
+          </use>
+        </svg>
+        <%= t('onboarding.create_course') %>
+      </a>
+      <% if onboarding_status[:course_created] %>
+        <a class="onboarding-steps-link" href="/courses/<%= onboarding_status[:first_course] %>/outline">
+      <% else %>
+        <a class="onboarding-steps-link" disabled>
+      <% end %>
+        <svg class="icon icon-md mr-2">
+          <use href="<%= onboarding_status[:chapter_created] ? '#icon-green-check-circled' : '#icon-disabled-check' %>">
+          </use>
+        </svg>
+        <%= t('onboarding.add_chapter') %>
+      </a>
+      <% if onboarding_status[:chapter_created] %>
+        <a class="onboarding-steps-link" href="/courses/<%= onboarding_status[:first_course] %>/learn/1.1/edit">
+      <% else %>
+        <a class="onboarding-steps-link" disabled>
+      <% end %>
+        <svg class="icon icon-md mr-2">
+          <use href="<%= onboarding_status[:lesson_created] ? '#icon-green-check-circled' : '#icon-disabled-check' %>">
+          </use>
+        </svg>
+        <%= t('onboarding.add_lesson') %>
+      </a>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const skipButton = document.querySelector('.onboarding-skip');
+    if (skipButton) {
+      skipButton.addEventListener('click', function(e) {
+        skipOnboarding(e);
+      });
+    }
+  });
+
+  function skipOnboarding(e) {
+    e.preventDefault();
+
+    fetch('/api/method/frappe.client.set_value', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+      },
+      body: JSON.stringify({
+        doctype: 'LMS Settings',
+        name: 'LMS Settings',
+        fieldname: 'is_onboarding_complete',
+        value: 1
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.reload();
+      }
+    })
+    .catch(error => {
+      console.error('Error skipping onboarding:', error);
+    });
+  }
+</script>

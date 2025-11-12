@@ -1,0 +1,137 @@
+<% custom_signup_content = LmsSetting.custom_signup_content %>
+
+<form class="signup-form" role="form">
+    <div class="page-card-body">
+        <div class="form-group">
+            <label class="form-label sr-only" for="signup_fullname"> <%= t('signup.full_name') %> </label>
+            <input type="text" id="signup_fullname" class="form-control" placeholder="<%= t('signup.full_name_placeholder') %>"
+            required autofocus>
+        </div>
+        <div class="form-group">
+            <label class="form-label sr-only" for="signup_email"> <%= t('signup.email') %> </label>
+            <input type="email" id="signup_email" class="form-control"
+            placeholder="<%= t('signup.email_placeholder') %>" required>
+        </div>
+
+        <% if LmsSetting.user_category_enabled? %>
+        <div class="form-group">
+            <label class="form-label sr-only"> <%= t('signup.user_category') %> </label>
+            <div class="control-input-wrapper">
+                <div class="control-input flex align-center">
+                    <select type="text" id="user_category" data-fieldname="user_category" style="color: var(--text-light)"
+                    class="input-with-feedback form-control ellipsis" data-fieldtype="Select" required>
+                        <option value=""> <%= t('signup.category') %> </option>
+                        <option value="Business Owner"> <%= t('signup.business_owner') %> </option>
+                        <option value="Manager (Sales/Marketing/Customer)"> <%= t('signup.manager') %> </option>
+                        <option value="Employee"> <%= t('signup.employee') %> </option>
+                        <option value="Student"> <%= t('signup.student') %> </option>
+                        <option value="Freelancer/Just looking"> <%= t('signup.freelancer') %> </option>
+                        <option value="Others"> <%= t('signup.others') %> </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <% end %>
+
+        <% if custom_signup_content.present? %>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <span class="input-area">
+                    <input type="checkbox" autocomplete="off" class="input-with-feedback"
+                        data-fieldtype="Check" data-fieldname="terms" id="signup-terms" required>
+                    </span>
+                    <span class="label-area">
+                    <%= custom_signup_content.html_safe %>
+                    </span>
+                </label>
+            </div>
+        </div>
+        <% end %>
+    </div>
+    <div class="page-card-actions">
+        <button class="btn btn-sm btn-primary btn-block btn-signup"
+            type="submit"><%= t('signup.sign_up') %></button>
+
+        <p class="text-center sign-up-message">
+            <a href="#login" class="blue"><%= t('signup.have_account') %></a>
+        </p>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userCategorySelect = document.getElementById('user_category');
+        if (userCategorySelect) {
+            userCategorySelect.addEventListener('change', function(e) {
+                styleCategory(e);
+            });
+        }
+
+        const signupForm = document.querySelector('.signup-form');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function(e) {
+                signup(e);
+            });
+        }
+    });
+
+    function styleCategory(e) {
+        const categoryColor = e.currentTarget.value ? 'var(--text-color)' : 'var(--text-muted)';
+        e.currentTarget.style.color = categoryColor;
+    }
+
+    function signup(e) {
+        e.preventDefault();
+        const email = (document.getElementById('signup_email').value || '').trim();
+        const fullName = (document.getElementById('signup_fullname').value || '').trim();
+
+        if (!email || !validateEmail(email) || !fullName) {
+            showStatus('<%= t('signup.valid_email_name_required') %>', 'red');
+            return false;
+        }
+
+        const formData = {
+            email: email,
+            full_name: fullName,
+            verify_terms: document.getElementById('signup-terms')?.checked ? 1 : 0,
+            user_category: document.getElementById('user_category')?.value || ''
+        };
+
+        fetch('/api/method/lms.lms.user.sign_up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message && data.message.success) {
+                showStatus('<%= t('signup.success') %>', 'green');
+                // Redirect to login or dashboard
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                showStatus(data.message || '<%= t('signup.error') %>', 'red');
+            }
+        })
+        .catch(error => {
+            console.error('Signup error:', error);
+            showStatus('<%= t('signup.error') %>', 'red');
+        });
+
+        return false;
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function showStatus(message, color) {
+        // Implement status display logic
+        console.log(message, color);
+    }
+</script>

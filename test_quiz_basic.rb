@@ -1,0 +1,1 @@
+puts "=== LMS Quiz Model Test ==="; puts "Model loaded: #{LmsQuiz.new.class}"; puts "Table exists: #{ActiveRecord::Base.connection.table_exists?("lms_quizzes")}"; quiz = LmsQuiz.new(name: "Test", title: "Test", description: "Test"); puts "Basic validation works: #{quiz.valid? ? "YES" : "NO"}"; puts "Required fields: #{quiz.errors.full_messages.join(", ")}"
