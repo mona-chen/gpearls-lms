@@ -1,0 +1,19 @@
+<p>Dear <%= @student_name %>,</p>
+<br>
+<p>This is a friendly reminder that your batch is starting soon!</p>
+<br>
+<p><strong>Batch:</strong> <%= @batch_title %></p>
+<p><strong>Course:</strong> <%= @course_title %></p>
+<p><strong>Start Date:</strong> <%= @start_date.strftime("%B %d, %Y") %></p>
+<p><strong>Time:</strong> <%= @start_time.strftime("%I:%M %p") %></p>
+<% if @medium %>
+<p><strong>Medium:</strong> <%= @medium %></p>
+<% end %>
+<br>
+<p>Please make sure you're ready and have all necessary materials.</p>
+<p><a href="<%= @batch_url %>">View Batch Details</a></p>
+<br>
+<p>We're excited to start this learning journey with you!</p>
+<br>
+<p>Best regards,</p>
+<p>LMS Team</p>

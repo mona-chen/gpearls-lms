@@ -1,0 +1,18 @@
+<p>Dear <%= @user_name %>,</p>
+<br>
+<p>This is a reminder that your payment for the course is pending.</p>
+<br>
+<p><strong>Course:</strong> <%= @course_title %></p>
+<p><strong>Amount Due:</strong> <%= @currency %><%= @amount %></p>
+<p><strong>Due Date:</strong> <%= @due_date.strftime("%B %d, %Y") %></p>
+<br>
+<p>To complete your enrollment and secure your spot in the course, please make the payment at your earliest convenience.</p>
+<br>
+<p><a href="<%= @payment_url %>" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Make Payment Now</a></p>
+<br>
+<p>If you've already made the payment, please disregard this email.</p>
+<br>
+<p>For any payment-related queries, please contact our support team.</p>
+<br>
+<p>Best regards,</p>
+<p>LMS Team</p>

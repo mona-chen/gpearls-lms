@@ -1,0 +1,14 @@
+<p>Dear <%= @instructor_name %>,</p>
+<br>
+<p>A new assignment submission has been received for your course.</p>
+<br>
+<p><strong>Course:</strong> <%= @course_title %></p>
+<p><strong>Assignment:</strong> <%= @assignment_title %></p>
+<p><strong>Student:</strong> <%= @student_name %></p>
+<p><strong>Submission Date:</strong> <%= @submission_date.strftime("%B %d, %Y at %I:%M %p") %></p>
+<br>
+<p>Please review the submission at your earliest convenience.</p>
+<p><a href="<%= @assignment_url %>">View Assignment Submission</a></p>
+<br>
+<p>Best regards,</p>
+<p>LMS System</p>

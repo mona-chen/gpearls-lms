@@ -1,0 +1,19 @@
+<p>Dear <%= @student_name %>,</p>
+<br>
+<p>This is a reminder that you have a live class scheduled soon.</p>
+<br>
+<p><strong>Class:</strong> <%= @class_title %></p>
+<p><strong>Course:</strong> <%= @course_title %></p>
+<p><strong>Date & Time:</strong> <%= @start_time.strftime("%B %d, %Y at %I:%M %p") %></p>
+<% if @instructor %>
+<p><strong>Instructor:</strong> <%= @instructor %></p>
+<% end %>
+<br>
+<% if @meeting_url %>
+<p><strong>Join the class:</strong> <a href="<%= @meeting_url %>">Click here to join</a></p>
+<% end %>
+<br>
+<p>Please make sure to join on time. We look forward to seeing you in class!</p>
+<br>
+<p>Best regards,</p>
+<p>LMS Team</p>

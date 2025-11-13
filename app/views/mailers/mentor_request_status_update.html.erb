@@ -1,0 +1,18 @@
+<div>
+  <p>Dear <%= @member_name %>,</p>
+  <br>
+  <% if @status == 'accepted' %>
+    <p>Great news! Your application to become a mentor for the course "<%= @course_title %>" has been <strong>accepted</strong>.</p>
+    <p>You can now start mentoring students in this course. <a href="<%= @course_url %>">View Course Details</a></p>
+  <% elsif @status == 'rejected' %>
+    <p>We regret to inform you that your application to become a mentor for the course "<%= @course_title %>" has been <strong>declined</strong>.</p>
+    <p>Thank you for your interest. Please feel free to apply for other courses.</p>
+  <% else %>
+    <p>The status of your mentor application for the course "<%= @course_title %>" has been updated to: <strong><%= @status.humanize %></strong>.</p>
+  <% end %>
+  <br>
+  <p>If you have any questions, please don't hesitate to contact us.</p>
+  <br>
+  <p>Thanks and Regards,</p>
+  <p>Team School.</p>
+</div>

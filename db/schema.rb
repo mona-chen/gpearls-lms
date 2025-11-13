@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
   create_table "batch_courses", force: :cascade do |t|
     t.string "name", null: false
     t.string "owner", null: false
@@ -121,6 +121,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
     t.index ["parent"], name: "index_chapter_references_on_parent"
     t.index ["parentfield"], name: "index_chapter_references_on_parentfield"
     t.index ["parenttype"], name: "index_chapter_references_on_parenttype"
+  end
+
+  create_table "code_revisions", force: :cascade do |t|
+    t.text "code", null: false
+    t.string "section_id", null: false
+    t.string "section_type", null: false
+    t.integer "user_id", null: false
+    t.text "notes"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["section_id", "section_type", "user_id"], name: "index_code_revisions_on_section_id_and_section_type_and_user_id"
+    t.index ["user_id", "created_at"], name: "index_code_revisions_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_code_revisions_on_user_id"
   end
 
   create_table "cohort_join_requests", force: :cascade do |t|
@@ -2509,6 +2523,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
     t.index ["parenttype"], name: "index_preferred_industries_on_parenttype"
   end
 
+  create_table "pwa_install_trackings", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "action", null: false
+    t.string "platform", null: false
+    t.text "user_agent"
+    t.datetime "timestamp", null: false
+    t.string "ip_address"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_pwa_install_trackings_on_action"
+    t.index ["platform"], name: "index_pwa_install_trackings_on_platform"
+    t.index ["timestamp"], name: "index_pwa_install_trackings_on_timestamp"
+    t.index ["user_id", "timestamp"], name: "index_pwa_install_trackings_on_user_id_and_timestamp"
+    t.index ["user_id"], name: "index_pwa_install_trackings_on_user_id"
+  end
+
   create_table "related_courses", force: :cascade do |t|
     t.string "name", null: false
     t.string "owner", null: false
@@ -2575,6 +2606,58 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
     t.index ["parentfield"], name: "index_scheduled_flows_on_parentfield"
     t.index ["parenttype"], name: "index_scheduled_flows_on_parenttype"
     t.index ["start_time"], name: "index_scheduled_flows_on_start_time"
+  end
+
+  create_table "scorm_completions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "scorm_package_id", null: false
+    t.integer "course_lesson_id", null: false
+    t.integer "completion_status", default: 0
+    t.integer "success_status", default: 0
+    t.float "score_raw"
+    t.float "score_min"
+    t.float "score_max"
+    t.integer "total_time"
+    t.integer "session_time"
+    t.text "suspend_data"
+    t.string "location"
+    t.json "interactions_data"
+    t.json "objectives_data"
+    t.json "scorm_data"
+    t.datetime "started_at"
+    t.datetime "last_accessed_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["completion_status"], name: "index_scorm_completions_on_status"
+    t.index ["course_lesson_id"], name: "index_scorm_completions_on_course_lesson_id"
+    t.index ["course_lesson_id"], name: "index_scorm_completions_on_lesson"
+    t.index ["last_accessed_at"], name: "index_scorm_completions_on_access_time"
+    t.index ["scorm_package_id"], name: "index_scorm_completions_on_scorm_package_id"
+    t.index ["user_id", "scorm_package_id"], name: "unique_user_scorm_completion", unique: true
+    t.index ["user_id"], name: "index_scorm_completions_on_user_id"
+  end
+
+  create_table "scorm_packages", force: :cascade do |t|
+    t.integer "course_lesson_id", null: false
+    t.integer "uploaded_by_id", null: false
+    t.string "title", null: false
+    t.text "manifest_file"
+    t.text "launch_file"
+    t.string "version"
+    t.integer "status", default: 0
+    t.text "manifest_content"
+    t.text "extracted_path"
+    t.text "error_message"
+    t.json "metadata"
+    t.datetime "extracted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_lesson_id"], name: "index_scorm_packages_on_course_lesson_id"
+    t.index ["course_lesson_id"], name: "index_scorm_packages_on_lesson"
+    t.index ["status"], name: "index_scorm_packages_on_status"
+    t.index ["uploaded_by_id"], name: "index_scorm_packages_on_uploaded_by_id"
+    t.index ["uploaded_by_id"], name: "index_scorm_packages_on_uploader"
   end
 
   create_table "skills", force: :cascade do |t|
@@ -2708,6 +2791,25 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
     t.index ["status"], name: "index_users_on_status"
     t.index ["students_taught_count"], name: "index_users_on_students_taught_count"
     t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  create_table "video_watch_durations", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "course_lesson_id", null: false
+    t.string "video_url", null: false
+    t.integer "duration_watched", default: 0
+    t.integer "video_length", default: 0
+    t.integer "last_position", default: 0
+    t.json "watch_sessions"
+    t.datetime "first_watched_at"
+    t.datetime "last_watched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_lesson_id"], name: "index_video_durations_on_course_lesson"
+    t.index ["course_lesson_id"], name: "index_video_watch_durations_on_course_lesson_id"
+    t.index ["user_id", "course_lesson_id", "video_url"], name: "unique_user_lesson_video", unique: true
+    t.index ["user_id", "updated_at"], name: "index_video_durations_on_user_time"
+    t.index ["user_id"], name: "index_video_watch_durations_on_user_id"
   end
 
   create_table "work_experiences", force: :cascade do |t|
@@ -2845,6 +2947,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
   add_foreign_key "certificate_requests", "evaluators"
   add_foreign_key "certificate_requests", "users"
   add_foreign_key "chapter_references", "course_chapters", column: "chapter"
+  add_foreign_key "code_revisions", "users"
   add_foreign_key "course_chapters", "lms_courses", column: "course"
   add_foreign_key "course_evaluators", "users", column: "evaluator"
   add_foreign_key "course_instructors", "users", column: "instructor"
@@ -2938,8 +3041,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_08_120447) do
   add_foreign_key "notifications", "users"
   add_foreign_key "payments", "users"
   add_foreign_key "preferred_industries", "industries", column: "industry"
+  add_foreign_key "pwa_install_trackings", "users"
   add_foreign_key "related_courses", "lms_courses", column: "course"
+  add_foreign_key "scorm_completions", "course_lessons"
+  add_foreign_key "scorm_completions", "scorm_packages"
+  add_foreign_key "scorm_completions", "users"
+  add_foreign_key "scorm_packages", "course_lessons"
+  add_foreign_key "scorm_packages", "users", column: "uploaded_by_id"
   add_foreign_key "user_skills", "users"
+  add_foreign_key "video_watch_durations", "course_lessons"
+  add_foreign_key "video_watch_durations", "users"
   add_foreign_key "workflow_states", "workflows"
   add_foreign_key "workflow_transitions", "workflows"
   add_foreign_key "zoom_settings", "users", column: "created_by_id"

@@ -127,6 +127,51 @@ Rails.application.routes.draw do
   get "api/payments/methods", to: "api/payments#payment_methods"
   delete "api/payments/methods/:id", to: "api/payments#remove_payment_method"
 
+  # Code Revisions (Programming Exercise Auto-save)
+  post "api/autosave-section", to: "api/code_revisions#autosave_section"
+  get "api/code-revisions/:section", to: "api/code_revisions#get_latest_revision"
+  get "api/code-revisions/history/:section", to: "api/code_revisions#get_revision_history"
+  post "api/code-revisions/:id/restore", to: "api/code_revisions#restore_revision"
+  
+  # Video Analytics and Tracking
+  post "api/track-video-duration", to: "api/video_analytics#track_duration"
+  get "api/video-analytics/:lesson_id", to: "api/video_analytics#lesson_analytics"
+  get "api/my-video-progress/:lesson_id", to: "api/video_analytics#my_progress"
+  get "api/video-heatmap/:course_id", to: "api/video_analytics#course_video_heatmap"
+  
+  # SCORM Package Support
+  post "api/scorm/upload", to: "api/scorm#upload"
+  get "api/scorm/:id/launch", to: "api/scorm#launch"
+  post "api/scorm/:id/track", to: "api/scorm#track"
+  get "api/scorm/:id/get-value", to: "api/scorm#get_value"
+  post "api/scorm/:id/set-value", to: "api/scorm#set_value"
+  post "api/scorm/:id/commit", to: "api/scorm#commit"
+  get "api/scorm/:id/analytics", to: "api/scorm#analytics"
+  get "api/scorm/packages/:lesson_id", to: "api/scorm#packages_for_lesson"
+  delete "api/scorm/:id", to: "api/scorm#destroy"
+  
+  # Advanced Analytics
+  get "api/advanced-analytics/learning-heatmap/:course_id", to: "api/advanced_analytics#learning_heatmap"
+  get "api/advanced-analytics/engagement/:course_id", to: "api/advanced_analytics#engagement_analytics"
+  get "api/advanced-analytics/progress-distribution/:course_id", to: "api/advanced_analytics#progress_distribution"
+  get "api/advanced-analytics/dashboard/:course_id", to: "api/advanced_analytics#analytics_dashboard"
+  get "api/advanced-analytics/predictive/:course_id", to: "api/advanced_analytics#predictive_analytics"
+  get "api/advanced-analytics/learning-patterns/:course_id", to: "api/advanced_analytics#learning_patterns"
+  get "api/advanced-analytics/content-effectiveness/:course_id", to: "api/advanced_analytics#content_effectiveness"
+  get "api/advanced-analytics/user-journey/:course_id", to: "api/advanced_analytics#user_journey_analysis"
+  get "api/advanced-analytics/real-time/:course_id", to: "api/advanced_analytics#real_time_analytics"
+  post "api/advanced-analytics/custom-report", to: "api/advanced_analytics#generate_custom_report"
+  get "api/advanced-analytics/export/:course_id", to: "api/advanced_analytics#export_analytics"
+  get "api/advanced-analytics/system-analytics", to: "api/advanced_analytics#system_analytics"
+  
+  # PWA Support
+  get "api/pwa-manifest", to: "api/pwa#manifest"
+  get "api/pwa/service-worker", to: "api/pwa#service_worker"
+  post "api/pwa/install-prompt", to: "api/pwa#track_install_prompt"
+  get "api/pwa/offline-content", to: "api/pwa#offline_content"
+  post "api/pwa/sync-offline-data", to: "api/pwa#sync_offline_data"
+  get "api/pwa/cache-status", to: "api/pwa#cache_status"
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
