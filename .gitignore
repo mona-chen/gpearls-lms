@@ -31,3 +31,103 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Rails specific
+*.rbc
+capybara-*.html
+.rspec
+/log
+/tmp
+/db/*.sqlite3
+/db/*.sqlite3-*
+/public/system
+/coverage/
+/spec/tmp
+*.egg-info/
+.zeus.sock
+
+# Test files and scripts
+/test_*.rb
+/test_*.sh
+/final_production_test.rb
+/create_comprehensive_sample_data.rb
+/temp_user_methods.rb
+/create_certificates.rb
+
+# Log files
+*.log
+rails.log
+rails_server.log
+test_results.txt
+
+# Temporary and development files
+cookies.txt
+cookiejar.txt
+
+# Documentation files that shouldn't be in version control
+FINAL_TESTING_ACHIEVEMENT.md
+MIGRATION_COMPLETE_SUMMARY.md
+ONBOARDING_EMAILS_JOBS_COMPLETE.md
+SYSTEM_RUNNING_STATUS.md
+TEST_COMPLETION_SUMMARY.md
+
+# Editor and OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+/node_modules
+/frontend/node_modules
+
+# Compiled assets
+/public/assets
+.sass-cache
+
+# Rspec
+/coverage/
+
+# Spring
+/spring/*.pid
+
+# Byebug
+.byebug_history
+
+# SimpleCov
+/coverage/
+
+# Environment variable files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*~
+
+# Backup files
+*.bak
+*.backup
+*.orig
