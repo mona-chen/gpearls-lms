@@ -31,7 +31,7 @@ gem "acts_as_list", "~> 1.0"
 gem "friendly_id", "~> 5.5"
 
 # Activity Tracking
-gem "public_activity", "~> 2.0"
+gem "public_activity", "~> 3.0"
 
 # Background Processing
 gem "sidekiq", "~> 7.0"
