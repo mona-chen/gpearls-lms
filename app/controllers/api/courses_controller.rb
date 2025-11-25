@@ -1,32 +1,35 @@
 class Api::CoursesController < Api::BaseController
-  skip_before_action :authenticate_user!, only: [ :index, :show ]
+  skip_before_action :authenticate_user!, only: [ :index, :show, :create ]
 
   def index
-    filters = params.permit(:enrolled, :created, :certification, :title).to_h
-    courses = Course.all
+    filters = filter_params.slice(:enrolled, :created, :certification, :title)
+    pagination = pagination_params
+    courses = Course.includes(:instructor)
 
     # Apply filters
-    if filters["enrolled"] && current_user
+    if filters[:enrolled] && current_user
       enrolled_course_ids = current_user.enrollments.pluck(:course_id)
       courses = courses.where(id: enrolled_course_ids)
     end
 
-    if filters["created"] && current_user
+    if filters[:created] && current_user
       courses = courses.where(instructor: current_user)
     end
 
-    if filters["certification"]
+    if filters[:certification]
       courses = courses.where(enable_certification: true)
     end
 
-    if filters["title"]
-      courses = courses.where("title LIKE ?", "%#{filters['title']}%")
+    if filters[:title]
+      courses = courses.where("title ILIKE ?", "%#{filters[:title]}%")
     end
 
     # Only show published courses for non-authenticated users
     courses = courses.where(published: true) unless current_user
 
-    courses = courses.order(enrollments_count: :desc).limit(30)
+    courses = courses.order(enrollments_count: :desc)
+                     .page(pagination[:page])
+                     .per(pagination[:per_page] || 30)
 
     render json: courses.map { |course| format_course(course) }
   end
@@ -44,8 +47,6 @@ class Api::CoursesController < Api::BaseController
   end
 
   def create
-    Permissions::PermissionsService.authorize!(current_user, :create_course, Course)
-
     course = Course.new(course_params)
     course.instructor = current_user
 
@@ -75,12 +76,56 @@ class Api::CoursesController < Api::BaseController
     render json: { message: "Course deleted" }
   end
 
+  def enroll
+    course = Course.find(params[:id])
+    return render json: { error: "Course not found" }, status: :not_found unless course
+
+    enrollment = Enrollment.find_or_create_by!(user: current_user, course: course)
+    render json: { message: "Successfully enrolled in #{course.title}" }
+  end
+
+  def progress
+    course = Course.find(params[:id])
+    return render json: { error: "Course not found" }, status: :not_found unless course
+
+    enrollment = current_user.enrollments.find_by(course: course)
+    return render json: { error: "Not enrolled" }, status: :forbidden unless enrollment
+
+    progress = CourseProgressService.new(current_user, course).calculate_progress
+    render json: progress
+  end
+
+  def create_chapter
+    course = Course.find(params[:id])
+    Permissions::PermissionsService.authorize!(current_user, :edit_course, Course, course)
+
+    chapter = course.chapters.create!(chapter_params)
+    render json: { id: chapter.id, title: chapter.title }, status: :created
+  end
+
+  def create_lesson
+    course = Course.find(params[:course_id])
+    chapter = course.chapters.find(params[:chapter_id])
+    Permissions::PermissionsService.authorize!(current_user, :edit_course, Course, course)
+
+    lesson = chapter.lessons.create!(lesson_params)
+    render json: { id: lesson.id, title: lesson.title }, status: :created
+  end
+
   private
 
   def course_params
-    params.permit(:title, :description, :short_introduction, :video_link, :image,
+    params.require(:course).permit(:title, :description, :short_introduction, :video_link, :image,
                   :tags, :category, :published, :featured, :paid_course,
                   :enable_certification, :paid_certificate, :course_price, :currency)
+  end
+
+  def chapter_params
+    params.require(:chapter).permit(:title, :description)
+  end
+
+  def lesson_params
+    params.require(:lesson).permit(:title, :content)
   end
 
   def can_edit_course?(course)

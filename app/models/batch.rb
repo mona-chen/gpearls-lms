@@ -1,10 +1,12 @@
 class Batch < ApplicationRecord
   self.table_name = "lms_batches"
+  belongs_to :course
   belongs_to :instructor, class_name: "User", optional: true
   has_many :batch_enrollments, dependent: :destroy
   has_many :batch_courses, dependent: :destroy
   has_many :courses, through: :batch_courses
-  has_many :users, through: :batch_enrollments, source: :user
+   has_many :users, through: :batch_enrollments, source: :user
+   alias_method :students, :users
   has_many :assessments, dependent: :destroy
   has_many :live_classes, dependent: :destroy
   has_many :batch_timetables, foreign_key: :parent, primary_key: :name, dependent: :destroy
@@ -50,7 +52,19 @@ class Batch < ApplicationRecord
 
   # Frappe compatibility methods
   def name
-    title.parameterize.gsub("-", "_")
+    base_slug = title.parameterize
+    return base_slug if new_record?
+
+    # Check for duplicates and append number if needed
+    existing_names = self.class.where.not(id: id).pluck(:title).map { |t| t.parameterize }
+    return base_slug unless existing_names.include?(base_slug)
+
+    count = 2
+    loop do
+      candidate = "#{base_slug}-#{count}"
+      break candidate unless existing_names.include?(candidate)
+      count += 1
+    end
   end
 
   def status
@@ -64,7 +78,37 @@ class Batch < ApplicationRecord
   end
 
   def active?
-    status == "Active"
+    return true if start_date.nil? && end_date.nil? # Consider active if no date restrictions
+    published? && (start_date.nil? || start_date <= Time.current) && (end_date.nil? || end_date > Time.current)
+  end
+
+  def student_count
+    users.count
+  end
+
+  def is_published?
+    published?
+  end
+
+  def is_active?
+    active?
+  end
+
+  def can_enroll?(user)
+    return false unless published?
+    return false if users.include?(user)
+    return true if max_students.nil?
+    users.count < max_students
+  end
+
+  def enroll_student(user)
+    return nil if users.include?(user)
+
+    batch_enrollments.create!(user: user)
+  end
+
+  def self.by_course(course)
+    where(course: course)
   end
 
   def upcoming?
@@ -320,41 +364,67 @@ class Batch < ApplicationRecord
     false
   end
 
+  def batch_details_raw
+    # Not implemented in current schema, return batch_details for compatibility
+    batch_details
+  end
+
+  def meta_image
+    # Not implemented in current schema, return nil for compatibility
+    nil
+  end
+
+  def custom_component
+    # Not implemented in current schema, return nil for compatibility
+    nil
+  end
+
+  def custom_script
+    # Not implemented in current schema, return nil for compatibility
+    nil
+  end
+
   def to_frappe_format
     {
-      name: name,
-      title: title,
-      start_date: start_date&.strftime("%Y-%m-%d"),
-      end_date: end_date&.strftime("%Y-%m-%d"),
-      start_time: start_time&.strftime("%H:%M:%S"),
-      end_time: end_time&.strftime("%H:%M:%S"),
-      timezone: timezone,
-      description: description,
-        batch_details: additional_info,
-      published: published,
-      allow_self_enrollment: allow_self_enrollment,
-      certification: certificate_enabled,
-      seat_count: seat_count,
-      evaluation_end_date: evaluation_end_date,
-      medium: medium,
-      category: category,
-      confirmation_email_template: confirmation_email_template,
-      instructors: instructors_list,
-      zoom_account: zoom_account,
-      paid_batch: paid_batch,
-      amount: amount,
-      currency: currency,
-      amount_usd: amount_usd,
-      show_live_class: show_live_class,
-      allow_future: allow_future,
-      status: status,
-      current_seats: current_seats,
-      seats_left: seats_left,
-      full: full?,
-      accept_enrollments: accept_enrollments?,
-      courses: batch_courses.map(&:to_frappe_format),
-      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
-      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
+      "name" => name,
+      "title" => title,
+      "start_date" => start_date&.strftime("%Y-%m-%d"),
+      "end_date" => end_date&.strftime("%Y-%m-%d"),
+      "start_time" => start_time&.strftime("%H:%M:%S"),
+      "end_time" => end_time&.strftime("%H:%M:%S"),
+      "timezone" => timezone,
+      "published" => published,
+      "allow_self_enrollment" => allow_self_enrollment,
+      "certification" => certificate_enabled,
+      "description" => description,
+      "batch_details" => additional_info,
+      "batch_details_raw" => batch_details_raw,
+      "medium" => medium,
+      "category" => category,
+      "confirmation_email_template" => confirmation_email_template,
+      "seat_count" => seat_count,
+      "evaluation_end_date" => evaluation_end_date,
+      "meta_image" => meta_image,
+      "instructors" => instructors_list,
+      "zoom_account" => zoom_account,
+      "paid_batch" => paid_batch,
+      "amount" => amount,
+      "currency" => currency,
+      "amount_usd" => amount_usd,
+      "show_live_class" => show_live_class,
+      "allow_future" => allow_future,
+      "custom_component" => custom_component,
+      "custom_script" => custom_script,
+      "courses" => batch_courses.map(&:to_frappe_format),
+      "timetable" => batch_timetables.map(&:to_frappe_format),
+      "timetable_legends" => [], # Not implemented yet
+      "status" => status,
+      "current_seats" => current_seats,
+      "seats_left" => seats_left,
+      "full" => full?,
+      "accept_enrollments" => accept_enrollments?,
+      "creation" => created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "modified" => updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 

@@ -9,11 +9,11 @@ class UserPaymentMethod < ApplicationRecord
   validates :payment_gateway, presence: true
   validates :method_type, presence: true, inclusion: { in: %w[paystack stripe razorpay paypal flutterwave] }
   validates :status, presence: true, inclusion: { in: %w[active inactive expired revoked] }
-  validates :customer_code, presence: true, if: -> { method_type == 'paystack' }
+  validates :customer_code, presence: true, if: -> { method_type == "paystack" }
   validates :customer_id, presence: true, if: -> { %w[stripe razorpay].include?(method_type) }
-  validates :authorization_code, presence: true, if: -> { method_type == 'paystack' && last4.present? }
+  validates :authorization_code, presence: true, if: -> { method_type == "paystack" && last4.present? }
   validates :last4, presence: true, if: -> { authorization_code.present? }
-  validates :exp_month, :exp_year, presence: true, if: -> { last4.present? && method_type != 'paypal' }
+  validates :exp_month, :exp_year, presence: true, if: -> { last4.present? && method_type != "paypal" }
   validate :validate_expiration_date, if: -> { exp_month.present? && exp_year.present? }
   validate :ensure_single_default_method
 
@@ -23,9 +23,9 @@ class UserPaymentMethod < ApplicationRecord
   after_update :update_default_method, if: :saved_change_to_is_default?
 
   # Scopes
-  scope :active, -> { where(status: 'active') }
-  scope :inactive, -> { where(status: 'inactive') }
-  scope :expired, -> { where(status: 'expired') }
+  scope :active, -> { where(status: "active") }
+  scope :inactive, -> { where(status: "inactive") }
+  scope :expired, -> { where(status: "expired") }
   scope :default, -> { where(is_default: true) }
   scope :by_type, ->(type) { where(method_type: type) }
   scope :by_gateway, ->(gateway) { where(payment_gateway: gateway) }
@@ -46,20 +46,20 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def self.expiring_soon(days = 30)
-    where('exp_month <= ? AND exp_year <= ?', Date.current.month + (days / 30), Date.current.year)
+    where("exp_month <= ? AND exp_year <= ?", Date.current.month + (days / 30), Date.current.year)
   end
 
   # Instance methods
   def active?
-    status == 'active'
+    status == "active"
   end
 
   def inactive?
-    status == 'inactive'
+    status == "inactive"
   end
 
   def expired?
-    status == 'expired' || card_expired?
+    status == "expired" || card_expired?
   end
 
   def default?
@@ -67,7 +67,7 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def card?
-    last4.present? && method_type != 'paypal'
+    last4.present? && method_type != "paypal"
   end
 
   def bank_account?
@@ -75,25 +75,25 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def card_type_display
-    return 'Card' unless card?
+    return "Card" unless card?
 
     case card_type&.downcase
-    when 'visa'
-      'Visa'
-    when 'mastercard'
-      'Mastercard'
-    when 'amex'
-      'American Express'
-    when 'discover'
-      'Discover'
-    when 'diners'
-      'Diners Club'
-    when 'jcb'
-      'JCB'
-    when 'unionpay'
-      'UnionPay'
+    when "visa"
+      "Visa"
+    when "mastercard"
+      "Mastercard"
+    when "amex"
+      "American Express"
+    when "discover"
+      "Discover"
+    when "diners"
+      "Diners Club"
+    when "jcb"
+      "JCB"
+    when "unionpay"
+      "UnionPay"
     else
-      card_type&.titleize || 'Card'
+      card_type&.titleize || "Card"
     end
   end
 
@@ -101,8 +101,8 @@ class UserPaymentMethod < ApplicationRecord
     return nil unless last4.present?
 
     case method_type
-    when 'paypal'
-      '****'
+    when "paypal"
+      "****"
     else
       "**** **** **** #{last4}"
     end
@@ -140,24 +140,24 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def deactivate!
-    update!(status: 'inactive', is_default: false)
+    update!(status: "inactive", is_default: false)
   end
 
   def expire!
-    update!(status: 'expired', is_default: false)
+    update!(status: "expired", is_default: false)
   end
 
   def revoke!
-    update!(status: 'revoked', is_default: false)
+    update!(status: "revoked", is_default: false)
   end
 
   def refresh_gateway_data!
     case method_type
-    when 'paystack'
+    when "paystack"
       refresh_paystack_data
-    when 'stripe'
+    when "stripe"
       refresh_stripe_data
-    when 'razorpay'
+    when "razorpay"
       refresh_razorpay_data
     end
   rescue => e
@@ -165,29 +165,29 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def charge(amount, description = nil)
-    return { success: false, error: 'Payment method cannot be used' } unless can_be_used?
+    return { success: false, error: "Payment method cannot be used" } unless can_be_used?
 
     payment = Payment.create!(
       user: user,
       amount: amount,
       currency: payment_gateway.supported_currencies.first,
       payment_method: method_type,
-      payment_status: 'Pending',
+      payment_status: "Pending",
       description: description
     )
 
     begin
       service = get_gateway_service
       result = case method_type
-              when 'paystack'
+      when "paystack"
                 service.charge_authorization(payment, authorization_code)
-              when 'stripe'
+      when "stripe"
                 service.charge_customer(payment, customer_id)
-              when 'razorpay'
+      when "razorpay"
                 service.charge_customer(payment, customer_id)
-              else
+      else
                 raise Payments::Error::UnsupportedGatewayError, "Method #{method_type} not supported"
-              end
+      end
 
       {
         success: true,
@@ -222,15 +222,15 @@ class UserPaymentMethod < ApplicationRecord
       bank_name: bank_name,
       account_name: account_name,
       account_number_last4: account_number_last4,
-      created_at: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      modified_at: updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+      created_at: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      modified_at: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
   private
 
   def set_defaults
-    self.status ||= 'active'
+    self.status ||= "active"
     self.is_default ||= false
   end
 
@@ -249,7 +249,7 @@ class UserPaymentMethod < ApplicationRecord
 
   def ensure_single_default_method
     if is_default? && user.user_payment_methods.where(is_default: true).where.not(id: id).exists?
-      errors.add(:is_default, 'Only one payment method can be set as default')
+      errors.add(:is_default, "Only one payment method can be set as default")
     end
   end
 
@@ -261,24 +261,24 @@ class UserPaymentMethod < ApplicationRecord
 
       if expiry_date.year < Date.current.year ||
          (expiry_date.year == Date.current.year && expiry_date.month < Date.current.month)
-        errors.add(:exp_year, 'Card has expired')
+        errors.add(:exp_year, "Card has expired")
       end
 
       if expiry_date > Date.current + 10.years
-        errors.add(:exp_year, 'Expiry year is too far in the future')
+        errors.add(:exp_year, "Expiry year is too far in the future")
       end
     rescue ArgumentError
-      errors.add(:exp_month, 'Invalid expiry date')
+      errors.add(:exp_month, "Invalid expiry date")
     end
   end
 
   def get_gateway_service
     case method_type
-    when 'paystack'
-      Paystack::PaystackService.new(payment_gateway)
-    when 'stripe'
+    when "paystack"
+      PaystackIntegration::PaystackService.new(payment_gateway)
+    when "stripe"
       Stripe::StripeService.new(payment_gateway)
-    when 'razorpay'
+    when "razorpay"
       Razorpay::RazorpayService.new(payment_gateway)
     else
       raise Payments::Error::UnsupportedGatewayError, "Method #{method_type} not supported"
@@ -286,7 +286,7 @@ class UserPaymentMethod < ApplicationRecord
   end
 
   def refresh_paystack_data
-    service = Paystack::PaystackService.new(payment_gateway)
+    service = PaystackIntegration::PaystackService.new(payment_gateway)
     customer = service.get_customer(customer_code)
 
     if customer.present?

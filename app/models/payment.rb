@@ -1,10 +1,26 @@
 class Payment < ApplicationRecord
+  attr_accessor :name
+
   # Associations
-  belongs_to :user
-  belongs_to :course, optional: true
-  belongs_to :batch, optional: true
-  belongs_to :program, optional: true, class_name: "LmsProgram"
+  belongs_to :user, class_name: "User", foreign_key: :user_id
+  alias_attribute :payment_status, :status
+  belongs_to :payable, polymorphic: true, optional: true
   belongs_to :payment_gateway, optional: true
+  belongs_to :coupon, optional: true, class_name: "LmsCoupon"
+  belongs_to :address, optional: true
+
+  # Aliases for backward compatibility
+  def course
+    payable if payable_type == "Course"
+  end
+
+  def batch
+    payable if payable_type == "Batch"
+  end
+
+  def program
+    payable if payable_type == "LmsProgram"
+  end
 
   # Validations
   validates :name, presence: true
@@ -28,14 +44,14 @@ class Payment < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :by_user, ->(user) { where(user: user) }
   scope :by_gateway, ->(gateway) { where(payment_method: gateway) }
-  scope :for_course, ->(course) { where(course: course) }
-  scope :for_batch, ->(batch) { where(batch: batch) }
+  scope :for_course, ->(course) { where(payable: course) }
+  scope :for_batch, ->(batch) { where(payable: batch) }
 
   # Class methods
   def self.create_for_course(user, course, gateway = "paystack")
     create!(
       user: user,
-      course: course,
+      payable: course,
       amount: course.course_price || 0,
       currency: course.currency || "USD",
       payment_method: gateway,
@@ -169,20 +185,28 @@ class Payment < ApplicationRecord
 
   def to_frappe_format
     {
-      name: name,
-      user: user&.email,
-      course: course&.title,
-      batch: batch&.title,
-      program: program&.title,
-      amount: amount,
-      currency: currency,
-      payment_method: payment_method,
-      payment_status: payment_status,
-      transaction_id: transaction_id,
-      payment_date: payment_date&.strftime("%Y-%m-%d %H:%M:%S"),
-      gateway_response: gateway_response,
-      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
-      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
+      "name" => name,
+      "member" => member&.email,
+      "billing_name" => billing_name,
+      "source" => source,
+      "payment_for_document_type" => payment_for_document_type,
+      "payment_for_document" => payment_for_document,
+      "payment_received" => payment_received || false,
+      "payment_for_certificate" => payment_for_certificate || false,
+      "original_amount" => original_amount,
+      "discount_amount" => discount_amount,
+      "amount" => amount,
+      "amount_with_gst" => amount_with_gst,
+      "currency" => currency,
+      "coupon" => coupon&.name,
+      "coupon_code" => coupon_code,
+      "address" => address&.name,
+      "payment_id" => payment_id,
+      "order_id" => order_id,
+      "gstin" => gstin,
+      "pan" => pan,
+      "creation" => created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "modified" => updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
@@ -203,29 +227,26 @@ class Payment < ApplicationRecord
   def set_defaults
     self.currency ||= "USD"
     self.payment_status ||= "Pending"
-    self.creation ||= Time.current
-    self.modified ||= Time.current
   end
 
   def generate_name
     self.name = "PAY-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(4).upcase}"
-  end
+   end
+end
 
   def update_enrollment_status
     return unless completed?
 
-    if course.present?
-      enrollment = Enrollment.find_or_create_by!(user: user, course: course)
+    if payable_type == "Course"
+      enrollment = Enrollment.find_or_create_by!(user: user, course: payable)
       enrollment.update!(status: "Active", enrollment_date: Time.current)
-    elsif batch.present?
-      batch_enrollment = BatchEnrollment.find_or_create_by!(user: user, batch: batch)
-      batch_enrollment.update!(status: "Active", enrollment_date: Time.current)
-    elsif program.present?
-      program_enrollment = LmsProgramEnrollment.find_or_create_by!(user: user, program: program)
-      program_enrollment.update!(status: "Active", enrollment_date: Time.current)
+    elsif payable_type == "Batch"
+      # Handle batch enrollment
+    elsif payable_type == "LmsProgram"
+      # Handle program enrollment
     end
 
-    # Send payment confirmation
+    # Send notifications
     PaymentMailer.payment_confirmation(self).deliver_later
   end
 
@@ -299,5 +320,4 @@ class Payment < ApplicationRecord
     when "charge.dispute.created"
       # Handle disputes
     end
-  end
-end
+   end

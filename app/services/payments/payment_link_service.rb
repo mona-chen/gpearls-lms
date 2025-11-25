@@ -105,7 +105,7 @@ module Payments
     def get_gateway_service(payment)
       case payment.payment_method
       when "paystack", "paystack_ussd", "paystack_bank_transfer", "paystack_mobile_money"
-        Paystack::PaystackService.new
+        PaystackIntegration::PaystackService.new
       when "razorpay"
         Razorpay::RazorpayService.new
       when "stripe"

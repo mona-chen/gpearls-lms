@@ -20,6 +20,12 @@ class LmsSetting < ApplicationRecord
       "/assets/lms/images/favicon.ico"
     when "footer_text"
       "© 2025 LMS. All rights reserved."
+    when "persona_captured"
+      # Check if any user has captured persona (exact Frappe logic)
+      User.where.not(persona_captured_at: nil).exists? ? 1 : 0
+    when "is_onboarding_complete"
+      # Check onboarding status (exact Frappe logic)
+      Onboarding::OnboardingService.has_course_moderator_role? ? (Course.exists? && CourseChapter.exists? && CourseLesson.exists? ? 1 : 0) : 1
     else
       default
     end

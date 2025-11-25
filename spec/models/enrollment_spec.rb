@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Enrollment, type: :model do
   let(:course) { create(:course, title: 'Test Course') }
   let(:user) { create(:user, email: 'test01@test.com', first_name: 'Test') }
-  let(:batch) { create(:batch, course: course, title: 'Test Batch') }
+  let(:batch) { create(:batch, title: 'Test Batch', instructor: user) }
   
   describe 'validations' do
     it 'is valid with valid attributes' do
@@ -59,27 +59,24 @@ RSpec.describe Enrollment, type: :model do
     end
 
     it 'creates enrollment with course and member name' do
-      enrollment = create(:enrollment, 
-                         course: course, 
-                         user: user, 
-                         batch: batch,
-                         member_type: 'Student')
-      
+      enrollment = create(:enrollment,
+                         course: course,
+                         user: user,
+                         batch: batch)
+
       expect(enrollment.course).to eq(course)
-      expect(enrollment.user.full_name).to eq('Test')
-      expect(enrollment.member_type).to eq('Student')
+      expect(enrollment.user.full_name).to eq(user.full_name)
     end
 
     it 'allows changing member role' do
-      enrollment = create(:enrollment, 
-                         course: course, 
-                         user: user, 
-                         batch: batch,
-                         member_type: 'Student')
-      
+      enrollment = create(:enrollment,
+                         course: course,
+                         user: user,
+                         batch: batch)
+
       # It should be possible to change role
-      enrollment.update!(member_type: 'Admin')
-      expect(enrollment.reload.member_type).to eq('Admin')
+      enrollment.update!(role: 'Admin')
+      expect(enrollment.reload.role).to eq('Admin')
     end
 
     it 'sets enrollment date' do
@@ -91,8 +88,8 @@ RSpec.describe Enrollment, type: :model do
 
   describe '#progress_percentage' do
     let(:chapter) { create(:course_chapter, course: course) }
-    let!(:lesson1) { create(:course_lesson, course_chapter: chapter, course: course) }
-    let!(:lesson2) { create(:course_lesson, course_chapter: chapter, course: course) }
+    let!(:lesson1) { create(:course_lesson, chapter: chapter, course: course) }
+    let!(:lesson2) { create(:course_lesson, chapter: chapter, course: course) }
     let(:enrollment) { create(:enrollment, course: course, user: user) }
 
     it 'returns 0 when no lessons completed' do
@@ -100,7 +97,7 @@ RSpec.describe Enrollment, type: :model do
     end
 
     it 'returns 50 when half lessons completed' do
-      create(:lesson_progress, user: user, lesson: lesson1, status: 'Complete')
+      LessonProgress.create!(user: user, lesson: lesson1, status: 'Complete', progress: 100)
       expect(enrollment.progress_percentage).to eq(50)
     end
 
@@ -113,8 +110,8 @@ RSpec.describe Enrollment, type: :model do
 
   describe '#completed_lessons_count' do
     let(:chapter) { create(:course_chapter, course: course) }
-    let!(:lesson1) { create(:course_lesson, course_chapter: chapter, course: course) }
-    let!(:lesson2) { create(:course_lesson, course_chapter: chapter, course: course) }
+    let!(:lesson1) { create(:course_lesson, chapter: chapter, course: course) }
+    let!(:lesson2) { create(:course_lesson, chapter: chapter, course: course) }
     let(:enrollment) { create(:enrollment, course: course, user: user) }
 
     it 'returns 0 when no lessons completed' do
@@ -132,8 +129,8 @@ RSpec.describe Enrollment, type: :model do
 
   describe '#is_completed?' do
     let(:chapter) { create(:course_chapter, course: course) }
-    let!(:lesson1) { create(:course_lesson, course_chapter: chapter, course: course) }
-    let!(:lesson2) { create(:course_lesson, course_chapter: chapter, course: course) }
+    let!(:lesson1) { create(:course_lesson, chapter: chapter, course: course) }
+    let!(:lesson2) { create(:course_lesson, chapter: chapter, course: course) }
     let(:enrollment) { create(:enrollment, course: course, user: user) }
 
     it 'returns false when not all lessons completed' do
@@ -150,8 +147,8 @@ RSpec.describe Enrollment, type: :model do
 
   describe '#current_lesson' do
     let(:chapter) { create(:course_chapter, course: course) }
-    let!(:lesson1) { create(:course_lesson, course_chapter: chapter, course: course, idx: 1) }
-    let!(:lesson2) { create(:course_lesson, course_chapter: chapter, course: course, idx: 2) }
+    let!(:lesson1) { create(:course_lesson, chapter: chapter, course: course, idx: 1) }
+    let!(:lesson2) { create(:course_lesson, chapter: chapter, course: course, idx: 2) }
     let(:enrollment) { create(:enrollment, course: course, user: user) }
 
     it 'returns first lesson when no progress' do
@@ -171,8 +168,9 @@ RSpec.describe Enrollment, type: :model do
   end
 
   describe 'scopes' do
+    let(:user2) { create(:user, email: 'test02@test.com', first_name: 'Test2') }
     let!(:active_enrollment) { create(:enrollment, course: course, user: user, status: 'Active') }
-    let!(:completed_enrollment) { create(:enrollment, status: 'Completed') }
+    let!(:completed_enrollment) { create(:enrollment, course: course, user: user2, status: 'Completed') }
 
     describe '.active' do
       it 'returns only active enrollments' do
@@ -222,6 +220,5 @@ RSpec.describe Enrollment, type: :model do
     LessonProgress.where(user: user).destroy_all
     Enrollment.where(course: course).destroy_all
     Enrollment.where(user: user).destroy_all
-    User.where(email: ['test01@test.com', 'mentor@test.com']).destroy_all
   end
 end

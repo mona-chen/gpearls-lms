@@ -5,20 +5,8 @@ class ScormCompletion < ApplicationRecord
   
   validates :user_id, uniqueness: { scope: :scorm_package_id }
   
-  enum completion_status: { 
-    incomplete: 0, 
-    completed: 1, 
-    passed: 2, 
-    failed: 3, 
-    browsed: 4,
-    not_attempted: 5
-  }
-  
-  enum success_status: {
-    unknown: 0,
-    passed_success: 1,
-    failed_success: 2
-  }
+   enum :completion_status, [:incomplete, :completed, :passed, :failed, :browsed, :not_attempted]
+   enum :success_status, [:unknown, :passed_success, :failed_success]
   
   scope :by_lesson, ->(lesson) { where(course_lesson: lesson) }
   scope :by_package, ->(package) { where(scorm_package: package) }

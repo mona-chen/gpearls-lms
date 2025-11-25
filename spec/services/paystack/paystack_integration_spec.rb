@@ -14,7 +14,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'USSD Payment' do
       it 'initializes USSD payment correctly' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         stub_request(:post, 'https://api.paystack.co/transaction/initialize')
           .to_return(
@@ -39,7 +39,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Bank Transfer Payment' do
       it 'initializes bank transfer payment correctly' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         stub_request(:post, 'https://api.paystack.co/transaction/initialize')
           .to_return(
@@ -68,7 +68,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Mobile Money Payment' do
       it 'initializes mobile money payment for MTN' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         stub_request(:post, 'https://api.paystack.co/transaction/initialize')
           .to_return(
@@ -94,7 +94,7 @@ RSpec.describe 'Paystack Integration', type: :service do
         user_without_phone = double('User', email: 'test@example.com', phone_number: nil, full_name: 'Test User')
         payment_without_phone = double('Payment', id: 1, name: 'PAY001', amount: 5000, currency: 'NGN', user: user_without_phone, transaction_id: nil, payment_method: 'paystack_mobile_money')
 
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         result = service.initialize_mobile_money_payment(payment_without_phone)
 
@@ -104,7 +104,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Mobile Provider Detection' do
       it 'correctly identifies Nigerian mobile providers' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         test_cases = {
           '+2348031234567' => 'mtn',
@@ -122,7 +122,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Bank Operations' do
       it 'retrieves list of supported banks' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         stub_request(:get, 'https://api.paystack.co/bank')
           .to_return(
@@ -145,7 +145,7 @@ RSpec.describe 'Paystack Integration', type: :service do
       end
 
       it 'resolves account number details' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         stub_request(:post, 'https://api.paystack.co/bank/resolve')
           .to_return(
@@ -170,7 +170,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Webhook Security' do
       it 'validates correct webhook signature' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
         payload = '{"event":"charge.success","data":{}}'
         signature = OpenSSL::HMAC.hexdigest('sha512', 'wh_test_123', payload)
 
@@ -178,7 +178,7 @@ RSpec.describe 'Paystack Integration', type: :service do
       end
 
       it 'rejects invalid webhook signature' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         expect(service.validate_webhook_signature('{}', 'invalid')).to be_falsey
       end
@@ -186,7 +186,7 @@ RSpec.describe 'Paystack Integration', type: :service do
 
     describe 'Supported Mobile Money Providers' do
       it 'returns comprehensive list of mobile money providers' do
-        service = Paystack::PaystackService.new(gateway)
+        service = PaystackModule::PaystackService.new(gateway)
 
         providers = service.get_mobile_money_providers
 

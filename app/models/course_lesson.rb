@@ -3,6 +3,7 @@ class CourseLesson < ApplicationRecord
   # Associations
   belongs_to :chapter, class_name: "CourseChapter", foreign_key: "chapter"
   belongs_to :course, class_name: "Course", foreign_key: "course", optional: true
+  alias_attribute :course_chapter, :chapter
 
   # Validations
   validates :title, presence: true

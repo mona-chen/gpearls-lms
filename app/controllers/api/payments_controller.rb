@@ -1,7 +1,7 @@
-class Api::PaymentsController < ApplicationController
+class Api::PaymentsController < Api::BaseController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_user!
-  before_action :set_payment, only: [:show, :verify, :refund]
+  before_action :set_payment, only: [ :show, :verify, :refund ]
   before_action :set_payment_gateway
 
   # POST /api/payments/initialize
@@ -58,22 +58,22 @@ class Api::PaymentsController < ApplicationController
 
   # POST /api/payments/callback/paystack
   def paystack_callback
-    signature = request.headers['X-Paystack-Signature']
+    signature = request.headers["X-Paystack-Signature"]
     payload = request.raw_post
 
     begin
-      paystack_service = Paystack::PaystackService.new
+      paystack_service = PaystackIntegration::PaystackService.new
       unless paystack_service.validate_webhook_signature(payload, signature)
-        return render json: { error: 'Invalid signature' }, status: :unauthorized
+        return render json: { error: "Invalid signature" }, status: :unauthorized
       end
 
       webhook_data = JSON.parse(payload)
       paystack_service.process_webhook(webhook_data)
 
-      render json: { status: 'success' }
+      render json: { status: "success" }
     rescue => e
       Rails.logger.error "Paystack webhook error: #{e.message}"
-      render json: { error: 'Webhook processing failed' }, status: :unprocessable_entity
+      render json: { error: "Webhook processing failed" }, status: :unprocessable_entity
     end
   end
 
@@ -82,7 +82,7 @@ class Api::PaymentsController < ApplicationController
     unless @payment.can_be_refunded?
       return render json: {
         success: false,
-        error: 'Payment cannot be refunded'
+        error: "Payment cannot be refunded"
       }, status: :unprocessable_entity
     end
 
@@ -125,8 +125,10 @@ class Api::PaymentsController < ApplicationController
 
   # GET /api/payments/gateways
   def gateways
+    currency = params[:currency] || "USD"
+    currency_pattern = "%#{currency.gsub('%', '\\%').gsub('_', '\\_')}%"
     active_gateways = PaymentGateway.active
-                           .where("settings->>'supported_currencies' LIKE ?", "%#{params[:currency] || 'USD'}%")
+                           .where("settings->>'supported_currencies' LIKE ?", currency_pattern)
 
     render json: {
       success: true,
@@ -150,20 +152,20 @@ class Api::PaymentsController < ApplicationController
     unless gateway
       return render json: {
         success: false,
-        error: 'Payment gateway not available'
+        error: "Payment gateway not available"
       }, status: :unprocessable_entity
     end
 
     begin
       case method_type
-      when 'paystack'
+      when "paystack"
         result = add_paystack_method(gateway)
-      when 'stripe'
+      when "stripe"
         result = add_stripe_method(gateway)
       else
         return render json: {
           success: false,
-          error: 'Unsupported payment method'
+          error: "Unsupported payment method"
         }, status: :unprocessable_entity
       end
 
@@ -194,11 +196,11 @@ class Api::PaymentsController < ApplicationController
   # DELETE /api/payments/methods/:id
   def remove_payment_method
     method = current_user.payment_methods.find(params[:id])
-    method.update!(status: 'inactive')
+    method.update!(status: "inactive")
 
     render json: {
       success: true,
-      message: 'Payment method removed successfully'
+      message: "Payment method removed successfully"
     }
   end
 
@@ -209,16 +211,16 @@ class Api::PaymentsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {
       success: false,
-      error: 'Payment not found'
+      error: "Payment not found"
     }, status: :not_found
   end
 
   def set_payment_gateway
-    @gateway = PaymentGateway.active_for_type(params[:payment_method] || 'paystack')
+    @gateway = PaymentGateway.active_for_type(params[:payment_method] || "paystack")
     unless @gateway&.active?
       render json: {
         success: false,
-        error: 'Payment gateway not available'
+        error: "Payment gateway not available"
       }, status: :unprocessable_entity
     end
   end
@@ -229,27 +231,27 @@ class Api::PaymentsController < ApplicationController
     )
 
     case payment_params[:item_type]
-    when 'course'
+    when "course"
       course = Course.find(payment_params[:item_id])
       Payment.create_for_course(current_user, course, payment_params[:payment_method])
-    when 'batch'
+    when "batch"
       batch = Batch.find(payment_params[:item_id])
       Payment.create_for_batch(current_user, batch, payment_params[:payment_method])
-    when 'program'
+    when "program"
       program = LmsProgram.find(payment_params[:item_id])
       Payment.create_for_program(current_user, program, payment_params[:payment_method])
     else
-      raise ArgumentError, 'Invalid item type'
+      raise ArgumentError, "Invalid item type"
     end
   end
 
   def get_gateway_service(method_type)
     case method_type
-    when 'paystack'
-      Paystack::PaystackService.new
-    when 'razorpay'
+    when "paystack"
+      PaystackIntegration::PaystackService.new
+    when "razorpay"
       Razorpay::RazorpayService.new
-    when 'stripe'
+    when "stripe"
       Stripe::StripeService.new
     else
       raise Error::UnsupportedGatewayError, "Gateway #{method_type} not supported"
@@ -257,15 +259,15 @@ class Api::PaymentsController < ApplicationController
   end
 
   def add_paystack_method(gateway)
-    service = Paystack::PaystackService.new(gateway)
+    service = PaystackIntegration::PaystackService.new(gateway)
     customer_data = service.create_customer(current_user)
 
     # Save payment method to database
     payment_method = current_user.payment_methods.create!(
-      method_type: 'paystack',
+      method_type: "paystack",
       gateway: gateway,
       customer_code: customer_data[:customer_code],
-      status: 'active'
+      status: "active"
     )
 
     { method: payment_method, customer: customer_data }
@@ -276,10 +278,10 @@ class Api::PaymentsController < ApplicationController
     customer_data = service.create_customer(current_user)
 
     payment_method = current_user.payment_methods.create!(
-      method_type: 'stripe',
+      method_type: "stripe",
       gateway: gateway,
       customer_id: customer_data[:customer_id],
-      status: 'active'
+      status: "active"
     )
 
     { method: payment_method, customer: customer_data }

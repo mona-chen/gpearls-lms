@@ -5,25 +5,30 @@ class Api::CohortsController < Api::BaseController
 
   # GET /api/cohorts
   def index
-    cohorts = Cohort.includes(:course, :instructor, :cohort_subgroups)
+    filters = filter_params.slice(:course_id, :my_cohorts, :status)
+    search = search_params[:search]
+    pagination = pagination_params
+
+    cohorts = Cohort.includes(:instructor, :course)
+                    .published
                     .order(created_at: :desc)
 
-    # Apply filters
-    cohorts = cohorts.by_course(params[:course_id]) if params[:course_id].present?
-    cohorts = cohorts.by_instructor(current_user) if params[:my_cohorts] == 'true'
-    cohorts = cohorts.active if params[:status] == 'active'
-    cohorts = cohorts.upcoming if params[:status] == 'upcoming'
-    cohorts = cohorts.completed if params[:status] == 'completed'
+    cohorts = cohorts.by_course(filters[:course_id]) if filters[:course_id].present?
+    cohorts = cohorts.by_instructor(current_user) if filters[:my_cohorts] == 'true'
+    cohorts = cohorts.active if filters[:status] == 'active'
+    cohorts = cohorts.upcoming if filters[:status] == 'upcoming'
+    cohorts = cohorts.completed if filters[:status] == 'completed'
 
     # Apply search
-    if params[:search].present?
-      cohorts = cohorts.where('cohorts.title ILIKE ?', "%#{params[:search]}%")
+    if search.present?
+      search_term = "%#{search.gsub('%', '\\%').gsub('_', '\\_')}%"
+      cohorts = cohorts.where("cohorts.title ILIKE ?", search_term)
     end
 
     # Pagination
-    page = params[:page] || 1
-    per_page = params[:per_page] || 20
-    cohorts = cohorts.limit(per_page).offset((page.to_i - 1) * per_page)
+    page = pagination[:page] || 1
+    per_page = pagination[:per_page] || 20
+    cohorts = cohorts.page(page).per(per_page)
 
     render json: {
       data: cohorts.map(&:to_frappe_format),

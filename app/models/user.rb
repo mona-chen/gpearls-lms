@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  # Custom authentication (Frappe-compatible) - not using Devise
-  has_secure_password
+  # Include Devise modules for JWT support
+  devise :database_authenticatable, :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
   # Devise-like methods for compatibility
   def valid_password?(password)
@@ -49,6 +49,7 @@ class User < ApplicationRecord
 
   # Frappe LMS compatibility - exact field mappings
   self.table_name = "users" # Explicit table name for clarity
+  alias_attribute :phone_number, :phone
 
   # Associations
   has_many :notifications, dependent: :destroy
@@ -99,10 +100,11 @@ class User < ApplicationRecord
    # Alias for test compatibility (test expects singular association name)
    has_many :lesson_progress, class_name: "LessonProgress", dependent: :destroy
 
-    # Advanced role-based methods (Frappe-compatible - matches frappe.get_roles())
-    def has_role?(role_name)
-      HasRole.user_has_role?(self, role_name)
-    end
+     # Advanced role-based methods (Frappe-compatible - matches frappe.get_roles())
+     def has_role?(role_name)
+       # Check both persisted roles and in-memory associations (for factories)
+       has_roles.any? { |hr| hr.role == role_name } || HasRole.user_has_role?(self, role_name)
+     end
 
     def add_role(role_name)
       HasRole.assign_role_to_user(self, role_name)
@@ -112,30 +114,38 @@ class User < ApplicationRecord
       HasRole.remove_role_from_user(self, role_name)
     end
 
-    def roles_list
-      has_roles.pluck(:role)
-    end
+     def roles_list
+       # Include both persisted and in-memory roles
+       persisted_roles = has_roles.pluck(:role)
+       in_memory_roles = has_roles.reject(&:persisted?).map(&:role)
+       (persisted_roles + in_memory_roles).uniq
+     end
 
     # Frappe-compatible get_roles() method
     def get_roles
       roles_list
     end
 
-    def instructor?
-      has_role?("Course Creator")
-    end
+     def instructor?
+       has_role?("Course Creator") || role == "Course Creator"
+     end
 
-    def moderator?
-      has_role?("Moderator")
-    end
+     def moderator?
+       has_role?("Moderator") || role == "Moderator"
+     end
 
-    def evaluator?
-      has_role?("Batch Evaluator")
-    end
+     def evaluator?
+       has_role?("Batch Evaluator") || role == "Batch Evaluator"
+     end
 
-    def student?
-      has_role?("LMS Student") || roles_list.empty?
-    end
+     def student?
+       # If role field is explicitly set to something other than LMS Student, respect that
+       if role.present? && role != "LMS Student"
+         false
+       else
+         has_role?("LMS Student") || roles_list.empty? || role == "LMS Student"
+       end
+     end
 
     # Frappe-compatible attributes (match get_user_info() exactly)
     def is_instructor
@@ -154,30 +164,46 @@ class User < ApplicationRecord
       roles_list.empty? || has_role?("LMS Student")
     end
 
-    # Frappe-compatible setters
-    def is_instructor=(value)
-      if value
-        add_role("Course Creator")
-      else
-        remove_role("Course Creator")
-      end
-    end
+     # Frappe-compatible setters
+     def is_instructor=(value)
+       if value
+         add_role("Course Creator")
+         self.role = "Course Creator"
+       else
+         remove_role("Course Creator")
+         self.role = roles_list.first || "LMS Student"
+       end
+     end
 
-    def is_moderator=(value)
-      if value
-        add_role("Moderator")
-      else
-        remove_role("Moderator")
-      end
-    end
+     def is_moderator=(value)
+       if value
+         add_role("Moderator")
+         self.role = "Moderator"
+       else
+         remove_role("Moderator")
+         self.role = roles_list.first || "LMS Student"
+       end
+     end
 
-    def is_evaluator=(value)
-      self.role = value ? "Batch Evaluator" : "LMS Student"
-    end
+     def is_evaluator=(value)
+       if value
+         add_role("Batch Evaluator")
+         self.role = "Batch Evaluator"
+       else
+         remove_role("Batch Evaluator")
+         self.role = roles_list.first || "LMS Student"
+       end
+     end
 
-    def is_student=(value)
-      self.role = value ? "LMS Student" : "LMS Student"
-    end
+     def is_student=(value)
+       if value
+         add_role("LMS Student")
+         self.role = "LMS Student"
+       else
+         remove_role("LMS Student")
+         self.role = roles_list.first || "LMS Student"
+       end
+     end
 
     def user_type
      role

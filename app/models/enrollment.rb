@@ -9,6 +9,9 @@ class Enrollment < ApplicationRecord
   belongs_to :course
   belongs_to :batch, optional: true
 
+  # Association for lesson progress (through user)
+  has_many :lesson_progresses, through: :user, source: :lesson_progress
+
   # Validations
   validates :user_id, uniqueness: { scope: :course_id }
   validates :progress_percentage, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
@@ -20,11 +23,16 @@ class Enrollment < ApplicationRecord
   # Scopes
   scope :completed, -> { where("progress_percentage >= 100") }
   scope :in_progress, -> { where("progress_percentage < 100") }
-  scope :active, -> { where.not(progress_percentage: nil) }
+  scope :active, -> { where(status: 'Active') }
+  scope :by_course, ->(course) { where(course: course) }
 
   # Instance Methods
   def completed?
-    progress_percentage.present? && progress_percentage >= 100
+    progress_percentage >= 100
+  end
+
+  def is_completed?
+    completed?
   end
 
   def in_progress?
@@ -35,8 +43,36 @@ class Enrollment < ApplicationRecord
     progress_percentage.nil? || progress_percentage == 0
   end
 
+  def progress_percentage
+    return 0 if course.nil?
+
+    total_lessons = course.lessons.count
+    return 0 if total_lessons.zero?
+
+    # Count completed lessons that belong to this course
+    completed_lessons = lesson_progresses.where(status: 'Complete')
+                                         .select { |lp| lp.lesson&.course == course }
+                                         .count
+    (completed_lessons.to_f / total_lessons * 100).round
+  end
+
   def completion_percentage
-    progress_percentage || 0
+    progress_percentage
+  end
+
+  def completed_lessons_count
+    lesson_progresses.where(status: 'Complete')
+                     .select { |lp| lp.lesson&.course == course }
+                     .count
+  end
+
+  def current_lesson
+    # Find the first lesson that is not completed
+    course.lessons.each do |lesson|
+      return lesson unless lesson_progresses.where(lesson: lesson, status: 'Complete').exists?
+    end
+    # If all lessons are completed, return the last lesson
+    course.lessons.last
   end
 
   # Alias for backward compatibility

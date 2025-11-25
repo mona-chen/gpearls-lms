@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # Setup wizard (must be before other routes)
+  get "setup", to: "setup_wizard#index", as: :setup_wizard
+  patch "setup", to: "setup_wizard#update"
+
   get "dashboard", to: "dashboard#index"
   devise_for :users
   devise_for :users, skip: [ :sessions, :registrations ]
@@ -20,15 +24,23 @@ Rails.application.routes.draw do
   get "api/users", to: "api/users#get_all_users"
   get "api/members", to: "api/users#get_members"
 
-  # Generic Frappe-style API endpoints for frontend compatibility
-  post "api/method/*method_path", to: "api/compatibility#handle_method", constraints: { method_path: /.+/ }
+   # Courses
+   get "api/courses", to: "api/courses#index"
+   get "api/courses/:course", to: "api/courses#show"
+   post "api/courses", to: "api/courses#create"
+   put "api/courses/:course", to: "api/courses#update"
+   delete "api/courses/:course", to: "api/courses#destroy"
+   post "api/courses/:id/enroll", to: "api/courses#enroll"
+   get "api/courses/:id/progress", to: "api/courses#progress"
 
-  # Courses
-  get "api/courses", to: "api/courses#index"
-  get "api/courses/:course", to: "api/courses#show"
-  post "api/courses", to: "api/courses#create"
-  put "api/courses/:course", to: "api/courses#update"
-  delete "api/courses/:course", to: "api/courses#destroy"
+   # Chapters
+   post "api/courses/:id/chapters", to: "api/courses#create_chapter"
+
+   # Lessons
+   post "api/courses/:course_id/chapters/:chapter_id/lessons", to: "api/courses#create_lesson"
+
+   # Generic Frappe-style API endpoints for frontend compatibility
+   post "api/method/*method_path", to: "api/compatibility#handle_method", constraints: { method_path: /.+/ }
 
   # Course outline and lessons
   get "api/course-outline/:course", to: "api/course_outline#show"
@@ -37,6 +49,7 @@ Rails.application.routes.draw do
 
   # Quizzes
   get "api/quizzes", to: "api/quizzes#index"
+  post "api/quizzes", to: "api/quizzes#create"
   get "api/quiz/:quiz_id", to: "api/quizzes#get_quiz_details"
   post "api/quiz/submit/:quiz_id", to: "api/quizzes#submit"
   get "api/quiz/attempts/:quiz_id", to: "api/quizzes#get_quiz_attempts"
@@ -44,7 +57,12 @@ Rails.application.routes.draw do
   # Batches
   get "api/batches", to: "api/batches#index"
   get "api/batches/:batch", to: "api/batches#show"
+  post "api/batches", to: "api/batches#create"
   post "api/batch/enroll/:batch", to: "api/batches#enroll"
+
+  # Discussions
+  post "api/discussions", to: "api/discussions#create"
+  post "api/discussions/:discussion_id/replies", to: "api/discussions#create_reply"
 
   # Cohorts
   get "api/cohorts", to: "api/cohorts#index"
@@ -132,13 +150,13 @@ Rails.application.routes.draw do
   get "api/code-revisions/:section", to: "api/code_revisions#get_latest_revision"
   get "api/code-revisions/history/:section", to: "api/code_revisions#get_revision_history"
   post "api/code-revisions/:id/restore", to: "api/code_revisions#restore_revision"
-  
+
   # Video Analytics and Tracking
   post "api/track-video-duration", to: "api/video_analytics#track_duration"
   get "api/video-analytics/:lesson_id", to: "api/video_analytics#lesson_analytics"
   get "api/my-video-progress/:lesson_id", to: "api/video_analytics#my_progress"
   get "api/video-heatmap/:course_id", to: "api/video_analytics#course_video_heatmap"
-  
+
   # SCORM Package Support
   post "api/scorm/upload", to: "api/scorm#upload"
   get "api/scorm/:id/launch", to: "api/scorm#launch"
@@ -149,7 +167,7 @@ Rails.application.routes.draw do
   get "api/scorm/:id/analytics", to: "api/scorm#analytics"
   get "api/scorm/packages/:lesson_id", to: "api/scorm#packages_for_lesson"
   delete "api/scorm/:id", to: "api/scorm#destroy"
-  
+
   # Advanced Analytics
   get "api/advanced-analytics/learning-heatmap/:course_id", to: "api/advanced_analytics#learning_heatmap"
   get "api/advanced-analytics/engagement/:course_id", to: "api/advanced_analytics#engagement_analytics"
@@ -163,7 +181,7 @@ Rails.application.routes.draw do
   post "api/advanced-analytics/custom-report", to: "api/advanced_analytics#generate_custom_report"
   get "api/advanced-analytics/export/:course_id", to: "api/advanced_analytics#export_analytics"
   get "api/advanced-analytics/system-analytics", to: "api/advanced_analytics#system_analytics"
-  
+
   # PWA Support
   get "api/pwa-manifest", to: "api/pwa#manifest"
   get "api/pwa/service-worker", to: "api/pwa#service_worker"

@@ -1,8 +1,22 @@
 require 'rails_helper'
 
-RSpec.describe Quiz, type: :model do
+RSpec.describe LmsQuiz, type: :model do
   let(:course) { create(:course) }
-  let(:quiz) { create(:quiz, title: 'Test Quiz', passing_percentage: 90, course: course) }
+  let(:user) { create(:user) }
+  let(:quiz) do
+    LmsQuiz.create!(
+      name: 'test_quiz',
+      title: 'Test Quiz',
+      description: 'Test quiz description',
+      course: course,
+      max_attempts: 3,
+      duration_minutes: 60,
+      passing_percentage: 70.0,
+      status: 'Draft',
+      quiz_type: 'Graded',
+      total_marks: 100.0
+    )
+  end
 
   describe 'validations' do
     it 'is valid with valid attributes' do
@@ -152,16 +166,16 @@ RSpec.describe Quiz, type: :model do
       it 'returns only published quizzes' do
         published_quiz = create(:quiz, published: true)
         unpublished_quiz = create(:quiz, published: false)
-        
-        expect(Quiz.published).to include(published_quiz)
-        expect(Quiz.published).not_to include(unpublished_quiz)
+
+        expect(LmsQuiz.published).to include(published_quiz)
+        expect(LmsQuiz.published).not_to include(unpublished_quiz)
       end
     end
   end
 
   after(:each) do
     # Clean up data similar to Frappe tearDown
-    QuizSubmission.where(quiz: quiz).destroy_all
-    LmsQuestion.where(quiz: quiz).destroy_all
+    LmsQuizSubmission.where(quiz: quiz).destroy_all
+    LmsQuizQuestion.where(quiz: quiz).destroy_all
   end
 end

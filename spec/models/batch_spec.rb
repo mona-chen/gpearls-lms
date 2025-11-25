@@ -65,13 +65,13 @@ RSpec.describe Batch, type: :model do
       expect do
         batch.enroll_student(student)
       end.to change(batch.batch_enrollments, :count).by(1)
-      
+
       expect(batch.students).to include(student)
     end
 
     it 'prevents duplicate enrollments' do
       batch.enroll_student(student)
-      
+
       expect do
         batch.enroll_student(student)
       end.not_to change(batch.batch_enrollments, :count)
@@ -146,19 +146,19 @@ RSpec.describe Batch, type: :model do
     it 'handles date ranges' do
       start_date = 1.month.from_now
       end_date = 3.months.from_now
-      
+
       batch.start_date = start_date
       batch.end_date = end_date
       batch.save!
-      
-      expect(batch.start_date).to eq(start_date.to_date)
-      expect(batch.end_date).to eq(end_date.to_date)
+
+      expect(batch.start_date.to_date).to eq(start_date.to_date)
+      expect(batch.end_date.to_date).to eq(end_date.to_date)
     end
 
     it 'validates end date is after start date' do
       batch.start_date = 1.month.from_now
       batch.end_date = 1.week.from_now
-      
+
       expect(batch).to_not be_valid
       expect(batch.errors[:end_date]).to be_present
     end
@@ -168,6 +168,7 @@ RSpec.describe Batch, type: :model do
     it 'returns true for batch in session' do
       batch.start_date = 1.week.ago
       batch.end_date = 1.week.from_now
+      batch.published = true
       expect(batch.is_active?).to be_truthy
     end
 
@@ -201,11 +202,18 @@ RSpec.describe Batch, type: :model do
       batch_attrs = {
         title: 'Test Batch',
         course: course,
-        instructor: instructor
+        instructor: instructor,
+        start_date: 1.week.from_now,
+        end_date: 3.weeks.from_now,
+        start_time: '10:00',
+        end_time: '12:00',
+        timezone: 'UTC',
+        description: 'Test batch description',
+        additional_info: 'Additional info'
       }
-      
+
       new_batch = Batch.create!(batch_attrs)
-      
+
       expect(new_batch.title).to eq('Test Batch')
       expect(new_batch.course).to eq(course)
       expect(new_batch.instructor).to eq(instructor)
@@ -215,9 +223,9 @@ RSpec.describe Batch, type: :model do
     it 'allows enrollment after creation' do
       batch.save!
       student = create(:user, email: 'test01@test.com', first_name: 'Test')
-      
+
       enrollment = batch.enroll_student(student)
-      
+
       expect(enrollment).to be_persisted
       expect(enrollment.batch).to eq(batch)
       expect(enrollment.user).to eq(student)
@@ -228,9 +236,9 @@ RSpec.describe Batch, type: :model do
     before do
       create(:batch, published: true, course: course)
       create(:batch, published: false, course: course)
-      create(:batch, published: true, 
-             start_date: 1.week.ago, 
-             end_date: 1.week.from_now, 
+      create(:batch, published: true,
+             start_date: 1.week.ago,
+             end_date: 1.week.from_now,
              course: course)
     end
 
@@ -252,7 +260,7 @@ RSpec.describe Batch, type: :model do
 
     describe '.by_course' do
       let(:other_course) { create(:course) }
-      
+
       before do
         create(:batch, course: other_course)
       end

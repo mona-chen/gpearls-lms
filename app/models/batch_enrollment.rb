@@ -53,6 +53,14 @@ class BatchEnrollment < ApplicationRecord
     user&.username
   end
 
+  def member_type
+    self[:member_type] || "Student"
+  end
+
+  def role
+    self[:role] || "Member"
+  end
+
   def batch_name
     batch&.title
   end
@@ -97,20 +105,22 @@ class BatchEnrollment < ApplicationRecord
 
   def to_frappe_format
     {
-      name: id,
-      member: user&.email,
-      member_name: user&.full_name,
-      member_username: user&.username,
-      batch: batch&.name || batch&.id,
-      batch_name: batch&.title,
-      payment: payment&.name,
-      source: source&.name,
-      confirmation_email_sent: confirmation_email_sent,
-      status: status,
-      enrolled_at: enrolled_at&.strftime("%Y-%m-%d %H:%M:%S"),
-      completed_at: completed_at&.strftime("%Y-%m-%d %H:%M:%S"),
-      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
-      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
+      "name" => id.to_s,
+      "member" => user&.email,
+      "member_name" => user&.full_name,
+      "member_username" => user&.username,
+      "member_type" => member_type,
+      "role" => role,
+      "batch" => batch&.name || batch&.id,
+      "batch_name" => batch&.title,
+      "payment" => payment&.name,
+      "source" => source&.name,
+      "confirmation_email_sent" => confirmation_email_sent,
+      "status" => status,
+      "enrolled_at" => enrolled_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "completed_at" => completed_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "creation" => created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "modified" => updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 

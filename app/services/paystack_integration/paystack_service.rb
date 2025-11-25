@@ -1,4 +1,4 @@
-module Paystack
+module PaystackIntegration
   class PaystackService
     include HTTParty
 
@@ -10,6 +10,95 @@ module Paystack
 
       @secret_key = @gateway.credentials[:secret_key]
       @public_key = @gateway.credentials[:public_key]
+    end
+
+    # Verify transaction
+    def verify_transaction(reference)
+      response = self.class.get("/transaction/verify/#{reference}", {
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data
+      end
+    end
+
+    # Get list of supported banks
+    def get_banks
+      response = self.class.get("/bank", {
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data || []
+      end
+    end
+
+    # Resolve account number details
+    def resolve_account_number(account_number, bank_code)
+      response = self.class.get("/bank/resolve", {
+        query: { account_number: account_number, bank_code: bank_code },
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data
+      end
+    end
+
+    # Validate webhook signature
+    def validate_webhook_signature(payload, signature)
+      expected_signature = OpenSSL::HMAC.hexdigest("sha512", @gateway.credentials[:webhook_secret], payload)
+      ActiveSupport::SecurityUtils.secure_compare(signature, expected_signature)
+    end
+
+    # Process webhook
+    def process_webhook(webhook_data)
+      event = webhook_data["event"]
+      reference = webhook_data["data"]["reference"]
+
+      payment = Payment.find_by(transaction_id: reference)
+      return { status: "payment_not_found" } unless payment
+
+      case event
+      when "charge.success"
+        payment.update!(payment_status: "Completed")
+        { status: "processed" }
+      when "charge.failed"
+        payment.update!(payment_status: "Failed")
+        { status: "processed" }
+      else
+        { status: "ignored" }
+      end
+    end
+
+    private
+
+    def auth_headers
+      {
+        "Authorization" => "Bearer #{@secret_key}",
+        "Content-Type" => "application/json"
+      }
+    end
+
+    def determine_mobile_provider(phone_number)
+      return nil unless phone_number
+
+      # Remove country code and check prefix
+      number = phone_number.gsub(/^\+234/, "").gsub(/^234/, "")
+
+      case number
+      when /^803/, /^903/, /^806/, /^813/, /^816/, /^814/, /^903/
+        "mtn"
+      when /^802/, /^808/, /^812/, /^701/, /^902/
+        "airtel"
+      when /^805/, /^807/, /^815/, /^905/
+        "glo"
+      when /^809/, /^817/, /^818/, /^909/
+        "9mobile"
+      else
+        "unknown"
+      end
     end
 
     # Initialize a payment transaction
@@ -463,7 +552,66 @@ module Paystack
         { code: "tigo", name: "Tigo Cash", countries: [ "GH" ] }
       ]
     end
-  end
+
+    # Verify transaction
+    def verify_transaction(reference)
+      response = self.class.get("/transaction/verify/#{reference}", {
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data
+      end
+    end
+
+    # Get list of supported banks
+    def get_banks
+      response = self.class.get("/bank", {
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data || []
+      end
+    end
+
+    # Resolve account number details
+    def resolve_account_number(account_number, bank_code)
+      response = self.class.get("/bank/resolve", {
+        query: { account_number: account_number, bank_code: bank_code },
+        headers: auth_headers
+      })
+
+      handle_response(response) do |data|
+        data
+      end
+    end
+
+    # Validate webhook signature
+    def validate_webhook_signature(payload, signature)
+      expected_signature = OpenSSL::HMAC.hexdigest("sha512", @gateway.credentials[:webhook_secret], payload)
+      ActiveSupport::SecurityUtils.secure_compare(signature, expected_signature)
+    end
+
+    # Process webhook
+    def process_webhook(webhook_data)
+      event = webhook_data["event"]
+      reference = webhook_data["data"]["reference"]
+
+      payment = Payment.find_by(transaction_id: reference)
+      return { status: "payment_not_found" } unless payment
+
+      case event
+      when "charge.success"
+        payment.update!(payment_status: "Completed")
+        { status: "processed" }
+      when "charge.failed"
+        payment.update!(payment_status: "Failed")
+        { status: "processed" }
+      else
+        { status: "ignored" }
+      end
+    end
 
     private
 
@@ -602,5 +750,6 @@ module Paystack
       else
         "unknown"
       end
+   end
   end
 end

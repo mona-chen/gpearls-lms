@@ -221,21 +221,171 @@ module Quiz
     end
 
     def self.execute_python_code(code, input)
-      # Placeholder for Python code execution
-      # In production, this would use a secure sandbox
-      "Hello World"
+      require 'timeout'
+      require 'tempfile'
+
+      # Create temporary files
+      code_file = Tempfile.new(['code', '.py'])
+      input_file = Tempfile.new(['input', '.txt'])
+      output_file = Tempfile.new(['output', '.txt'])
+
+      begin
+        # Write code and input to files
+        code_file.write(code)
+        code_file.flush
+        input_file.write(input.to_s)
+        input_file.flush
+
+        # Execute with timeout and resource limits
+        Timeout.timeout(10) do
+          # Use docker to sandbox execution if available, otherwise basic execution
+          if system('docker --version > /dev/null 2>&1')
+            execute_in_docker(code_file.path, input_file.path, output_file.path, 'python')
+          else
+            execute_direct(code_file.path, input_file.path, output_file.path, 'python3')
+          end
+        end
+
+        # Read output
+        output_file.read.strip
+      rescue Timeout::Error
+        "Execution timed out after 10 seconds"
+      rescue => e
+        "Execution error: #{e.message}"
+      ensure
+        # Clean up temporary files
+        [code_file, input_file, output_file].each do |file|
+          file.close
+          file.unlink
+        end
+      end
     end
 
     def self.execute_javascript_code(code, input)
-      # Placeholder for JavaScript code execution
-      # In production, this would use Node.js in a sandbox
-      "Hello World"
+      require 'timeout'
+      require 'tempfile'
+
+      code_file = Tempfile.new(['code', '.js'])
+      input_file = Tempfile.new(['input', '.txt'])
+      output_file = Tempfile.new(['output', '.txt'])
+
+      begin
+        code_file.write(code)
+        code_file.flush
+        input_file.write(input.to_s)
+        input_file.flush
+
+        Timeout.timeout(10) do
+          if system('docker --version > /dev/null 2>&1')
+            execute_in_docker(code_file.path, input_file.path, output_file.path, 'node')
+          else
+            execute_direct(code_file.path, input_file.path, output_file.path, 'node')
+          end
+        end
+
+        output_file.read.strip
+      rescue Timeout::Error
+        "Execution timed out after 10 seconds"
+      rescue => e
+        "Execution error: #{e.message}"
+      ensure
+        [code_file, input_file, output_file].each do |file|
+          file.close
+          file.unlink
+        end
+      end
     end
 
     def self.execute_java_code(code, input)
-      # Placeholder for Java code execution
-      # In production, this would compile and run Java in a sandbox
-      "Hello World"
+      require 'timeout'
+      require 'tempfile'
+
+      # For Java, we need to create a proper class structure
+      class_file = Tempfile.new(['Main', '.java'])
+      input_file = Tempfile.new(['input', '.txt'])
+      output_file = Tempfile.new(['output', '.txt'])
+
+      begin
+        # Wrap code in a proper Java class
+        java_code = <<~JAVA
+          import java.util.*;
+          import java.io.*;
+
+          public class Main {
+              public static void main(String[] args) throws Exception {
+                  Scanner scanner = new Scanner(System.in);
+                  #{code}
+              }
+          }
+        JAVA
+
+        class_file.write(java_code)
+        class_file.flush
+        input_file.write(input.to_s)
+        input_file.flush
+
+        Timeout.timeout(15) do
+          if system('docker --version > /dev/null 2>&1')
+            execute_java_in_docker(class_file.path, input_file.path, output_file.path)
+          else
+            execute_java_direct(class_file.path, input_file.path, output_file.path)
+          end
+        end
+
+        output_file.read.strip
+      rescue Timeout::Error
+        "Execution timed out after 15 seconds"
+      rescue => e
+        "Execution error: #{e.message}"
+      ensure
+        [class_file, input_file, output_file].each do |file|
+          file.close
+          file.unlink
+        end
+      end
+    end
+
+    private
+
+    def self.execute_in_docker(code_path, input_path, output_path, runtime)
+      # Create a docker command with resource limits
+      docker_cmd = [
+        'docker', 'run', '--rm',
+        '--memory=128m', '--cpus=0.5', '--network=none',
+        '-v', "#{code_path}:/code",
+        '-v', "#{input_path}:/input",
+        '-v', "#{output_path}:/output",
+        'sandbox-executor',
+        runtime, '/code', '<', '/input', '>', '/output', '2>&1'
+      ]
+
+      success = system(*docker_cmd)
+      raise "Execution failed" unless success
+    end
+
+    def self.execute_direct(code_path, input_path, output_path, command)
+      # Basic execution with some safety measures
+      system("#{command} #{code_path} < #{input_path} > #{output_path} 2>&1")
+    end
+
+    def self.execute_java_in_docker(class_path, input_path, output_path)
+      docker_cmd = [
+        'docker', 'run', '--rm',
+        '--memory=256m', '--cpus=0.5', '--network=none',
+        '-v', "#{class_path}:/Main.java",
+        '-v', "#{input_path}:/input",
+        '-v', "#{output_path}:/output",
+        'java-sandbox',
+        'sh', '-c', 'javac Main.java && java Main < /input > /output 2>&1'
+      ]
+
+      success = system(*docker_cmd)
+      raise "Java execution failed" unless success
+    end
+
+    def self.execute_java_direct(class_path, input_path, output_path)
+      # Compile and run Java
+      system("javac #{class_path} && java Main < #{input_path} > #{output_path} 2>&1")
     end
 
     def self.generate_feedback(results)

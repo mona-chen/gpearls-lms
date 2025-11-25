@@ -1,33 +1,38 @@
 class Api::BatchesController < Api::BaseController
-  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :authenticate_user!, except: [ :index, :show, :create ]
   before_action :set_batch, only: [ :show, :update, :destroy, :enroll, :unenroll, :timetable, :students, :statistics ]
   before_action :require_batch_instructor_or_admin!, only: [ :update, :destroy, :students, :statistics ]
 
   # GET /api/batches
   def index
+    filters = filter_params.slice(:category, :my_batches, :starting_soon, :status, :paid)
+    search = search_params[:search]
+    pagination = pagination_params
+
     batches = Batch.includes(:instructor, :batch_courses, :courses)
                   .published
                   .order(start_date: :asc)
 
     # Apply filters
-    batches = batches.by_category(params[:category]) if params[:category].present?
-    batches = batches.by_instructor(current_user) if params[:my_batches] == "true"
-    batches = batches.starting_soon if params[:starting_soon] == "true"
-    batches = batches.active if params[:status] == "active"
-    batches = batches.upcoming if params[:status] == "upcoming"
-    batches = batches.completed if params[:status] == "completed"
-    batches = batches.paid if params[:paid] == "true"
-    batches = batches.free if params[:paid] == "false"
+    batches = batches.by_category(filters[:category]) if filters[:category].present?
+    batches = batches.by_instructor(current_user) if filters[:my_batches] == "true"
+    batches = batches.starting_soon if filters[:starting_soon] == "true"
+    batches = batches.active if filters[:status] == "active"
+    batches = batches.upcoming if filters[:status] == "upcoming"
+    batches = batches.completed if filters[:status] == "completed"
+    batches = batches.paid if filters[:paid] == "true"
+    batches = batches.free if filters[:paid] == "false"
 
     # Apply search
-    if params[:search].present?
-      batches = batches.where("batches.title ILIKE ?", "%#{params[:search]}%")
+    if search.present?
+      search_term = "%#{search.gsub('%', '\\%').gsub('_', '\\_')}%"
+      batches = batches.where("batches.title ILIKE ?", search_term)
     end
 
     # Pagination
-    page = params[:page] || 1
-    per_page = params[:per_page] || 20
-    batches = batches.limit(per_page).offset((page.to_i - 1) * per_page)
+    page = pagination[:page] || 1
+    per_page = pagination[:per_page] || 20
+    batches = batches.page(page).per(per_page)
 
     render json: {
       data: batches.map(&:to_frappe_format),
@@ -46,12 +51,23 @@ class Api::BatchesController < Api::BaseController
 
   # POST /api/batches
   def create
-    batch = Batch.new(batch_params)
+    batch = Batch.new(batch_params.except(:course_id, :instructor_id).merge(
+      start_time: batch_params[:start_time] || "09:00",
+      end_time: batch_params[:end_time] || "17:00",
+      additional_info: batch_params[:additional_info] || "Additional information",
+      max_students: batch_params[:max_students] || batch_params[:seat_count] || 50
+    ))
     batch.instructor = current_user
 
     if batch.save
       # Add instructor to instructors list if not already present
       batch.add_instructor(current_user) unless batch.has_instructor?(current_user)
+
+      # Add course if provided
+      if batch_params[:course_id].present?
+        course = Course.find(batch_params[:course_id])
+        batch.batch_courses.create!(course: course)
+      end
 
       render json: batch.to_frappe_format, status: :created
     else
@@ -327,6 +343,7 @@ class Api::BatchesController < Api::BaseController
       :title,
       :description,
       :batch_details,
+      :additional_info,
       :start_date,
       :end_date,
       :start_time,
@@ -352,6 +369,8 @@ class Api::BatchesController < Api::BaseController
       :custom_component,
       :custom_script,
       :meta_image,
+      :course_id,
+      :instructor_id,
       batch_courses_attributes: [ :id, :course_id, :evaluator_id, :_destroy ]
     )
   end

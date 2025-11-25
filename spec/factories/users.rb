@@ -8,18 +8,42 @@ FactoryBot.define do
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     profile_image { Faker::Internet.url }
-    role { "LMS Student" }
+
+    after(:build) do |user|
+      # Assign default student role immediately for both build and create
+      user.has_roles << HasRole.new(role: "LMS Student", user: user)
+      user.role = "LMS Student"
+    end
 
     trait :instructor do
-      role { "Course Creator" }
+      after(:build) do |user|
+        # Clear default roles and assign instructor role
+        user.has_roles.clear
+        user.has_roles << HasRole.new(role: "Course Creator", user: user)
+        user.role = "Course Creator"
+      end
     end
 
     trait :moderator do
-      role { "Moderator" }
+      after(:build) do |user|
+        # Clear default roles and assign moderator role
+        user.has_roles.clear
+        user.has_roles << HasRole.new(role: "Moderator", user: user)
+        user.role = "Moderator"
+      end
     end
 
     trait :evaluator do
-      role { "Batch Evaluator" }
+      after(:build) do |user|
+        # Clear default roles and assign evaluator role
+        user.has_roles.clear
+        user.has_roles << HasRole.new(role: "Batch Evaluator", user: user)
+        user.role = "Batch Evaluator"
+      end
+    end
+
+    trait :student do
+      # Default user is already a student, so no changes needed
     end
   end
 end

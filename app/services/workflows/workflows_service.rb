@@ -53,17 +53,91 @@ module Workflows
       end
     end
 
-    def self.apply_action(document, action, user)
-      transition = document.workflow&.workflow_transitions&.find_by(state: document.workflow_state, action: action)
-      return false unless transition
+  def self.apply_action(document, action, user)
+    transition = document.workflow&.workflow_transitions&.find_by(state: document.workflow_state, action: action)
+    return { success: false, error: "Invalid transition" } unless transition
 
-      allowed_roles = transition.allowed_roles&.split(",")&.map(&:strip) || []
-      if allowed_roles.any?
-        user_roles = user.roles || []
-        return false unless (allowed_roles & user_roles).any?
-      end
-
-      document.update(workflow_state: transition.next_state)
+    allowed_roles = transition.allowed_roles&.split(",")&.map(&:strip) || []
+    if allowed_roles.any?
+      user_roles = user.roles || []
+      return { success: false, error: "Insufficient permissions" } unless (allowed_roles & user_roles).any?
     end
+
+    # Execute transition
+    old_state = document.workflow_state
+    document.update(workflow_state: transition.next_state)
+
+    # Create workflow action record (if you have a WorkflowAction model)
+    # WorkflowAction.create!(
+    #   document: document,
+    #   user: user,
+    #   action: action,
+    #   from_state: old_state,
+    #   to_state: transition.next_state,
+    #   transition: transition
+    # )
+
+    # Execute any post-transition actions
+    execute_post_transition_actions(document, transition, user)
+
+    { success: true, message: "Action '#{action}' applied successfully", new_state: transition.next_state }
+  end
+
+  def self.execute_post_transition_actions(document, transition, user)
+    # Execute any automated actions after transition
+    case document.class.name
+    when "Course"
+      execute_course_workflow_actions(document, transition, user)
+    when "Batch"
+      execute_batch_workflow_actions(document, transition, user)
+    end
+  end
+
+  def self.execute_course_workflow_actions(course, transition, user)
+    case transition.next_state
+    when "Approved"
+      # Send approval notifications
+      notify_course_approved(course, user)
+      # Make course published
+      course.update(published: true, published_at: Time.current)
+    when "Rejected"
+      # Send rejection notifications
+      notify_course_rejected(course, user)
+    end
+  end
+
+  def self.execute_batch_workflow_actions(batch, transition, user)
+    case transition.next_state
+    when "Approved"
+      # Send approval notifications
+      notify_batch_approved(batch, user)
+      # Make batch published
+      batch.update(published: true)
+    when "Rejected"
+      # Send rejection notifications
+      notify_batch_rejected(batch, user)
+    end
+  end
+
+  def self.notify_course_approved(course, user)
+    # Send notifications to course creator and administrators
+    # This would integrate with your notification system
+    puts "Course #{course.title} approved by #{user.email}"
+  end
+
+  def self.notify_course_rejected(course, user)
+    # Send rejection notification
+    puts "Course #{course.title} rejected by #{user.email}"
+  end
+
+  def self.notify_batch_approved(batch, user)
+    # Send notifications to batch creator and administrators
+    puts "Batch #{batch.title} approved by #{user.email}"
+  end
+
+  def self.notify_batch_rejected(batch, user)
+    # Send rejection notification
+    puts "Batch #{batch.title} rejected by #{user.email}"
+  end
   end
 end

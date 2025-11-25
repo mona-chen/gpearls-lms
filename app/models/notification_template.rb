@@ -54,6 +54,109 @@ class NotificationTemplate < ApplicationRecord
     ERB.new(subject).result_with_hash(template_vars)
   end
 
+  def deliver(document, recipients = [])
+    return unless active?
+
+    recipients = determine_recipients(document) if recipients.empty?
+
+    recipients.each do |recipient|
+      next unless should_send_to_recipient?(recipient)
+
+      begin
+        case template_type
+        when "email"
+          deliver_email(document, recipient)
+        when "system"
+          deliver_system_notification(document, recipient)
+        when "both"
+          deliver_email(document, recipient)
+          deliver_system_notification(document, recipient)
+        end
+      rescue => e
+        Rails.logger.error "Failed to deliver notification #{name} to #{recipient}: #{e.message}"
+      end
+    end
+  end
+
+  private
+
+  def determine_recipients(document)
+    # Logic to determine recipients based on document type and conditions
+    case document_type
+    when "Course"
+      determine_course_recipients(document)
+    when "Batch"
+      determine_batch_recipients(document)
+    when "User"
+      determine_user_recipients(document)
+    else
+      []
+    end
+  end
+
+  def determine_course_recipients(course)
+    recipients = []
+    # Add course creator
+    recipients << course.instructor.email if course.instructor
+    # Add administrators/moderators
+    User.where(role: ["System Manager", "Moderator"]).pluck(:email).each do |email|
+      recipients << email
+    end
+    recipients.uniq
+  end
+
+  def determine_batch_recipients(batch)
+    recipients = []
+    # Add batch instructor
+    recipients << batch.instructor.email if batch.instructor
+    # Add administrators
+    User.where(role: "System Manager").pluck(:email).each do |email|
+      recipients << email
+    end
+    recipients.uniq
+  end
+
+  def determine_user_recipients(user)
+    [user.email]
+  end
+
+  def should_send_to_recipient?(recipient)
+    # Check if recipient should receive this notification
+    # Could check user preferences, etc.
+    true
+  end
+
+  def deliver_email(document, recipient)
+    return unless email?
+
+    subject_text = render_subject(document, recipient)
+    message_text = render_message(document, recipient)
+
+    # Use ActionMailer to send email
+    NotificationMailer.notification_email(
+      recipient,
+      subject_text,
+      message_text,
+      document
+    ).deliver_later
+  end
+
+  def deliver_system_notification(document, recipient)
+    return unless system? || both?
+
+    user = User.find_by(email: recipient)
+    return unless user
+
+    # Create in-app notification
+    Notification.create!(
+      user: user,
+      subject: render_subject(document, user),
+      message: render_message(document, user),
+      notification_type: "system",
+      related_document: document
+    )
+  end
+
   private
 
   def evaluate_conditions(document)

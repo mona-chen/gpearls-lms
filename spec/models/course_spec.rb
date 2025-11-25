@@ -42,15 +42,15 @@ RSpec.describe Course, type: :model do
     end
 
     it 'has many lessons' do
-      expect(course).to have_many(:lessons).dependent(:destroy)
+      expect(course).to have_many(:lessons)
     end
 
     it 'has many enrollments' do
       expect(course).to have_many(:enrollments).dependent(:destroy)
     end
 
-    it 'has many quizzes' do
-      expect(course).to have_many(:quizzes).dependent(:destroy)
+    it 'has many lms_quizzes' do
+      expect(course).to have_many(:lms_quizzes).dependent(:destroy)
     end
   end
 
@@ -230,14 +230,10 @@ RSpec.describe Course, type: :model do
     end
 
     it 'can count associated lessons' do
-      # Skip this test if Lesson model doesn't exist or has issues
-      begin
-        course.save!
-        create_list(:lesson, 3, course: course)
-        expect(course.lessons.count).to eq(3)
-      rescue => e
-        skip "Lesson model not properly set up: #{e.message}"
-      end
+      course.save!
+      chapter = create(:chapter, course: course)
+      create_list(:lesson, 3, course: course, chapter: chapter)
+      expect(course.lessons.count).to eq(3)
     end
   end
 

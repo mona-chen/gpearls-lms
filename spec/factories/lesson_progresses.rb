@@ -1,9 +1,16 @@
 FactoryBot.define do
   factory :lesson_progress do
-    user { nil }
-    lesson { nil }
-    progress { 1 }
+    progress { 100 }
     completed { false }
-    last_accessed_at { "2025-10-09 14:59:24" }
+    status { 'Incomplete' }
+
+    association :user
+    association :lesson
+
+    trait :completed do
+      progress { 100 }
+      completed { true }
+      status { 'Complete' }
+    end
   end
 end

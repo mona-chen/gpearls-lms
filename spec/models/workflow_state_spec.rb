@@ -1,5 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe WorkflowState, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it 'is a valid model' do
+    expect(WorkflowState).to be_a(Class)
+  end
 end

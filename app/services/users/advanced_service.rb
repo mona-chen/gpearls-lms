@@ -68,15 +68,48 @@ module Users
       user = User.find_by(email: user_email)
       return { success: false, error: "User not found" } unless user
 
-      # For now, we'll store badges as a simple JSON field on the user
-      # In a full implementation, this would be a separate Badge model
-      current_badges = user.badges || []
-      unless current_badges.include?(badge_name)
-        current_badges << badge_name
-        user.update!(badges: current_badges)
+      badge = LmsBadge.find_by(name: badge_name)
+      return { success: false, error: "Badge not found" } unless badge
+
+      # Check if user already has this badge
+      existing_assignment = LmsBadgeAssignment.find_by(badge: badge, member: user)
+      if existing_assignment
+        return { success: false, error: "User already has this badge" }
       end
 
-      { success: true, message: "Badge #{badge_name} assigned to #{user_email}" }
+      # Check badge eligibility
+      unless badge.is_eligible_for_user?(user)
+        return { success: false, error: "User is not eligible for this badge" }
+      end
+
+      # Check issuance limit
+      if badge.issuance_limit && badge.issuance_limit > 0 && badge.get_award_count(user) >= badge.issuance_limit
+        return { success: false, error: "Badge issuance limit reached for this user" }
+      end
+
+      # Create badge assignment
+      assignment = LmsBadgeAssignment.create!(
+        badge: badge,
+        member: user,
+        issued_on: Time.current,
+        status: "Active",
+        expires_on: badge.expires_after_days ? badge.expires_after_days.days.from_now : nil
+      )
+
+      # Create badge award record
+      LmsBadgeAward.create!(
+        badge: badge,
+        user: user,
+        awarded_at: Time.current,
+        awarded_by: Current.user, # Assuming current user context
+        context: "manual_assignment",
+        metadata: { assigned_by: "system", reason: "manual_assignment" }
+      )
+
+      # Update badge statistics
+      badge.update_award_count
+
+      { success: true, message: "Badge #{badge_name} assigned to #{user_email}", assignment_id: assignment.id }
     rescue => e
       { success: false, error: "Failed to assign badge: #{e.message}" }
     end

@@ -70,7 +70,7 @@ RSpec.describe CodeRevision, type: :model do
         'def solve(): return 42',
         user
       )
-      
+
       expect(revision).to be_persisted
       expect(revision.id).to be_present
     end
@@ -86,7 +86,7 @@ RSpec.describe CodeRevision, type: :model do
         user: user,
         created_at: 2.hours.ago
       )
-      
+
       CodeRevision.create!(
         section_id: exercise.id,
         section_type: 'LmsProgrammingExercise',
@@ -164,7 +164,7 @@ RSpec.describe CodeRevision, type: :model do
 
       # Verify both revisions exist
       expect(CodeRevision.count).to eq(2)
-      
+
       # Latest should return the most recent
       latest = CodeRevision.latest_for_section(exercise.id, 'LmsProgrammingExercise', user)
       expect(latest.id).to eq(revision2.id)
@@ -176,7 +176,7 @@ RSpec.describe CodeRevision, type: :model do
         section_type: 'LmsProgrammingExercise',
         user: user
       ).order(created_at: :desc)
-      
+
       expect(history.count).to eq(2)
       expect(history.first.code).to eq('def improved(): return "better"')
       expect(history.last.code).to eq('def initial(): pass')
@@ -189,7 +189,7 @@ RSpec.describe CodeRevision, type: :model do
                        code: 'print("test")',
                        notes: 'Fixed the bug',
                        metadata: { language: 'python', line_count: 1 })
-      
+
       expect(revision.notes).to eq('Fixed the bug')
       expect(revision.metadata['language']).to eq('python')
       expect(revision.metadata['line_count']).to eq(1)

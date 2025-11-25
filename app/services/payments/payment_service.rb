@@ -1,6 +1,6 @@
 module Payments
   class PaymentService
-    def self.initialize_payment(user, item_type, item_id, payment_method = 'paystack')
+    def self.initialize_payment(user, item_type, item_id, payment_method = "paystack")
       new(user, item_type, item_id, payment_method).initialize_payment
     end
 
@@ -14,7 +14,7 @@ module Payments
       new(payment.user, nil, nil, payment.payment_method).process_refund(payment, amount)
     end
 
-    def initialize(user, item_type = nil, item_id = nil, payment_method = 'paystack')
+    def initialize(user, item_type = nil, item_id = nil, payment_method = "paystack")
       @user = user
       @item_type = item_type
       @item_id = item_id
@@ -30,7 +30,7 @@ module Payments
       begin
         result = payment.initialize_payment(@gateway_service)
 
-        log_payment_event(payment, 'payment_initialized', 'success', {
+        log_payment_event(payment, "payment_initialized", "success", {
           gateway_type: @payment_method,
           authorization_url: result[:authorization_url]
         })
@@ -44,7 +44,7 @@ module Payments
         }
       rescue => e
         payment.mark_failed!(error: e.message)
-        log_payment_event(payment, 'payment_initialization_failed', 'error', { error: e.message })
+        log_payment_event(payment, "payment_initialization_failed", "error", { error: e.message })
 
         {
           success: false,
@@ -60,15 +60,15 @@ module Payments
       begin
         result = payment.verify_payment(@gateway_service, reference)
 
-        if result[:status] == 'success'
-          log_payment_event(payment, 'payment_verified', 'success', result[:gateway_response])
+        if result[:status] == "success"
+          log_payment_event(payment, "payment_verified", "success", result[:gateway_response])
         else
-          log_payment_event(payment, 'payment_verification_failed', 'error', result[:gateway_response])
+          log_payment_event(payment, "payment_verification_failed", "error", result[:gateway_response])
         end
 
         result
       rescue => e
-        log_payment_event(payment, 'payment_verification_error', 'error', { error: e.message })
+        log_payment_event(payment, "payment_verification_error", "error", { error: e.message })
 
         {
           success: false,
@@ -84,7 +84,7 @@ module Payments
       begin
         result = @gateway_service.process_refund(payment, amount)
 
-        log_payment_event(payment, 'refund_processed', 'success', {
+        log_payment_event(payment, "refund_processed", "success", {
           refund_amount: result[:amount],
           refund_id: result[:refund_id]
         })
@@ -95,7 +95,7 @@ module Payments
           payment: payment
         }
       rescue => e
-        log_payment_event(payment, 'refund_failed', 'error', { error: e.message })
+        log_payment_event(payment, "refund_failed", "error", { error: e.message })
 
         {
           success: false,
@@ -115,11 +115,11 @@ module Payments
 
       begin
         case gateway_type
-        when 'paystack'
+        when "paystack"
           add_paystack_method(gateway, payment_details)
-        when 'stripe'
+        when "stripe"
           add_stripe_method(gateway, payment_details)
-        when 'razorpay'
+        when "razorpay"
           add_razorpay_method(gateway, payment_details)
         else
           raise Error::UnsupportedGatewayError, "Gateway #{gateway_type} not supported"
@@ -134,11 +134,11 @@ module Payments
 
     def remove_payment_method(method_id)
       payment_method = @user.payment_methods.find(method_id)
-      payment_method.update!(status: 'inactive')
+      payment_method.update!(status: "inactive")
 
       {
         success: true,
-        message: 'Payment method removed successfully'
+        message: "Payment method removed successfully"
       }
     end
 
@@ -159,7 +159,7 @@ module Payments
       }
     end
 
-    def get_available_gateways(currency = 'USD')
+    def get_available_gateways(currency = "USD")
       active_gateways = PaymentGateway.active
                              .where("settings->>'supported_currencies' LIKE ?", "%#{currency}%")
                              .order(is_primary: :desc)
@@ -195,21 +195,21 @@ module Payments
         amount: amount,
         currency: payment_method.payment_gateway.supported_currencies.first,
         payment_method: payment_method.method_type,
-        payment_status: 'Pending',
+        payment_status: "Pending",
         description: description
       )
 
       begin
         case payment_method.method_type
-        when 'paystack'
+        when "paystack"
           result = charge_paystack_method(payment_method, payment)
-        when 'stripe'
+        when "stripe"
           result = charge_stripe_method(payment_method, payment)
         else
           raise Error::UnsupportedGatewayError, "Method #{payment_method.method_type} not supported"
         end
 
-        log_payment_event(payment, 'saved_method_charged', 'success', {
+        log_payment_event(payment, "saved_method_charged", "success", {
           payment_method_id: payment_method_id,
           result: result
         })
@@ -221,7 +221,7 @@ module Payments
         }
       rescue => e
         payment.mark_failed!(error: e.message)
-        log_payment_event(payment, 'saved_method_charge_failed', 'error', { error: e.message })
+        log_payment_event(payment, "saved_method_charge_failed", "error", { error: e.message })
 
         {
           success: false,
@@ -234,21 +234,21 @@ module Payments
     private
 
     def validate_payment_setup
-      raise Error::GatewayNotConfiguredError, 'Payment gateway not configured' unless @gateway&.active?
-      raise Error::InvalidPaymentError, 'User not provided' unless @user
-      raise Error::InvalidPaymentError, 'Item type not provided' unless @item_type
-      raise Error::InvalidPaymentError, 'Item ID not provided' unless @item_id
+      raise Error::GatewayNotConfiguredError, "Payment gateway not configured" unless @gateway&.active?
+      raise Error::InvalidPaymentError, "User not provided" unless @user
+      raise Error::InvalidPaymentError, "Item type not provided" unless @item_type
+      raise Error::InvalidPaymentError, "Item ID not provided" unless @item_id
 
       validate_item_exists
     end
 
     def validate_item_exists
       case @item_type
-      when 'course'
+      when "course"
         @item = Course.find(@item_id)
-      when 'batch'
+      when "batch"
         @item = Batch.find(@item_id)
-      when 'program'
+      when "program"
         @item = LmsProgram.find(@item_id)
       else
         raise Error::InvalidPaymentError, "Invalid item type: #{@item_type}"
@@ -258,33 +258,33 @@ module Payments
     end
 
     def validate_payment(payment)
-      raise Error::InvalidPaymentError, 'Payment not found' unless payment
-      raise Error::InvalidPaymentError, 'Payment does not belong to user' unless payment.user == @user
+      raise Error::InvalidPaymentError, "Payment not found" unless payment
+      raise Error::InvalidPaymentError, "Payment does not belong to user" unless payment.user == @user
     end
 
     def validate_refund(payment)
       validate_payment(payment)
-      raise Error::RefundFailedError, 'Payment cannot be refunded' unless payment.can_be_refunded?
+      raise Error::RefundFailedError, "Payment cannot be refunded" unless payment.can_be_refunded?
     end
 
     def create_payment_record
       case @item_type
-      when 'course'
+      when "course"
         Payment.create_for_course(@user, @item, @payment_method)
-      when 'batch'
+      when "batch"
         Payment.create_for_batch(@user, @item, @payment_method)
-      when 'program'
+      when "program"
         Payment.create_for_program(@user, @item, @payment_method)
       end
     end
 
     def get_gateway_service
       case @payment_method
-      when 'paystack'
-        Paystack::PaystackService.new(@gateway)
-      when 'razorpay'
+      when "paystack"
+        PaystackIntegration::PaystackService.new(@gateway)
+      when "razorpay"
         Razorpay::RazorpayService.new(@gateway)
-      when 'stripe'
+      when "stripe"
         Stripe::StripeService.new(@gateway)
       else
         raise Error::UnsupportedGatewayError, "Gateway #{@payment_method} not supported"
@@ -292,14 +292,14 @@ module Payments
     end
 
     def add_paystack_method(gateway, details)
-      service = Paystack::PaystackService.new(gateway)
+      service = PaystackIntegration::PaystackService.new(gateway)
       customer_data = service.create_customer(@user)
 
       payment_method = @user.payment_methods.create!(
         payment_gateway: gateway,
-        method_type: 'paystack',
+        method_type: "paystack",
         customer_code: customer_data[:customer_code],
-        status: 'active',
+        status: "active",
         gateway_data: customer_data
       )
 
@@ -316,9 +316,9 @@ module Payments
 
       payment_method = @user.payment_methods.create!(
         payment_gateway: gateway,
-        method_type: 'stripe',
+        method_type: "stripe",
         customer_id: customer_data[:customer_id],
-        status: 'active',
+        status: "active",
         gateway_data: customer_data
       )
 
@@ -335,9 +335,9 @@ module Payments
 
       payment_method = @user.payment_methods.create!(
         payment_gateway: gateway,
-        method_type: 'razorpay',
+        method_type: "razorpay",
         customer_id: customer_data[:customer_id],
-        status: 'active',
+        status: "active",
         gateway_data: customer_data
       )
 
@@ -349,8 +349,8 @@ module Payments
     end
 
     def charge_paystack_method(payment_method, payment)
-      service = Paystack::PaystackService.new(payment_method.payment_gateway)
-      service.charge_authorization(payment, payment_method.gateway_data['authorization_code'])
+      service = PaystackIntegration::PaystackService.new(payment_method.payment_gateway)
+      service.charge_authorization(payment, payment_method.gateway_data["authorization_code"])
     end
 
     def charge_stripe_method(payment_method, payment)

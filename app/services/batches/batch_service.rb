@@ -70,7 +70,7 @@ module Batches
       return { error: 'Batch not found' } unless batch
 
       # Validate Zoom account
-      zoom_account = LmsZoomSetting.find_by(name: params[:zoom_account])
+      zoom_account = ZoomSetting.find_by(account_name: params[:zoom_account])
       return { error: 'Zoom account not configured' } unless zoom_account
 
       # Create live class record
@@ -182,18 +182,96 @@ module Batches
     private
 
     def self.create_zoom_meeting(zoom_account, params)
-      # This would implement the actual Zoom API call
-      # For now, return mock success
-      {
-        success: true,
-        start_url: "https://zoom.us/s/meeting_id/start",
-        join_url: "https://zoom.us/j/meeting_id",
-        meeting_id: "123456789",
-        uuid: "uuid123",
-        password: "password123"
-      }
+      require 'net/http'
+      require 'uri'
+      require 'json'
+      require 'base64'
+
+      begin
+        # Get Zoom credentials
+        credentials = zoom_account.credentials
+        return { success: false, error: 'Zoom credentials not configured' } unless credentials
+
+        # Get access token using OAuth
+        access_token = get_zoom_access_token(credentials)
+        return { success: false, error: 'Failed to get Zoom access token' } unless access_token
+
+        # Create meeting
+        meeting_data = {
+          topic: params[:title] || "Live Class",
+          type: 2, # Scheduled meeting
+          start_time: params[:start_time]&.strftime('%Y-%m-%dT%H:%M:%S'),
+          duration: params[:duration] || 60,
+          timezone: params[:timezone] || 'UTC',
+          agenda: params[:description],
+          settings: {
+            host_video: true,
+            participant_video: true,
+            join_before_host: zoom_account.enable_join_before_host,
+            mute_upon_entry: zoom_account.mute_on_entry,
+            watermark: false,
+            use_pmi: false,
+            approval_type: 0, # Automatically approve
+            audio: 'both', # Both telephone and computer audio
+            auto_recording: zoom_account.auto_record_meetings ? 'cloud' : 'none',
+            waiting_room: zoom_account.enable_waiting_room
+          }
+        }
+
+        # Make API call to create meeting
+        uri = URI.parse("https://api.zoom.us/v2/users/#{credentials[:user_id]}/meetings")
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(uri.request_uri)
+        request['Authorization'] = "Bearer #{access_token}"
+        request['Content-Type'] = 'application/json'
+        request.body = meeting_data.to_json
+
+        response = http.request(request)
+        meeting = JSON.parse(response.body)
+
+        if response.code.to_i == 201 && meeting['id']
+          {
+            success: true,
+            start_url: meeting['start_url'],
+            join_url: meeting['join_url'],
+            meeting_id: meeting['id'].to_s,
+            uuid: meeting['uuid'],
+            password: meeting['password']
+          }
+        else
+          { success: false, error: "Zoom API Error: #{meeting['message'] || 'Failed to create meeting'}" }
+        end
+      rescue JSON::ParserError => e
+        { success: false, error: "Invalid JSON response from Zoom: #{e.message}" }
+      rescue => e
+        { success: false, error: "Unexpected error: #{e.message}" }
+      end
+    end
+
+    def self.get_zoom_access_token(credentials)
+      uri = URI.parse('https://zoom.us/oauth/token')
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request['Authorization'] = "Basic #{Base64.strict_encode64("#{credentials[:api_key]}:#{credentials[:api_secret]}")}"
+      request['Content-Type'] = 'application/x-www-form-urlencoded'
+      request.body = 'grant_type=account_credentials&account_id=' + credentials[:account_id]
+
+      response = http.request(request)
+      token_data = JSON.parse(response.body)
+
+      if response.code.to_i == 200 && token_data['access_token']
+        token_data['access_token']
+      else
+        Rails.logger.error "Zoom OAuth failed: #{token_data['reason'] || token_data['error']}"
+        nil
+      end
     rescue => e
-      { success: false, error: e.message }
+      Rails.logger.error "Zoom OAuth error: #{e.message}"
+      nil
     end
 
     def self.add_students_to_event(live_class, batch)

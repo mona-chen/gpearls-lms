@@ -2,17 +2,18 @@ FactoryBot.define do
   factory :batch do
     title { Faker::Lorem.words(number: 3).join(' ').titleize }
     description { Faker::Lorem.paragraph(sentence_count: 2) }
+    additional_info { Faker::Lorem.sentence }
     start_date { 1.week.from_now }
     end_date { 8.weeks.from_now }
     start_time { Time.parse('09:00') }
     end_time { Time.parse('17:00') }
-    seat_count { rand(20..50) }
+    max_students { rand(20..50) }
     published { false }
-    paid_batch { false }
-    certification { false }
+
     allow_self_enrollment { true }
     category { Faker::Educator.subject }
 
+    association :course
     association :instructor, factory: [:user, :instructor]
 
     trait :active do
@@ -32,13 +33,7 @@ FactoryBot.define do
     end
 
     trait :paid do
-      paid_batch { true }
-      amount { rand(99..999) }
-      currency { 'USD' }
-    end
-
-    trait :with_certification do
-      certification { true }
+      price { rand(99..999) }
     end
 
     trait :with_enrollments do

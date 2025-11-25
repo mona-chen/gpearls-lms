@@ -1,8 +1,9 @@
 require 'rails_helper'
+require './app/services/paystack_integration/paystack_service'
 
-RSpec.describe Paystack::PaystackService, type: :service do
+RSpec.describe PaystackIntegration::PaystackService, type: :service do
   let(:gateway) { create(:payment_gateway, gateway_type: 'paystack', status: 'active') }
-  let(:user) { create(:user, phone_number: '+2348031234567') }
+  let(:user) { create(:user, phone: '+2348031234567') }
   let(:payment) { create(:payment, user: user, payment_method: 'paystack', amount: 5000, currency: 'NGN') }
   let(:service) { described_class.new(gateway) }
 
@@ -252,7 +253,7 @@ RSpec.describe Paystack::PaystackService, type: :service do
 
   describe '#validate_webhook_signature' do
     it 'validates correct webhook signature' do
-      gateway.update(credentials: { webhook_secret: 'test_secret' })
+      gateway.update_credentials(public_key: 'pk_test', secret_key: 'sk_test', webhook_secret: 'test_secret')
       payload = '{"event":"charge.success","data":{}}'
       signature = OpenSSL::HMAC.hexdigest('sha512', 'test_secret', payload)
 
@@ -260,7 +261,7 @@ RSpec.describe Paystack::PaystackService, type: :service do
     end
 
     it 'rejects invalid webhook signature' do
-      gateway.update(credentials: { webhook_secret: 'test_secret' })
+      gateway.update_credentials(public_key: 'pk_test', secret_key: 'sk_test', webhook_secret: 'test_secret')
 
       expect(service.validate_webhook_signature('{}', 'invalid')).to be_falsey
     end

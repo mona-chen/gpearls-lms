@@ -1,217 +1,1793 @@
 
-While loading ./spec/models/course_spec.rb an `exit` / `raise SystemExit` occurred, RSpec will now quit.
-Failure/Error: abort e.to_s.strip
+LMS Utils
+  slugify function
+    simple slugification
+      keeps simple slugs unchanged
+      converts spaces to hyphens
+      removes special characters
+      handles multiple spaces
+      handles mixed case and special characters
+      trims leading and trailing spaces
+      handles empty string
+      handles nil input
+    duplicate handling
+      adds suffix for first duplicate
+      increments suffix for multiple duplicates
+      handles gaps in numbering
+      handles complex existing patterns
+    edge cases
+      handles numbers in original text
+      handles unicode characters (FAILED - 1)
+      handles very long titles
+  membership utilities
+    get_membership
+      returns nil when user not enrolled
+      returns enrollment when user enrolled
+    is_enrolled
+      returns false when user not enrolled
+      returns true when user enrolled
+  course utilities
+    get_chapters
+      returns chapters in order (FAILED - 2)
+      returns empty array for course without chapters (FAILED - 3)
+    get_lessons
+      returns lessons for a chapter (FAILED - 4)
+      returns lessons in order (FAILED - 5)
+    get_lesson_details
+      returns lesson with progress information (FAILED - 6)
+      handles user without enrollment (FAILED - 7)
+  progress utilities
+    get_progress
+      returns 0 for user with no progress (FAILED - 8)
+      calculates correct progress percentage (FAILED - 9)
+      returns 100 for completed course (FAILED - 10)
+  rating utilities
+    get_average_rating
+      returns 0 for course with no reviews (FAILED - 11)
+      calculates correct average rating (FAILED - 12)
+      handles single review (FAILED - 13)
+    get_reviews
+      returns reviews for course (FAILED - 14)
+      returns reviews in chronological order by default (FAILED - 15)
+    get_sorted_reviews
+      sorts reviews by rating descending (FAILED - 16)
+      sorts reviews by date descending (FAILED - 17)
+  instructor utilities
+    get_instructors
+      returns empty array for course without instructors (FAILED - 18)
+      returns course instructors (FAILED - 19)
+    is_instructor
+      returns false for non-instructor user
+      returns true for course instructor (FAILED - 20)
+  lesson utilities
+    get_lesson_icon
+      returns correct icon for article lesson (FAILED - 21)
+      returns correct icon for video lesson (FAILED - 22)
+      returns correct icon for quiz lesson (FAILED - 23)
+      returns default icon for unknown lesson type (FAILED - 24)
+    get_lesson_index
+      returns correct lesson index (FAILED - 25)
+    get_lesson_url
+      generates correct lesson URL (FAILED - 26)
+      handles course with special characters in name (FAILED - 27)
 
-SystemExit:
-  Migrations are pending. To resolve this issue, run:
+Batch
+  validations
+    is valid with valid attributes
+    is invalid without a title
+    is invalid without a course
+    generates a slug from title
+    handles duplicate slugs
+  associations
+    belongs to course
+    belongs to instructor
+    has many batch_enrollments
+    has many students through batch_enrollments
+    has many live_classes
+  enrollment management
+    allows student enrollment
+    prevents duplicate enrollments
+    tracks enrollment date
+  #student_count
+    returns correct student count
+    returns 0 for batch with no students
+  #is_published?
+    returns false for unpublished batch
+    returns true for published batch
+  #can_enroll?
+    allows enrollment when batch is published and not full
+    prevents enrollment when batch is not published
+    prevents enrollment when batch is full
+    prevents enrollment when student already enrolled
+    allows enrollment when max_students is nil (FAILED - 28)
+  #start_date and #end_date
+    handles date ranges
+    validates end date is after start date
+  #is_active?
+    returns true for batch in session
+    returns false for batch not started
+    returns false for batch ended
+    returns true when dates are nil
+  batch creation workflow (matching Frappe test)
+    creates batch with course and mentor
+    allows enrollment after creation
+  scopes
+    .published
+      returns only published batches
+    .active
+      returns only active batches
+    .by_course
+      returns batches for specific course
+  callbacks
+    before_save
+      generates slug from title
+      updates slug when title changes
 
-          bin/rails db:migrate
+CodeRevision
+  validations
+    is valid with valid attributes
+    is invalid without code
+    is invalid without section_id
+    is invalid without user
+  associations
+    belongs to user
+    has polymorphic association to exercise_section
+  .autosave_for_section
+    creates a new code revision
+    matches Frappe autosave_section API behavior
+  .latest_for_section
+    returns the latest revision for section and user
+    returns nil when no revisions exist
+  scopes
+    .recent
+      orders by created_at desc
+    .by_user
+      returns revisions for specific user
+    .by_section
+      returns revisions for specific section
+  code versioning workflow
+    supports typical auto-save workflow
+  metadata and notes
+    supports additional metadata
 
-  You have 95 pending migrations:
+Course
+  FactoryBot factories
+    has a valid default factory
+    creates valid published course
+    creates valid featured course
+    can create course in database
+  Associations
+    belongs to an instructor
+    belongs to an evaluator
+    has many chapters
+    has many lessons
+    has many enrollments
+    has many lms_quizzes
+  Validations
+    is valid with valid attributes
+    is not valid without title
+    is not valid with empty title
+    is valid without description
+    is valid without instructor
+    is valid without evaluator
+    is valid with very long title
+  Database fields
+    has expected attributes
+  Basic queries
+    can find published courses
+    can find featured courses
+    can find courses by instructor
+    can find courses by category
+  Callbacks and lifecycle
+    can be created
+    can be updated
+    can be destroyed
+    stores timestamps
+  Edge cases
+    handles course with no instructor
+    handles course with nil tags
+    handles course with empty tags
+    handles course with comma-separated tags
+    handles course with special characters in title
+    handles course with unicode characters in title
+  Relationships with other models
+    can count associated enrollments
+    can count associated chapters
+    can count associated lessons
+  Business logic validation
+    can be published
+    can be featured
+    can be unpublished
+    can have both published and featured flags
+  Performance considerations
+    includes associations to prevent N+1 queries
 
-  db/migrate/20251012005423_create_certification_categories.rb
-  db/migrate/20251012010616_create_certificate_requests.rb
-  db/migrate/20251013142346_create_payments_table.rb
-  db/migrate/20251015070813_create_lms_settings.rb
-  db/migrate/20251015070909_create_lms_categories.rb
-  db/migrate/20251015071013_create_user_skills.rb
-  db/migrate/20251015071316_create_industries.rb
-  db/migrate/20251015071408_create_skills.rb
-  db/migrate/20251015071534_create_lms_courses.rb
-  db/migrate/20251015071955_create_lms_batches.rb
-  db/migrate/20251015072208_create_lms_enrollments.rb
-  db/migrate/20251015073005_create_users.rb
-  db/migrate/20251015073241_create_lms_quizzes.rb
-  db/migrate/20251015073427_create_lms_questions.rb
-  db/migrate/20251015073631_create_lms_quiz_questions.rb
-  db/migrate/20251015073832_create_lms_quiz_submissions.rb
-  db/migrate/20251015074058_create_lms_payments.rb
-  db/migrate/20251015080150_create_zoom_settings.rb
-  db/migrate/20251015080446_create_lms_assignments.rb
-  db/migrate/20251015080837_create_lms_assignment_submissions.rb
-  db/migrate/20251015081115_create_lms_certificates.rb
-  db/migrate/20251015085442_create_lms_certificate_requests.rb
-  db/migrate/20251015091737_create_lms_certificate_evaluations.rb
-  db/migrate/20251015092236_create_lms_live_classes.rb
-  db/migrate/20251015092407_create_lms_live_class_participants.rb
-  db/migrate/20251015093025_create_lms_batch_enrollments.rb
-  db/migrate/20251015093921_create_cohorts.rb
-  db/migrate/20251015094132_create_cohort_join_requests.rb
-  db/migrate/20251015094336_create_cohort_mentors.rb
-  db/migrate/20251015094546_create_cohort_staff.rb
-  db/migrate/20251015094818_create_cohort_subgroups.rb
-  db/migrate/20251015095110_create_lms_programs.rb
-  db/migrate/20251015095630_create_lms_assessments.rb
-  db/migrate/20251015095857_create_lms_exercises.rb
-  db/migrate/20251015100550_create_lms_program_courses.rb
-  db/migrate/20251015101544_create_lms_program_members.rb
-  db/migrate/20251015105247_create_lms_programming_exercises.rb
-  db/migrate/20251015110333_create_lms_test_cases.rb
-  db/migrate/20251015112402_create_education_details.rb
-  db/migrate/20251015113704_create_work_experiences.rb
-  db/migrate/20251015154950_create_exercise_submissions.rb
-  db/migrate/20251015155138_create_lms_programming_exercise_submissions.rb
-  db/migrate/20251015155306_create_lms_test_case_submissions.rb
-  db/migrate/20251015174623_create_lms_batch_feedbacks.rb
-  db/migrate/20251015174718_create_lms_batch_timetables.rb
-  db/migrate/20251015174829_create_lms_course_progresses.rb
-  db/migrate/20251015174951_create_lms_course_reviews.rb
-  db/migrate/20251015175742_create_lms_mentor_requests.rb
-  db/migrate/20251015175901_create_lms_badges.rb
-  db/migrate/20251015175958_create_lms_badge_assignments.rb
-  db/migrate/20251015180440_create_lms_lesson_notes.rb
-  db/migrate/20251015180542_create_lms_video_watch_durations.rb
-  db/migrate/20251015180730_create_lms_options.rb
-  db/migrate/20251015180829_create_certifications.rb
-  db/migrate/20251015181209_create_course_chapters.rb
-  db/migrate/20251015181314_create_course_evaluators.rb
-  db/migrate/20251015181746_create_course_instructors.rb
-  db/migrate/20251015181948_create_course_lessons.rb
-  db/migrate/20251015182130_create_evaluator_schedules.rb
-  db/migrate/20251015182447_create_lms_sources.rb
-  db/migrate/20251015182718_create_lms_sidebar_items.rb
-  db/migrate/20251015183016_create_lms_timetable_legends.rb
-  db/migrate/20251015183144_create_lms_timetable_templates.rb
-  db/migrate/20251015184606_create_batch_courses.rb
-  db/migrate/20251015184802_create_chapter_references.rb
-  db/migrate/20251015185014_create_cohort_web_pages.rb
-  db/migrate/20251015185425_create_exercise_latest_submissions.rb
-  db/migrate/20251015185756_create_lesson_references.rb
-  db/migrate/20251015190112_create_preferred_functions.rb
-  db/migrate/20251015190333_create_preferred_industries.rb
-  db/migrate/20251015190524_create_lms_batch_olds.rb
-  db/migrate/20251015193221_create_lms_course_interests.rb
-  db/migrate/20251015193424_create_lms_course_mentor_mappings.rb
-  db/migrate/20251015193714_create_lms_quiz_results.rb
-  db/migrate/20251015193937_create_lms_zoom_settings.rb
-  db/migrate/20251015200134_create_related_courses.rb
-  db/migrate/20251015200334_create_scheduled_flows.rb
-  db/migrate/20251015200638_create_payment_countries.rb
-  db/migrate/20251015202259_create_countries.rb
-  db/migrate/20251016024239_create_functions.rb
-  db/migrate/20251027072039_add_upcoming_to_lms_courses.rb
-  db/migrate/20251027120344_create_notifications.rb
-  db/migrate/20251027134740_create_lms_files.rb
-  db/migrate/20251027142541_create_lesson_progresses.rb
-  db/migrate/20251029235620_add_missing_fields_to_lms_categories.rb
-  db/migrate/20251029235658_add_category_to_lms_batches.rb
-  db/migrate/20251030001309_add_unique_index_to_course_chapter_name.rb
-  db/migrate/20251030001404_recreate_course_lesson_foreign_keys.rb
-  db/migrate/20251030002622_add_batch_id_to_batch_courses.rb
-  db/migrate/20251030002703_add_evaluator_id_to_batch_courses.rb
-  db/migrate/20251030003335_add_user_id_to_lms_batch_enrollments.rb
-  db/migrate/20251030003626_add_published_to_lms_batches.rb
-  db/migrate/20251030085858_create_job_opportunities.rb
-  db/migrate/20251030085859_add_current_lesson_to_lms_enrollments.rb
-  db/migrate/20251030085860_add_batch_id_to_lms_live_classes.rb
-# ./spec/rails_helper.rb:30:in `abort'
-# ./spec/rails_helper.rb:30:in `rescue in <top (required)>'
-# ./spec/rails_helper.rb:27:in `<top (required)>'
-# ./spec/models/course_spec.rb:1:in `<top (required)>'
-# ------------------
-# --- Caused by: ---
-# ActiveRecord::PendingMigrationError:
-#   
-#   
-#   Migrations are pending. To resolve this issue, run:
-#   
-#           bin/rails db:migrate
-#   
-#   You have 95 pending migrations:
-#   
-#   db/migrate/20251012005423_create_certification_categories.rb
-#   db/migrate/20251012010616_create_certificate_requests.rb
-#   db/migrate/20251013142346_create_payments_table.rb
-#   db/migrate/20251015070813_create_lms_settings.rb
-#   db/migrate/20251015070909_create_lms_categories.rb
-#   db/migrate/20251015071013_create_user_skills.rb
-#   db/migrate/20251015071316_create_industries.rb
-#   db/migrate/20251015071408_create_skills.rb
-#   db/migrate/20251015071534_create_lms_courses.rb
-#   db/migrate/20251015071955_create_lms_batches.rb
-#   db/migrate/20251015072208_create_lms_enrollments.rb
-#   db/migrate/20251015073005_create_users.rb
-#   db/migrate/20251015073241_create_lms_quizzes.rb
-#   db/migrate/20251015073427_create_lms_questions.rb
-#   db/migrate/20251015073631_create_lms_quiz_questions.rb
-#   db/migrate/20251015073832_create_lms_quiz_submissions.rb
-#   db/migrate/20251015074058_create_lms_payments.rb
-#   db/migrate/20251015080150_create_zoom_settings.rb
-#   db/migrate/20251015080446_create_lms_assignments.rb
-#   db/migrate/20251015080837_create_lms_assignment_submissions.rb
-#   db/migrate/20251015081115_create_lms_certificates.rb
-#   db/migrate/20251015085442_create_lms_certificate_requests.rb
-#   db/migrate/20251015091737_create_lms_certificate_evaluations.rb
-#   db/migrate/20251015092236_create_lms_live_classes.rb
-#   db/migrate/20251015092407_create_lms_live_class_participants.rb
-#   db/migrate/20251015093025_create_lms_batch_enrollments.rb
-#   db/migrate/20251015093921_create_cohorts.rb
-#   db/migrate/20251015094132_create_cohort_join_requests.rb
-#   db/migrate/20251015094336_create_cohort_mentors.rb
-#   db/migrate/20251015094546_create_cohort_staff.rb
-#   db/migrate/20251015094818_create_cohort_subgroups.rb
-#   db/migrate/20251015095110_create_lms_programs.rb
-#   db/migrate/20251015095630_create_lms_assessments.rb
-#   db/migrate/20251015095857_create_lms_exercises.rb
-#   db/migrate/20251015100550_create_lms_program_courses.rb
-#   db/migrate/20251015101544_create_lms_program_members.rb
-#   db/migrate/20251015105247_create_lms_programming_exercises.rb
-#   db/migrate/20251015110333_create_lms_test_cases.rb
-#   db/migrate/20251015112402_create_education_details.rb
-#   db/migrate/20251015113704_create_work_experiences.rb
-#   db/migrate/20251015154950_create_exercise_submissions.rb
-#   db/migrate/20251015155138_create_lms_programming_exercise_submissions.rb
-#   db/migrate/20251015155306_create_lms_test_case_submissions.rb
-#   db/migrate/20251015174623_create_lms_batch_feedbacks.rb
-#   db/migrate/20251015174718_create_lms_batch_timetables.rb
-#   db/migrate/20251015174829_create_lms_course_progresses.rb
-#   db/migrate/20251015174951_create_lms_course_reviews.rb
-#   db/migrate/20251015175742_create_lms_mentor_requests.rb
-#   db/migrate/20251015175901_create_lms_badges.rb
-#   db/migrate/20251015175958_create_lms_badge_assignments.rb
-#   db/migrate/20251015180440_create_lms_lesson_notes.rb
-#   db/migrate/20251015180542_create_lms_video_watch_durations.rb
-#   db/migrate/20251015180730_create_lms_options.rb
-#   db/migrate/20251015180829_create_certifications.rb
-#   db/migrate/20251015181209_create_course_chapters.rb
-#   db/migrate/20251015181314_create_course_evaluators.rb
-#   db/migrate/20251015181746_create_course_instructors.rb
-#   db/migrate/20251015181948_create_course_lessons.rb
-#   db/migrate/20251015182130_create_evaluator_schedules.rb
-#   db/migrate/20251015182447_create_lms_sources.rb
-#   db/migrate/20251015182718_create_lms_sidebar_items.rb
-#   db/migrate/20251015183016_create_lms_timetable_legends.rb
-#   db/migrate/20251015183144_create_lms_timetable_templates.rb
-#   db/migrate/20251015184606_create_batch_courses.rb
-#   db/migrate/20251015184802_create_chapter_references.rb
-#   db/migrate/20251015185014_create_cohort_web_pages.rb
-#   db/migrate/20251015185425_create_exercise_latest_submissions.rb
-#   db/migrate/20251015185756_create_lesson_references.rb
-#   db/migrate/20251015190112_create_preferred_functions.rb
-#   db/migrate/20251015190333_create_preferred_industries.rb
-#   db/migrate/20251015190524_create_lms_batch_olds.rb
-#   db/migrate/20251015193221_create_lms_course_interests.rb
-#   db/migrate/20251015193424_create_lms_course_mentor_mappings.rb
-#   db/migrate/20251015193714_create_lms_quiz_results.rb
-#   db/migrate/20251015193937_create_lms_zoom_settings.rb
-#   db/migrate/20251015200134_create_related_courses.rb
-#   db/migrate/20251015200334_create_scheduled_flows.rb
-#   db/migrate/20251015200638_create_payment_countries.rb
-#   db/migrate/20251015202259_create_countries.rb
-#   db/migrate/20251016024239_create_functions.rb
-#   db/migrate/20251027072039_add_upcoming_to_lms_courses.rb
-#   db/migrate/20251027120344_create_notifications.rb
-#   db/migrate/20251027134740_create_lms_files.rb
-#   db/migrate/20251027142541_create_lesson_progresses.rb
-#   db/migrate/20251029235620_add_missing_fields_to_lms_categories.rb
-#   db/migrate/20251029235658_add_category_to_lms_batches.rb
-#   db/migrate/20251030001309_add_unique_index_to_course_chapter_name.rb
-#   db/migrate/20251030001404_recreate_course_lesson_foreign_keys.rb
-#   db/migrate/20251030002622_add_batch_id_to_batch_courses.rb
-#   db/migrate/20251030002703_add_evaluator_id_to_batch_courses.rb
-#   db/migrate/20251030003335_add_user_id_to_lms_batch_enrollments.rb
-#   db/migrate/20251030003626_add_published_to_lms_batches.rb
-#   db/migrate/20251030085858_create_job_opportunities.rb
-#   db/migrate/20251030085859_add_current_lesson_to_lms_enrollments.rb
-#   db/migrate/20251030085860_add_batch_id_to_lms_live_classes.rb
-#   ./spec/rails_helper.rb:28:in `<top (required)>'
+Enrollment
+  validations
+    is valid with valid attributes
+    is invalid without a course
+    is invalid without a user
+    prevents duplicate enrollments for same user and course
+  associations
+    belongs to course
+    belongs to user
+    can belong to batch
+    has many lesson_progresses
+  enrollment with batch (matching Frappe test_lms_enrollment.py)
+    creates enrollment with course and member name
+    allows changing member role
+    sets enrollment date
+  #progress_percentage
+    returns 0 when no lessons completed
+    returns 50 when half lessons completed
+    returns 100 when all lessons completed
+  #completed_lessons_count
+    returns 0 when no lessons completed
+    returns correct count of completed lessons
+  #is_completed?
+    returns false when not all lessons completed
+    returns true when all lessons completed
+  #current_lesson
+    returns first lesson when no progress
+    returns next lesson after completing current
+    returns last lesson when all completed
+  scopes
+    .active
+      returns only active enrollments
+    .by_course
+      returns enrollments for specific course
+  callbacks
+    after_create
+      sets enrollment status to active by default
+      sends enrollment confirmation if configured
+
+LmsFile
+  is a valid model
+
+LmsQuestion
+  validations
+    is valid with valid attributes
+    is invalid without a question
+    is invalid without a question type
+  multiple choice questions
+    with multiple correct options
+      sets multiple to true
+    with single correct option
+      sets multiple to false
+    with no correct options
+      raises validation error
+  user input questions
+    without possible answers
+      raises validation error
+    with possible answers
+      is valid
+  #correct_options
+    returns array of correct option values
+  #all_options
+    returns array of non-empty options
+  #check_answer
+    for choices question
+      returns true for correct answer
+      returns false for incorrect answer
+      handles multiple correct answers
+    for user input question
+      returns true for correct answer
+      returns true for case-insensitive match
+      returns false for incorrect answer
+  associations
+    belongs to quiz
+  scopes
+    .by_type
+      returns questions of specified type
+
+Permission
+  is a valid model
+
+LmsQuiz
+  validations
+    is valid with valid attributes (FAILED - 29)
+    is invalid without a title (FAILED - 30)
+    is invalid with negative passing percentage (FAILED - 31)
+    is invalid with passing percentage over 100 (FAILED - 32)
+  associations
+    belongs to course (FAILED - 33)
+    has many lms_questions (FAILED - 34)
+    has many quiz_submissions (FAILED - 35)
+  questions
+    has correct question count (FAILED - 36)
+    validates question types (FAILED - 37)
+  #total_marks
+    calculates total marks correctly (FAILED - 38)
+  #passing_marks
+    calculates passing marks correctly (FAILED - 39)
+  #user_attempts
+    returns 0 when user has no attempts (FAILED - 40)
+    returns correct attempt count (FAILED - 41)
+  #user_can_attempt?
+    when quiz has no attempt limit
+      allows attempts (FAILED - 42)
+    when quiz has attempt limit
+      allows attempts when under limit (FAILED - 43)
+      prevents attempts when limit reached (FAILED - 44)
+  #best_score
+    returns 0 when user has no submissions (FAILED - 45)
+    returns highest score (FAILED - 46)
+  #has_passed?
+    returns false when no submissions (FAILED - 47)
+    returns true when best score meets passing percentage (FAILED - 48)
+    returns false when best score below passing percentage (FAILED - 49)
+  scopes
+    .published
+      returns only published quizzes (FAILED - 50)
+
+ScormCompletion
+  validations
+    is valid with valid attributes
+    prevents duplicate completions for same user and package
+  associations
+    belongs to user
+    belongs to scorm_package
+    belongs to course_lesson
+  enums
+    defines completion_status enum
+    defines success_status enum
+  #progress_percentage
+    returns 100 for completed status
+    returns 100 for passed status
+    returns 50 for failed status
+    returns score_raw for incomplete status
+    returns 0 for not_attempted status
+  #update_from_scorm_data
+    updates completion from SCORM data
+    parses SCORM time format correctly
+    handles ISO 8601 duration format
+    updates lesson progress when completed
+  #completed_or_passed?
+    returns true for completed status
+    returns true for passed status
+    returns false for incomplete status
+  .track_scorm_interaction
+    creates new completion record
+    updates existing completion record
+  .get_analytics_for_package
+    calculates package analytics correctly
+  scopes
+    .by_lesson
+      returns completions for specific lesson
+    .by_package
+      returns completions for specific package
+    .completed_users
+      returns only completed or passed completions
+  SCORM data mapping
+    maps SCORM lesson status to completion status
+    maps SCORM success status
+
+ScormPackage
+  validations
+    is valid with valid attributes
+    is invalid without title
+    is invalid without manifest_file
+    is invalid without launch_file
+    is invalid without version
+  associations
+    belongs to course_lesson
+    belongs to uploaded_by user
+    has many scorm_completions
+  enums
+    defines status enum
+    defaults to uploaded status
+  .create_from_upload
+    creates SCORM package from file upload
+    attaches the uploaded file
+  #launch_url
+    returns nil for non-extracted package
+    returns launch URL for extracted package
+  #extract_package
+    with attached files
+      successfully extracts package
+    without attached files
+      returns false
+  #completion_data_for_user
+    returns completion data for user
+    returns nil when user has no completion data
+  scopes
+    .by_course
+      returns packages for specific course
+  SCORM version detection
+    detects SCORM 1.2
+    detects SCORM 2004
+    handles unknown version
+  security checks
+    detects malicious JavaScript
+    detects malicious event handlers
+    allows clean content
+    is invalid without title
+    is invalid without manifest_file
+    is invalid without launch_file
+    is invalid without version
+  associations
+    belongs to course_lesson
+    belongs to uploaded_by user
+    has many scorm_completions
+  enums
+    defines status enum
+    defaults to uploaded status
+  .create_from_upload
+    creates SCORM package from file upload
+    attaches the uploaded file
+  #launch_url
+    returns nil for non-extracted package
+    returns launch URL for extracted package
+  #extract_package
+    with valid SCORM package
+      successfully extracts package
+      parses manifest metadata
+    with malicious content
+      detects and rejects malicious content
+    with extraction error
+      handles extraction errors gracefully
+  #completion_data_for_user
+    returns completion data for user
+    returns nil when user has no completion data
+  scopes
+    .by_course
+      returns packages for specific course
+  SCORM version detection
+    detects SCORM 1.2
+    detects SCORM 2004
+    handles unknown version
+  security checks
+    detects malicious JavaScript
+    detects malicious event handlers
+    allows clean content
+
+User
+  FactoryBot factories
+    has a valid default factory
+    creates valid instructor factory
+    creates valid moderator factory
+    creates valid evaluator factory
+  Devise modules
+    includes database_authenticatable
+    includes registerable
+    includes recoverable
+    includes rememberable
+    includes validatable
+    includes trackable
+    includes timeoutable
+  Associations
+    has many enrollments
+    has many batch_enrollments
+    has many courses through enrollments
+    has many batches through batch_enrollments
+    has many lesson_progress
+  Validations
+    is valid with valid attributes
+    is not valid without email
+    is not valid with invalid email format
+    is not valid with duplicate email
+    is not valid without password
+    is not valid with short password
+  Role methods
+    #instructor?
+      returns true for instructor users
+      returns false for non-instructor users
+    #moderator?
+      returns true for moderator users
+      returns false for non-moderator users
+    #evaluator?
+      returns true for evaluator users
+      returns false for non-evaluator users
+    #student?
+      returns true for student users
+      returns false for non-student users
+  #roles
+    returns LMS Student role for regular users
+    returns Course Creator role for instructors
+    returns Moderator role for moderators
+    returns Batch Evaluator role for evaluators
+    returns single role for users
+  #first_name
+    returns first part of full_name
+    returns User when full_name is nil
+    handles single name
+    handles multiple word names
+  #last_name
+    returns last part of full_name
+    returns empty string when full_name is nil
+    handles single name
+    handles multiple word names
+  #session_user
+    returns user session data hash
+    includes correct role information
+  Scopes and queries
+    finding users by role
+      can find instructors
+      can find moderators
+      can find evaluators
+  Callbacks and hooks
+    can be created with valid attributes
+    can be updated
+    can be destroyed
+  Edge cases
+    handles user with student role
+    handles user with instructor role
+    handles empty full_name in session_user
+    handles nil full_name in session_user
+  JWT Authentication
+    has JWT token field
+    has JWT token field
+
+VideoWatchDuration
+  validations
+    is valid with valid attributes
+    is invalid without video_url
+    is invalid with negative duration_watched
+    is invalid with zero video_length
+  associations
+    belongs to user
+    belongs to course_lesson
+  #progress_percentage
+    calculates correct percentage
+    caps at 100%
+    returns 0 for zero video length
+  #completed?
+    returns true when 90% or more watched
+    returns false when less than 90% watched
+  .track_duration
+    creates new record for first tracking
+    updates existing record with maximum duration
+    does not decrease duration if new value is less
+    updates last_position with current duration
+  .get_analytics_for_lesson
+    calculates correct analytics
+  scopes
+    .by_lesson
+      returns durations for specific lesson
+    .by_user
+      returns durations for specific user
+    .recent
+      orders by updated_at desc
+  watch session tracking
+    tracks first watch time
+    updates last watched time on save
+
+Workflow
+  is a valid model
+
+WorkflowState
+  is a valid model
+
+WorkflowTransition
+  is a valid model
+
+API::Authentication
+  POST /api/login
+    with valid credentials
+      logs in successfully and returns Frappe-compatible response (FAILED - 51)
+      returns correct user data structure (FAILED - 52)
+      sets proper cookies for Frappe compatibility (FAILED - 53)
+      sets CORS headers for Frappe compatibility (FAILED - 54)
+      returns instructor-specific data for instructor users (FAILED - 55)
+      returns moderator-specific data for moderator users (FAILED - 56)
+      returns evaluator-specific data for evaluator users (FAILED - 57)
+      updates user JTI for JWT invalidation (FAILED - 58)
+      returns valid JWT token (FAILED - 59)
+    with invalid credentials
+      returns unauthorized for wrong password (FAILED - 60)
+      returns unauthorized for non-existent user
+      returns unauthorized for missing parameters
+    with disabled user
+      returns unauthorized for disabled user (FAILED - 61)
+  POST /api/signup
+    with valid parameters
+      creates new user successfully
+      creates user with correct attributes
+      accepts optional user_category parameter (FAILED - 62)
+    with invalid parameters
+      returns bad request for missing email
+      returns bad request for missing full_name
+      returns unprocessable entity for existing enabled user (FAILED - 63)
+      returns unprocessable entity for existing disabled user (FAILED - 64)
+    rate limiting
+      allows normal signup rate
+      blocks excessive signups (FAILED - 65)
+    error handling
+      handles validation errors gracefully
+  POST /api/logout
+    logs out successfully (FAILED - 66)
+    clears Frappe-style cookies (FAILED - 67)
+    clears user JTI (FAILED - 68)
+    works without authenticated user (FAILED - 69)
+  CORS preflight requests
+    handles OPTIONS requests for login (FAILED - 70)
+    handles OPTIONS requests for signup (FAILED - 71)
+
+API::Compatibility
+  POST /api/method/*method_path
+    with authenticated user
+      lms.api.get_user_info
+        returns user information in Frappe-compatible format (FAILED - 72)
+        includes instructor-specific data for instructor user (FAILED - 73)
+        includes moderator-specific data for moderator user (FAILED - 74)
+        includes evaluator-specific data for evaluator user (FAILED - 75)
+      lms.api.get_all_users
+        returns list of users with limited fields (FAILED - 76)
+      lms.api.get_notifications
+        returns user notifications (FAILED - 77)
+      lms.api.mark_as_read
+        marks notification as read (FAILED - 78)
+        with non-existent notification
+          returns error (FAILED - 79)
+      lms.api.mark_all_as_read
+        marks all notifications as read (FAILED - 80)
+      lms.api.get_branding
+        returns branding information
+      lms.api.get_lms_setting
+        returns LMS settings (FAILED - 81)
+      lms.api.get_translations
+        returns translations
+      lms.api.get_sidebar_settings
+        returns sidebar settings
+      lms.api.get_certification_categories
+        returns certification categories (FAILED - 82)
+      lms.api.get_count_of_certified_members
+        returns count of certified members (FAILED - 83)
+      lms.api.get_certified_participants
+        returns certified participants (FAILED - 84)
+      lms.api.get_job_opportunities
+        returns job opportunities (FAILED - 85)
+      lms.utils.get_my_courses
+        returns user courses with full details (FAILED - 86)
+        returns featured courses when no enrollments exist (FAILED - 87)
+      lms.utils.get_courses
+        returns courses with filtering (FAILED - 88)
+      lms.utils.get_course_completion_data
+        returns course completion analytics (FAILED - 89)
+      lms.utils.get_tags
+        returns course tags as array
+      lms.utils.get_reviews
+        returns course reviews
+      lms.utils.get_my_batches
+        returns user batches with details (FAILED - 90)
+      lms.utils.get_batches
+        returns batches with filtering (FAILED - 91)
+      lms.utils.get_upcoming_evals
+        returns upcoming evaluations (FAILED - 92)
+      lms.utils.get_streak_info
+        returns user streak information
+      lms.utils.get_my_live_classes
+        returns upcoming live classes (FAILED - 93)
+      lms.utils.get_heatmap_data
+        returns heatmap activity data
+      lms.utils.get_chart_data
+        returns chart data (FAILED - 94)
+      lms.utils.save_current_lesson
+        saves current lesson for user (FAILED - 95)
+        returns error when not enrolled (FAILED - 96)
+      lms.api.get_chart_details
+        returns chart details
+      frappe.apps.get_apps
+        returns available apps (FAILED - 97)
+      frappe.client.get
+        gets document by doctype and filters
+      frappe.client.get_single_value
+        gets single value from document (FAILED - 98)
+      frappe.client.get_count
+        gets count of documents
+      frappe.desk.search.search_link
+        searches for linked documents (FAILED - 99)
+      logout
+        logs out user
+    without authentication
+      public endpoints
+        allows access to get_branding
+        allows access to get_translations
+        allows access to get_courses
+        allows access to get_tags
+        allows access to get_reviews
+      protected endpoints
+        returns unauthorized for get_user_info
+        returns unauthorized for get_my_courses (FAILED - 100)
+        returns unauthorized for get_my_batches (FAILED - 101)
+        returns unauthorized for get_streak_info (FAILED - 102)
+        returns unauthorized for save_current_lesson (FAILED - 103)
+    with invalid method path
+      returns 404 for unknown method
+    with server errors
+      handles service errors gracefully (FAILED - 104)
+    parameter handling
+      handles JSON parameters correctly
+      handles form parameters correctly (FAILED - 105)
+      handles missing parameters gracefully
+
+Api::Courses
+  GET /api/courses
+    returns published courses (FAILED - 106)
+    includes course details (FAILED - 107)
+    supports pagination (FAILED - 108)
+    supports filtering by category (FAILED - 109)
+  GET /api/courses/:course
+    returns course details (FAILED - 110)
+    includes course chapters and lessons (FAILED - 111)
+    includes enrollment status for authenticated user (FAILED - 112)
+    returns 404 for non-existent course (FAILED - 113)
+    returns 404 for unpublished course for non-instructor (FAILED - 114)
+    allows instructor to view unpublished course (FAILED - 115)
+  POST /api/courses
+    when user is authorized
+      creates a new course (FAILED - 116)
+      assigns current user as instructor (FAILED - 117)
+      returns validation errors for invalid data (FAILED - 118)
+    when user is not authorized
+      returns unauthorized status (FAILED - 119)
+  PUT /api/courses/:course
+    returns 404 for non-existent course (FAILED - 120)
+    when user is course instructor
+      updates the course (FAILED - 121)
+      returns validation errors for invalid data (FAILED - 122)
+    when user is not course instructor
+      returns unauthorized status (FAILED - 123)
+  DELETE /api/courses/:course
+    returns 404 for non-existent course (FAILED - 124)
+    when user is course instructor
+      deletes the course (FAILED - 125)
+      deletes associated data (FAILED - 126)
+    when user is not course instructor
+      returns unauthorized status (FAILED - 127)
+  POST /api/courses/:course/enroll
+    enrolls user in course (FAILED - 128)
+    prevents duplicate enrollment (FAILED - 129)
+    prevents enrollment in unpublished course (FAILED - 130)
+    when enrollment requires payment
+      requires payment for paid course (FAILED - 131)
+  GET /api/courses/:course/progress
+    returns user progress in course (FAILED - 132)
+    returns 404 for non-enrolled user (FAILED - 133)
+
+API::Onboarding
+  GET /api/onboarding/status
+    when user is not authenticated
+      returns unauthorized
+    when user is not a moderator
+      returns onboarded status immediately (FAILED - 134)
+    when user is a moderator
+      with no content created
+        returns not onboarded with all flags false (FAILED - 135)
+      with only course created
+        returns partial onboarding status (FAILED - 136)
+      with course and chapter created
+        returns partial onboarding status (FAILED - 137)
+      with course, chapter, and lesson created
+        returns partial onboarding status (FAILED - 138)
+      with all content created
+        returns fully onboarded status (FAILED - 139)
+        updates LMS Settings to mark onboarding complete (FAILED - 140)
+  GET /api/onboarding/first-course
+    when user is not authenticated
+      returns unauthorized
+    when no courses exist
+      returns nil (FAILED - 141)
+    when courses exist
+      returns the first course title (FAILED - 142)
+  GET /api/onboarding/first-batch
+    when user is not authenticated
+      returns unauthorized
+    when no batches exist
+      returns nil (FAILED - 143)
+    when batches exist
+      returns the first batch title (FAILED - 144)
+  POST /api/onboarding/handle_method (Frappe Compatibility)
+    when handling is_onboarding_complete method
+      returns onboarding status (FAILED - 145)
+    when handling get_first_course method
+      returns first course name (FAILED - 146)
+    when handling set_value method for onboarding completion
+      sets onboarding complete status (FAILED - 147)
+    when handling unknown method
+      returns error (FAILED - 148)
+    when handling set_value with invalid parameters
+      returns error (FAILED - 149)
+
+Dashboards
+  GET /index
+    returns http success (FAILED - 150)
+
+Frappe LMS Test Parity
+  Course Creation Test Parity (equivalent to course_creation.cy.js)
+    replicates Frappe course creation workflow (FAILED - 151)
+  Batch Creation Test Parity (equivalent to batch_creation.cy.js)
+    replicates Frappe batch creation and student management workflow (FAILED - 152)
+  Discussion Test Parity (equivalent to Frappe discussion posting)
+    replicates Frappe discussion creation and reply workflow (FAILED - 153)
+  Enrollment Test Parity (equivalent to Frappe enrollment workflows)
+    replicates Frappe course enrollment and progress tracking (FAILED - 154)
+  Quiz Test Parity (equivalent to Frappe quiz functionality)
+    replicates Frappe quiz creation and submission workflow (FAILED - 155)
+  Payment Test Parity (equivalent to Frappe payment workflows)
+    replicates Frappe payment initialization and verification (FAILED - 156)
+  SCORM Test Parity (equivalent to Frappe SCORM functionality)
+    replicates Frappe SCORM package upload and tracking (FAILED - 157)
+
+Frappe LMS Onboarding Replica
+  Onboarding Status API (exact replica of lms.utils.is_onboarding_complete)
+    returns is_onboarded: true for non-moderators (exact Frappe logic) (FAILED - 158)
+    returns detailed onboarding status for moderators (exact Frappe logic) (FAILED - 159)
+    marks onboarding complete when moderator creates content (exact Frappe logic) (FAILED - 160)
+  Persona Capture API (exact replica of Frappe persona flow)
+    captures user persona with role and use case (exact Frappe logic) (FAILED - 161)
+    sets persona_captured flag in LMS Settings (exact Frappe logic) (FAILED - 162)
+  Onboarding UI Flow (exact replica of Frappe onboarding header)
+    shows onboarding header for moderators who havent completed onboarding (FAILED - 163)
+    hides onboarding header for moderators who have completed onboarding (FAILED - 164)
+    hides onboarding header for non-moderators (FAILED - 165)
+  Onboarding Step Links (exact replica of Frappe step progression)
+    shows disabled chapter link when no course exists (FAILED - 166)
+    enables chapter link when course exists (FAILED - 167)
+    enables lesson link when chapter exists (FAILED - 168)
+  Onboarding Skip Functionality (exact replica of Frappe skip)
+    allows skipping onboarding by setting LMS Settings flag (FAILED - 169)
+  Persona Form Integration (exact replica of Frappe persona flow)
+    redirects to persona form when no courses exist and persona not captured (FAILED - 170)
+    does not redirect to persona form when persona is captured (FAILED - 171)
+  Onboarding Progress Tracking (exact replica of Frappe progress logic)
+    tracks course creation progress (FAILED - 172)
+    tracks chapter creation progress (FAILED - 173)
+    tracks lesson creation progress and completes onboarding (FAILED - 174)
+
+Analytics::ChartService
+  .call
+    when requesting New Signups chart
+      returns signup data for the last 7 days
+    when requesting Course Enrollments chart
+      returns enrollment data for the last 7 days
+    when requesting Certification chart
+      returns certification data
+    when requesting unknown chart
+      returns empty array
+    when no chart name provided
+      returns all chart data
+
+Analytics::HeatmapDataService
+  .call
+    when user has no activity
+      returns empty heatmap data (FAILED - 175)
+    when user has activity
+      returns heatmap data with activities (FAILED - 176)
+    when no user provided
+      returns empty data
+
+Analytics::StreakInfoService
+  .call
+    when user has no activity
+      returns zero streaks
+    when user has activity
+      calculates current and longest streak (FAILED - 177)
+    when no user provided
+      returns default streak info
+    when user has broken streak
+      calculates correct current streak (FAILED - 178)
+
+AssignmentService
+  .upload
+    with valid parameters
+      uploads file successfully (FAILED - 179)
+      creates LmsFile record (FAILED - 180)
+      creates or updates assignment submission (FAILED - 181)
+    without assignment
+      returns error (FAILED - 182)
+    without file
+      returns error
+    with non-existent assignment
+      returns error (FAILED - 183)
+    with user not enrolled in course
+      returns error (FAILED - 184)
+    with file upload failure
+      returns error (FAILED - 185)
+
+Batches::BatchEnrollmentService
+  .enroll_in_batch
+    successful enrollment
+      creates batch enrollment (FAILED - 186)
+      creates course enrollments for batch courses (FAILED - 187)
+      returns success for already enrolled user (FAILED - 188)
+    validation failures
+      fails for non-existent batch (FAILED - 189)
+      fails for nil user (FAILED - 190)
+      fails for batch not allowing self-enrollment (FAILED - 191)
+      fails for unpublished batch (FAILED - 192)
+      fails for full batch (FAILED - 193)
+      fails for batch not accepting enrollments (FAILED - 194)
+    time conflicts
+      fails when there are time conflicts (FAILED - 195)
+    course conflicts
+      fails when there are course conflicts (FAILED - 196)
+    email notifications
+      sends confirmation email (FAILED - 197)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 198)
+      returns proper error response format (FAILED - 199)
+
+Batches::BatchStudentsService
+  .call
+    with valid batch
+      returns all enrolled students with Frappe-compatible format (FAILED - 200)
+      includes user details (FAILED - 201)
+      includes enrollment information (FAILED - 202)
+    with status filter
+      filters by active status (FAILED - 203)
+      filters by completed status (FAILED - 204)
+      filters by upcoming status (FAILED - 205)
+    with progress calculation
+      calculates user progress correctly (FAILED - 206)
+      includes last activity timestamp (FAILED - 207)
+    with certificates
+      includes certificate count (FAILED - 208)
+    with invalid batch
+      returns empty array for non-existent batch
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 209)
+      formats dates correctly (FAILED - 210)
+
+Batches::BatchTimetableService
+  .call
+    with valid batch
+      returns timetable entries with Frappe-compatible format (FAILED - 211)
+      includes live classes when show_live_class is enabled (FAILED - 212)
+      excludes live classes when show_live_class is disabled (FAILED - 213)
+    with date filters
+      filters by start_date (FAILED - 214)
+      filters by end_date (FAILED - 215)
+      filters by both start_date and end_date (FAILED - 216)
+    with invalid batch
+      returns empty array for non-existent batch (FAILED - 217)
+    ordering
+      orders by date and start_time (FAILED - 218)
+    Frappe API compatibility
+      returns exact field names matching Frappe LMS (FAILED - 219)
+      formats dates and times correctly (FAILED - 220)
+
+Batches::BatchesService
+  .call
+    without filters
+      returns all published batches with Frappe-compatible format (FAILED - 221)
+      includes course information (FAILED - 222)
+      includes proper timestamps (FAILED - 223)
+    with filters
+      filters by published status (FAILED - 224)
+      filters by start_date (FAILED - 225)
+    with pagination
+      applies limit (FAILED - 226)
+      applies offset (FAILED - 227)
+    with ordering
+      orders by start_date desc by default (FAILED - 228)
+      orders by custom field (FAILED - 229)
+    Frappe API compatibility
+      returns exact field names matching Frappe LMS (FAILED - 230)
+      formats dates correctly (FAILED - 231)
+
+Batches::MyBatchesService
+  .call
+    with enrolled user
+      returns user enrolled batches with Frappe-compatible format (FAILED - 232)
+      includes enrollment information (FAILED - 233)
+    with user not enrolled in any batches
+      returns empty array
+    with nil user
+      returns empty array
+    multiple enrollments
+      returns all enrolled batches (FAILED - 234)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 235)
+      formats dates correctly (FAILED - 236)
+
+Certifications::AdminEvalsService
+  .call
+    without filters
+      returns certifications needing admin evaluation (FAILED - 237)
+      orders by creation date descending (FAILED - 238)
+      includes evaluation details (FAILED - 239)
+    with status filter
+      filters by specific status (FAILED - 240)
+    with evaluator filter
+      filters by evaluator (FAILED - 241)
+    with course filter
+      filters by course (FAILED - 242)
+    evaluation details
+      calculates days pending correctly (FAILED - 243)
+      includes proper timestamps (FAILED - 244)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 245)
+      includes evaluation details with correct structure (FAILED - 246)
+
+Certifications::CertificateService
+  .create_certificate
+    successful certificate creation
+      creates a certificate for completed course (FAILED - 247)
+      returns success response with certificate data (FAILED - 248)
+      sets default values correctly (FAILED - 249)
+      allows custom parameters (FAILED - 250)
+    validation failures
+      fails for non-existent user (FAILED - 251)
+      fails for missing course parameter (FAILED - 252)
+      fails for non-existent course (FAILED - 253)
+      fails if user is not enrolled in course (FAILED - 254)
+      fails if course is not completed (FAILED - 255)
+      returns existing certificate if already created (FAILED - 256)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 257)
+      returns proper error response format (FAILED - 258)
+
+Certifications::CertificationCategoriesService
+  .call
+    returns only enabled categories (FAILED - 259)
+    orders categories by name (FAILED - 260)
+    returns categories in Frappe-compatible format (FAILED - 261)
+    includes proper timestamps (FAILED - 262)
+    when no enabled categories exist
+      returns empty array (FAILED - 263)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 264)
+      formats timestamps correctly (FAILED - 265)
+
+Certifications::CertifiedParticipantsService
+  .call
+    without filters
+      returns all issued certifications (FAILED - 266)
+      excludes non-issued certifications (FAILED - 267)
+    with category filter
+      filters by category name (FAILED - 268)
+    with course filter
+      filters by course title (FAILED - 269)
+    with both filters
+      applies both category and course filters (FAILED - 270)
+    ordering
+      orders by creation date descending (FAILED - 271)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 272)
+      formats dates correctly (FAILED - 273)
+      includes proper user and course information (FAILED - 274)
+
+Courses::CourseDetailsService
+  .call
+    with valid course id
+      returns course details with proper structure
+      includes all required Frappe-compatible fields
+      formats dates correctly
+      includes instructor information
+    with user parameter
+      includes membership data for enrolled user (FAILED - 275)
+      includes current lesson for enrolled user (FAILED - 276)
+      returns nil membership for non-enrolled user (FAILED - 277)
+    with invalid course id
+      returns error for non-existent course
+    course statistics
+      includes accurate enrollment count (FAILED - 278)
+      includes formatted enrollment count (FAILED - 279)
+      includes review statistics (FAILED - 280)
+    paid course information
+      includes payment information for paid courses
+
+Courses::CourseEnrollmentService
+  .enroll
+    with valid user and course
+      creates enrollment successfully
+      returns Frappe-compatible enrollment data
+      creates enrollment record in database
+      prevents duplicate enrollment
+    with invalid parameters
+      returns error for nil user
+      returns error for nil course
+      returns error for unpublished course
+      returns error for upcoming course
+  .unenroll
+    removes enrollment successfully
+    deletes enrollment record from database
+    returns error for non-enrolled user
+    returns error for nil user
+  .can_enroll?
+    returns true for published course and valid user
+    returns false for unpublished course
+    returns false for upcoming course
+    returns false for already enrolled user
+    returns false for nil user
+    returns false for nil course
+
+Courses::CourseProgressService
+  .update_progress
+    with valid parameters
+      marks lesson as complete
+      marks lesson as incomplete
+      creates course progress record
+      updates existing progress record
+      returns course progress percentage
+    with invalid parameters
+      returns error for nil user
+      returns error for nil course
+      returns error for nil lesson
+      returns error for unenrolled user
+    enrollment progress updates
+      updates enrollment progress when lesson completed (FAILED - 281)
+      marks enrollment as completed when all lessons done (FAILED - 282)
+  .get_progress
+    with valid parameters
+      returns course progress information (FAILED - 283)
+      calculates progress correctly with completed lessons
+      returns partial progress for in-progress courses
+    with invalid parameters
+      returns error for nil user
+      returns error for nil course
+    edge cases
+      handles courses with no lessons
+  .save_current_lesson
+    returns success for valid parameters
+    returns error for nil user
+    returns error for nil course
+    returns error for nil lesson
+
+Courses::CourseReviewService
+  .get_reviews
+    with course that has reviews
+      returns all reviews for the course (FAILED - 284)
+      returns reviews in correct format (FAILED - 285)
+      orders reviews by creation date descending (FAILED - 286)
+      limits results to 50 reviews (FAILED - 287)
+    with course that has no reviews
+      returns empty array
+    with nil course
+      returns empty array
+    with unpublished reviews
+      only returns published reviews (FAILED - 288)
+  .add_review
+    with valid parameters
+      creates review successfully (FAILED - 289)
+      creates review record in database (FAILED - 290)
+      returns Frappe-compatible review data (FAILED - 291)
+      allows review without text (FAILED - 292)
+    with invalid parameters
+      returns error for nil user
+      returns error for nil course
+      returns error for invalid rating
+      returns error for unenrolled user
+      prevents duplicate reviews from same user
+  .get_average_rating
+    with reviews
+      calculates average rating correctly (FAILED - 293)
+    without reviews
+      returns 0.0
+    with nil course
+      returns 0.0
+
+Courses::CoursesService
+  .call
+    with no parameters
+      returns courses with all required fields
+      includes instructor information
+      formats dates correctly
+      splits tags into array
+      returns Published status for published courses
+    with filters
+      published filter
+        filters only published courses when published=1
+      upcoming filter
+        excludes upcoming courses when upcoming=0
+      multiple filters
+        applies multiple filters together
+    with pagination
+      applies limit parameter
+      applies offset parameter
+      uses default pagination values
+    rating calculation
+      calculates rating based on completion rate
+      returns 0 rating for courses with no enrollments
+      caps rating at 5.0
+    enrollment count
+      includes accurate enrollment count
+      returns 0 for courses with no enrollments
+    course fields mapping
+      maps all required fields correctly
+    edge cases
+      handles courses without instructors
+      handles courses with nil tags
+      handles empty database
+      handles invalid filter parameters gracefully
+    performance considerations
+      includes instructor data to prevent N+1 queries
+  private methods
+    #calculate_course_rating
+      with no enrollments
+        returns 0
+      with mixed completion rates
+        calculates weighted average rating
+      with all high completions
+        caps at 5.0
+
+Discussions::DiscussionRepliesService
+  .call
+    with valid discussion
+      returns root messages by default (FAILED - 294)
+      includes replies for each message (FAILED - 295)
+    with parent message filter
+      returns replies to specific message (FAILED - 296)
+    with message type filter
+      filters by message type (FAILED - 297)
+    with pagination
+      applies limit (FAILED - 298)
+      applies offset (FAILED - 299)
+    with ordering
+      orders by creation date descending by default (FAILED - 300)
+      orders by custom field (FAILED - 301)
+    with invalid discussion
+      returns empty array for non-existent discussion (FAILED - 302)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 303)
+      formats dates correctly (FAILED - 304)
+      includes reply count (FAILED - 305)
+
+Discussions::DiscussionTopicsService
+  .call
+    without filters
+      returns all open discussions with Frappe-compatible format (FAILED - 306)
+    with course filter
+      filters discussions by course (FAILED - 307)
+      filters discussions by course title (FAILED - 308)
+    with status filter
+      filters by specific status (FAILED - 309)
+      returns all statuses when status filter is provided (FAILED - 310)
+    with pagination
+      applies limit (FAILED - 311)
+      applies offset (FAILED - 312)
+    with ordering
+      orders by creation date descending by default (FAILED - 313)
+      orders by custom field (FAILED - 314)
+    reply count and last reply
+      includes correct reply count (FAILED - 315)
+      includes last reply timestamp (FAILED - 316)
+      includes last reply author (FAILED - 317)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 318)
+      formats dates correctly (FAILED - 319)
+
+Discussions::SaveMessageService
+  .call
+    successful message creation
+      creates a message (FAILED - 320)
+      returns success response with message data (FAILED - 321)
+      sets default message type to text (FAILED - 322)
+      allows custom message type (FAILED - 323)
+    reply message creation
+      creates a reply message (FAILED - 324)
+    validation failures
+      fails for nil user (FAILED - 325)
+      fails for missing discussion
+      fails for missing content (FAILED - 326)
+      fails for non-existent discussion
+      fails for closed discussion (FAILED - 327)
+      fails for non-existent parent message (FAILED - 328)
+      fails for parent message in different discussion (FAILED - 329)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 330)
+      returns proper error response format
+
+Discussions::SubmitReviewService
+  .call
+    successful review submission
+      creates a review message (FAILED - 331)
+      creates or updates course review (FAILED - 332)
+      returns success response with review data (FAILED - 333)
+      sets message type to review (FAILED - 334)
+      includes rating if provided (FAILED - 335)
+    validation failures
+      fails for nil user (FAILED - 336)
+      fails for missing course (FAILED - 337)
+      fails for missing content (FAILED - 338)
+      fails for non-existent course (FAILED - 339)
+      fails if user is not enrolled in course (FAILED - 340)
+      fails if course is not completed (FAILED - 341)
+      fails if review already exists (FAILED - 342)
+    course review creation
+      creates new course review (FAILED - 343)
+      updates existing course review (FAILED - 344)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 345)
+      returns proper error response format (FAILED - 346)
+
+FileInfoService
+  .call
+    with valid file URL for existing LmsFile
+      returns file information
+    with file URL for non-existent LmsFile but existing file on disk
+      returns file information from file system
+    with non-existent file URL
+      returns error
+    with empty file URL
+      returns error
+    with nil file URL
+      returns error
+
+Frappe::LmsUtilsService
+  .get_tags
+    when course exists with tags
+      returns tags as array matching Frappe behavior
+      handles single tag without comma
+    when course does not exist
+      returns empty array
+    when course has no tags
+      returns empty array
+      handles empty string tags
+  .get_reviews
+    when course exists
+      returns empty array (placeholder until reviews table exists)
+    when course does not exist
+      returns empty array
+  .get_average_rating
+    when no reviews exist
+      returns nil
+    when reviews exist (mocked)
+      calculates average correctly
+    when reviews have no rating
+      returns nil
+  .get_course_progress
+    when user is enrolled in course
+      calculates progress based on completed lessons (FAILED - 347)
+      returns 0 when no lessons are completed
+      returns 100 when all lessons are completed (FAILED - 348)
+      handles course with no lessons
+    when user is not enrolled
+      returns 0
+    when course does not exist
+      returns 0
+    with custom member parameter
+      calculates progress for specified member (FAILED - 349)
+  .get_membership
+    when user is enrolled
+      returns membership details matching Frappe format (FAILED - 350)
+    when user is not enrolled
+      returns false
+    with custom member parameter
+      returns membership for specified member (FAILED - 351)
+  .get_my_courses
+    when user has enrollments
+      returns enrolled courses with details
+      includes membership details for enrolled courses
+    when user has no enrollments
+      returns featured courses as fallback
+      returns popular courses as second fallback
+      returns empty array when no courses available
+    when no current user
+      returns empty array
+  .get_my_batches
+    when user has batch enrollments
+      returns enrolled batches with details
+      includes enrollment details for enrolled batches
+    when user has no batch enrollments
+      returns upcoming batches as fallback
+      returns empty array when no batches available
+    when no current user
+      returns empty array
+    when user has no batch enrollments
+      returns upcoming batches as fallback
+  .get_my_live_classes
+    when user has batch enrollments with live classes
+      returns upcoming live classes (FAILED - 352)
+      includes course title for live classes (FAILED - 353)
+      limits to 2 upcoming classes (FAILED - 354)
+    when no current user
+      returns empty array (FAILED - 355)
+    when no live classes found
+      returns empty array (FAILED - 356)
+  .get_streak_info
+    when user has activity
+      calculates current and longest streak (FAILED - 357)
+    when user has no activity
+      returns zero streaks (FAILED - 358)
+    when no current user
+      returns empty hash
+    weekend handling
+      skips weekends in streak calculation (FAILED - 359)
+  .get_upcoming_evals
+    when user has upcoming evaluations
+      returns evaluation details (FAILED - 360)
+    with course filter
+      filters evaluations by courses (FAILED - 361)
+    with batch filter
+      filters evaluations by batch (FAILED - 362)
+    when no current user
+      returns empty array (FAILED - 363)
+    when no upcoming evaluations
+      returns empty array (FAILED - 364)
+  .save_current_lesson
+    when user is enrolled
+      updates current lesson in enrollment (FAILED - 365)
+    when user is not enrolled
+      returns error (FAILED - 366)
+    when no current user
+      returns authentication error (FAILED - 367)
+  private helper methods
+    fetch_activity_dates calculation
+      includes lesson progress dates (FAILED - 368)
+      includes quiz submission dates (FAILED - 369)
+      includes assignment submission dates (FAILED - 370)
+    streak calculation edge cases
+      handles single day activity (FAILED - 371)
+      handles activity with gaps (FAILED - 372)
+
+Notifications::MarkAllAsReadService
+  .call
+    with unread notifications
+      marks all user notifications as read
+      does not affect other users notifications
+      only updates unread notifications
+    with no unread notifications
+      returns success
+    with no notifications
+      returns success
+
+Notifications::MarkAsReadService
+  .call
+    with valid notification and authorized user
+      marks the notification as read
+    with non-existent notification
+      returns error
+    with notification belonging to different user
+      returns unauthorized error
+    with already read notification
+      still returns success
+
+Onboarding::OnboardingService
+  .call
+    when user is not a moderator
+      returns onboarded status immediately
+    when user is a moderator
+      with no content created
+        returns not onboarded with all flags false (FAILED - 373)
+      with partial content created
+        returns partial onboarding status (FAILED - 374)
+      with all content created
+        returns fully onboarded status (FAILED - 375)
+        updates LMS Settings to mark onboarding complete (FAILED - 376)
+  #get_first_course
+    when no courses exist
+      returns nil
+    when courses exist
+      returns the first course title
+  #get_first_batch
+    when no batches exist
+      returns nil
+    when batches exist
+      returns the first batch title
+  #has_course_moderator_role?
+    when user is nil
+      returns false
+    when user has Moderator role
+      returns true
+    when user has other roles but not Moderator
+      returns false for Course Creator (FAILED - 377)
+      returns false for Student
+    when user has no roles
+      returns false
+  private methods
+    #is_onboarding_complete
+      with all content types created
+        updates onboarding status to complete (FAILED - 378)
+      with missing content types
+        does not update onboarding status
+  integration with LmsSetting
+    uses LmsSetting methods correctly (FAILED - 379)
+  performance considerations
+    uses efficient queries for content existence checks (FAILED - 380)
+    uses efficient query for first course
+
+Payments::BillingAccessService
+  .call
+    course access validation
+      paid course
+        returns payment required when user has no access (FAILED - 381)
+        includes pricing information for paid courses (FAILED - 382)
+        returns access granted when user has enrollment (FAILED - 383)
+      free course
+        returns no payment required for free courses (FAILED - 384)
+    batch access validation
+      paid batch
+        returns payment required when user has no access (FAILED - 385)
+        returns access granted when user has enrollment (FAILED - 386)
+      free batch
+        returns no payment required for free batches (FAILED - 387)
+    program access validation
+      returns payment required when user has no access (FAILED - 388)
+      returns access granted when user has membership (FAILED - 389)
+    payment status tracking
+      includes payment status when payment exists (FAILED - 390)
+      returns nil payment status when no payment exists (FAILED - 391)
+    validation failures
+      fails for nil user
+      fails for missing item_type
+      fails for missing item_id
+      fails for non-existent item
+    Frappe API compatibility
+      returns proper success response format (FAILED - 392)
+      returns proper error response format
+      includes all required access fields (FAILED - 393)
+
+Payments::OrderSummaryService
+  .call
+    with valid payment and authorized user
+      returns complete order summary (FAILED - 394)
+      includes payment logs (FAILED - 395)
+    with invalid payment ID
+      returns error for non-existent payment (FAILED - 396)
+    with unauthorized user
+      returns access denied error (FAILED - 397)
+    with nil user
+      returns user not found error (FAILED - 398)
+    item type detection
+      correctly identifies course payments (FAILED - 399)
+      correctly identifies batch payments (FAILED - 400)
+      correctly identifies program payments (FAILED - 401)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 402)
+      returns proper error response format (FAILED - 403)
+
+Payments::PaymentGatewayService
+  .call
+    returns only active gateways (FAILED - 404)
+    includes gateway statistics (FAILED - 405)
+    includes fee information (FAILED - 406)
+    includes supported currencies (FAILED - 407)
+    includes last payment timestamp (FAILED - 408)
+    with no payments
+      handles gateways with no payments (FAILED - 409)
+    success rate calculation
+      calculates correct success rate (FAILED - 410)
+      returns 0 for gateways with no payments (FAILED - 411)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 412)
+      formats dates correctly (FAILED - 413)
+      includes proper gateway metadata (FAILED - 414)
+
+Payments::PaymentLinkService
+  .call
+    successful payment link generation for course
+      creates payment and returns payment link (FAILED - 415)
+      creates payment record with correct details (FAILED - 416)
+    successful payment link generation for batch
+      creates payment for batch (FAILED - 417)
+    user already has access
+      returns error when user already has access
+    existing pending payment
+      returns existing payment when pending payment exists (FAILED - 418)
+    validation failures
+      fails for nil user
+      fails for missing item_type
+      fails for missing item_id
+      fails for non-existent item
+      fails for invalid item_type
+    gateway integration
+      uses specified gateway (FAILED - 419)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 420)
+      returns proper error response format
+
+Paystack Integration
+  Nigerian Payment Methods
+    USSD Payment
+      initializes USSD payment correctly (FAILED - 421)
+    Bank Transfer Payment
+      initializes bank transfer payment correctly (FAILED - 422)
+    Mobile Money Payment
+      initializes mobile money payment for MTN (FAILED - 423)
+      returns error for missing phone number (FAILED - 424)
+    Mobile Provider Detection
+      correctly identifies Nigerian mobile providers (FAILED - 425)
+    Bank Operations
+      retrieves list of supported banks (FAILED - 426)
+      resolves account number details (FAILED - 427)
+    Webhook Security
+      validates correct webhook signature (FAILED - 428)
+      rejects invalid webhook signature (FAILED - 429)
+    Supported Mobile Money Providers
+      returns comprehensive list of mobile money providers (FAILED - 430)
+
+PaystackIntegration::PaystackService
+  #initialize_transaction
+    with card payment
+      initializes a card payment transaction (FAILED - 431)
+    with USSD payment
+      initializes a USSD payment (FAILED - 432)
+    with bank transfer payment
+      initializes a bank transfer payment (FAILED - 433)
+    with mobile money payment
+      initializes a mobile money payment (FAILED - 434)
+  #verify_transaction
+    verifies a successful transaction (FAILED - 435)
+    handles failed transaction (FAILED - 436)
+  #initialize_ussd_payment
+    creates USSD payment (FAILED - 437)
+  #initialize_bank_transfer
+    creates bank transfer payment (FAILED - 438)
+  #initialize_mobile_money_payment
+    creates mobile money payment for MTN number (FAILED - 439)
+    returns error for missing phone number (FAILED - 440)
+  #determine_mobile_provider
+    detects mtn for +2348031234567
+    detects airtel for +2348021234567
+    detects glo for +2348051234567
+    detects 9mobile for +2348091234567
+    detects unknown for +2347001234567
+  #get_banks
+    retrieves list of supported banks (FAILED - 441)
+  #resolve_account_number
+    resolves account number details (FAILED - 442)
+  #validate_webhook_signature
+    validates correct webhook signature (FAILED - 443)
+    rejects invalid webhook signature (FAILED - 444)
+  #process_webhook
+    processes successful charge webhook (FAILED - 445)
+    processes failed charge webhook (FAILED - 446)
+  #get_ussd_providers
+    retrieves USSD providers (FAILED - 447)
+  #get_mobile_money_providers
+    returns list of supported mobile money providers (FAILED - 448)
+
+Programs::ProgramDetailsService
+  .call
+    with valid program
+      returns program details with courses (FAILED - 449)
+      includes courses in correct order (FAILED - 450)
+      includes course details (FAILED - 451)
+    with user membership
+      includes membership information when user is enrolled (FAILED - 452)
+    without user membership
+      includes zero progress when user is not enrolled (FAILED - 453)
+    with invalid program
+      returns nil for non-existent program (FAILED - 454)
+    Frappe API compatibility
+      returns exact field structure matching Frappe LMS (FAILED - 455)
+      formats dates correctly (FAILED - 456)
+
+Programs::ProgramEnrollmentService
+  .enroll_in_program
+    successful enrollment
+      creates program membership (FAILED - 457)
+      auto-enrolls user in all program courses (FAILED - 458)
+      returns success response with membership data (FAILED - 459)
+      sets initial progress to 0.0 (FAILED - 460)
+    validation failures
+      fails for non-existent program (FAILED - 461)
+      fails for nil user (FAILED - 462)
+      fails for unpublished program (FAILED - 463)
+      returns success for already enrolled user (FAILED - 464)
+    course enrollment handling
+      does not create duplicate course enrollments (FAILED - 465)
+      handles programs with no courses (FAILED - 466)
+    Frappe API compatibility
+      returns proper success response format (FAILED - 467)
+      returns proper error response format (FAILED - 468)
+
+Programs::ProgramsService
+  .call
+    without filters
+      returns enrolled and published programs separately (FAILED - 469)
+      includes enrolled programs in enrolled section (FAILED - 470)
+      includes published programs excluding enrolled ones (FAILED - 471)
+      excludes unpublished programs (FAILED - 472)
+    Frappe API compatibility
+      returns exact structure matching Frappe LMS (FAILED - 473)
+
+Settings::BrandingService
+  .call
+    returns branding information with proper structure
+    returns default branding values when no settings exist
+    loads branding settings from LmsSetting model (FAILED - 474)
+    handles boolean settings correctly (FAILED - 475)
+    returns all required branding fields
+
+Settings::LmsSettingsService
+  .call
+    with field parameter
+      returns the value for the specified field (FAILED - 476)
+      returns false for non-existent field
+      returns boolean value for Check fieldtype (FAILED - 477)
+    without field parameter
+      returns all settings wrapped in message (FAILED - 478)
+      returns default settings when no database settings exist
+  private methods
+    #load_database_settings
+      loads settings from database (FAILED - 479)
+      returns empty hash when database has no settings
+    #default_settings
+      returns comprehensive default settings
+
+Settings::SidebarSettingsService
+  .call
+    returns sidebar settings with proper structure
+    returns default sidebar settings (all enabled)
+    loads sidebar settings from LmsSetting model (FAILED - 480)
+    converts boolean values to 1/0 format (FAILED - 481)
+    returns all required sidebar fields
+    handles web_pages as empty array for now
+
+Settings::TranslationsService
+  .call
+    returns translations with proper structure
+    returns default translations
+    merges custom translations from database (FAILED - 482)
+    handles database errors gracefully
+    returns comprehensive translation set
+
+Users::UserInfoService
+  .call
+    with a regular student user
+      returns user information in Frappe-compatible format (FAILED - 483)
+      includes site information
+    with an instructor user
+      returns instructor-specific roles
+    with a moderator user
+      returns moderator-specific roles
+    with an evaluator user
+      returns evaluator-specific roles
+    with course enrollments
+      calculates course progress correctly (FAILED - 484)
+      returns 0 progress for no completed lessons
+      calculates progress correctly across multiple courses (FAILED - 485)
+    edge cases
+      handles user without full_name (FAILED - 486)
+      handles user without user_image
+      handles user with enabled flag
+      handles user with Administrator user_type (FAILED - 487)
+  private methods
+    #calculate_overall_course_progress
+      returns 0 for user with no enrollments
+      calculates progress correctly for completed lessons (FAILED - 488)
+      handles division by zero gracefully
+    #map_user_type_to_frappe
+      maps Course Creator correctly
+      maps Moderator correctly
+      maps Batch Evaluator correctly
+      maps Administrator to System Manager
+      defaults to LMS Student for unknown types
+      defaults to LMS Student for nil type
+    #user_roles
+      returns base roles for student
+      returns instructor roles for Course Creator
+      removes duplicate roles
+    #site_info
+      returns consistent site information
+
+Users::UsersService
+  .call
+    returns users data in Frappe-compatible format (FAILED - 489)
+    includes all required user fields (FAILED - 490)
+    maps user data correctly (FAILED - 491)
+    handles users without full_name (FAILED - 492)
+    handles users without user_image (FAILED - 493)
+    limits results to 10 users (FAILED - 494)
+    returns users in database order (FAILED - 495)
+    returns empty array when no users exist (FAILED - 496)
+    selects only required fields from database (FAILED - 497)
+    with multiple users
+      returns all users up to limit (FAILED - 498)
+      returns consistent data structure (FAILED - 499)
+    username generation
+      generates username from email prefix (FAILED - 500)
+      handles simple email addresses (FAILED - 501)
+    name parsing
+      parses first and last names correctly (FAILED - 502)
+      handles single name users (FAILED - 503)
+      handles nil full_name (FAILED - 504)
+  performance considerations
+    uses efficient database queries (FAILED - 505)
+
+Batch Creation
+  creates a new batch with all fields and manages students (FAILED - 506)
+
+Course Creation
+  creates a new course with all fields (FAILED - 507)
+
+Onboarding UI Flow
+  Persona Form Flow (exact replica of Frappe persona onboarding)
+    shows persona form for system managers with no courses (FAILED - 508)
+    captures persona and redirects to courses (FAILED - 509)
+    allows skipping persona form (FAILED - 510)
+  Onboarding Header Display (exact replica of Frappe onboarding header)
+    shows onboarding header for moderators who havent completed setup (FAILED - 511)

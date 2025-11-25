@@ -4,7 +4,7 @@ RSpec.describe VideoWatchDuration, type: :model do
   let(:user) { create(:user) }
   let(:course) { create(:course) }
   let(:chapter) { create(:course_chapter, course: course) }
-  let(:lesson) { create(:course_lesson, course_chapter: chapter, course: course) }
+  let(:lesson) { create(:course_lesson, chapter: chapter, course: course) }
   let(:video_url) { 'https://example.com/video.mp4' }
 
   describe 'validations' do

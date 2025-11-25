@@ -4,16 +4,25 @@ class Course < ApplicationRecord
   # Database column aliases (Frappe compatibility)
   alias_attribute :course_price, :price
 
+  # Virtual attributes
+  def paid
+    price.present? && price > 0
+  end
+
+  def paid=(value)
+    # Paid is virtual, based on price
+  end
+
 # Associations
 belongs_to :instructor, class_name: "User", optional: true
 belongs_to :evaluator, class_name: "User", optional: true
 
   has_many :chapters, -> { order(:idx) }, class_name: "CourseChapter", foreign_key: "course", primary_key: "id", dependent: :destroy
-   has_many :lessons, -> { order(:idx) }, through: :chapters, class_name: "CourseLesson", dependent: :destroy
+    has_many :lessons, -> { order(:idx) }, through: :chapters, class_name: "CourseLesson"
    has_many :enrollments, dependent: :destroy
-    has_many :course_progresses, ->(course) { where(course: course.name) }, class_name: "CourseProgress", dependent: :destroy
-  has_many :quizzes, dependent: :destroy
-   has_many :course_reviews, ->(course) { where(course: course.name) }, class_name: "CourseReview", dependent: :destroy
+    has_many :course_progresses, ->(course) { where(course: course.name) }, class_name: "CourseProgress"
+   has_many :lms_quizzes, dependent: :destroy
+   has_many :course_reviews, ->(course) { where(course: course.name) }, class_name: "CourseReview"
 
   # Validations
   validates :title, presence: true

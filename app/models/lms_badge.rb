@@ -900,6 +900,12 @@ class LmsBadge < ApplicationRecord
     (unique_users.to_f / potential_users * 100).round(2)
   end
 
+  def update_award_count
+    # This would be called after badge assignments to update statistics
+    # For now, just ensure the badge is marked as updated
+    touch
+  end
+
   def get_potential_eligible_users_count
     # Estimate the number of users who could potentially earn this badge
     if course && batch

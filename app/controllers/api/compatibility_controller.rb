@@ -53,6 +53,20 @@ class Api::CompatibilityController < ApplicationController
       else
         { error: "Not authenticated", status: :unauthorized }
       end
+    when "lms.api.capture_user_persona"
+      if Current.user
+        # Parse the responses JSON and capture persona
+        responses = JSON.parse(safe_params[:responses] || '{}') rescue {}
+        Current.user.update!(
+          persona_role: responses['role'],
+          persona_use_case: responses['use_case'],
+          persona_responses: safe_params[:responses],
+          persona_captured_at: Time.current
+        )
+        { success: true, message: "Persona captured successfully" }
+      else
+        { error: "Not authenticated", status: :unauthorized }
+      end
     when "lms.api.get_all_users"
       Users::UsersService.call
     when "lms.api.get_notifications"

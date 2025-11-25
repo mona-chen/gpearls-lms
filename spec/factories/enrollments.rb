@@ -1,7 +1,8 @@
 FactoryBot.define do
-  factory :enrollment, class: LmsEnrollment do
+  factory :enrollment do
     progress_percentage { 0 }
     status { 'Active' }
+    role { 'Member' }
 
     association :course
     association :user

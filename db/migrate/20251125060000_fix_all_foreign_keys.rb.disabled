@@ -1,0 +1,115 @@
+class FixAllForeignKeys < ActiveRecord::Migration[7.2]
+  def change
+    # Certificate requests
+    add_foreign_key "certificate_requests", "lms_courses", column: "course_id" unless foreign_key_exists?("certificate_requests", "lms_courses", column: "course_id")
+    # evaluator_id FK will be added if the column exists
+
+    # Course lessons
+    add_foreign_key "course_lessons", "course_chapters", column: "chapter" unless foreign_key_exists?("course_lessons", "course_chapters", column: "chapter")
+    add_foreign_key "course_lessons", "lms_courses", column: "course" unless foreign_key_exists?("course_lessons", "lms_courses", column: "course")
+
+    # Course chapters
+    add_foreign_key "course_chapters", "lms_courses", column: "course" unless foreign_key_exists?("course_chapters", "lms_courses", column: "course")
+
+    # Enrollments
+    add_foreign_key "lms_enrollments", "users", column: "student_id" unless foreign_key_exists?("lms_enrollments", "users", column: "student_id")
+    add_foreign_key "lms_enrollments", "lms_courses", column: "course_id" unless foreign_key_exists?("lms_enrollments", "lms_courses", column: "course_id")
+    add_foreign_key "lms_batch_enrollments", "lms_batches", column: "batch_id" unless foreign_key_exists?("lms_batch_enrollments", "lms_batches", column: "batch_id")
+    add_foreign_key "lms_batch_enrollments", "users", column: "user_id" unless foreign_key_exists?("lms_batch_enrollments", "users", column: "user_id")
+
+    # Batch courses
+    add_foreign_key "batch_courses", "lms_batches", column: "batch_id" unless foreign_key_exists?("batch_courses", "lms_batches", column: "batch_id")
+    add_foreign_key "batch_courses", "lms_courses", column: "course_id" unless foreign_key_exists?("batch_courses", "lms_courses", column: "course_id")
+    add_foreign_key "batch_courses", "users", column: "evaluator_id" unless foreign_key_exists?("batch_courses", "users", column: "evaluator_id")
+
+    # Quiz results
+    add_foreign_key "lms_quiz_results", "lms_quizzes", column: "quiz_id" unless foreign_key_exists?("lms_quiz_results", "lms_quizzes", column: "quiz_id")
+    add_foreign_key "lms_quiz_results", "users", column: "user_id" unless foreign_key_exists?("lms_quiz_results", "users", column: "user_id")
+
+    # Quiz submissions
+    add_foreign_key "lms_quiz_submissions", "lms_quizzes", column: "quiz_id" unless foreign_key_exists?("lms_quiz_submissions", "lms_quizzes", column: "quiz_id")
+    add_foreign_key "lms_quiz_submissions", "users", column: "student_id" unless foreign_key_exists?("lms_quiz_submissions", "users", column: "student_id")
+
+    # Quiz questions
+    add_foreign_key "lms_quiz_questions", "lms_quizzes", column: "quiz_id" unless foreign_key_exists?("lms_quiz_questions", "lms_quizzes", column: "quiz_id")
+    add_foreign_key "lms_quiz_questions", "lms_questions", column: "question_id" unless foreign_key_exists?("lms_quiz_questions", "lms_questions", column: "question_id")
+
+    # Certificates
+    add_foreign_key "lms_certificates", "users", column: "member_id" unless foreign_key_exists?("lms_certificates", "users", column: "member_id")
+    add_foreign_key "lms_certificates", "lms_courses", column: "course_id" unless foreign_key_exists?("lms_certificates", "lms_courses", column: "course_id")
+    add_foreign_key "lms_certificates", "lms_batches", column: "batch_id" unless foreign_key_exists?("lms_certificates", "lms_batches", column: "batch_id")
+    add_foreign_key "lms_certificates", "users", column: "evaluator_id" unless foreign_key_exists?("lms_certificates", "users", column: "evaluator_id")
+
+    # Programs
+    add_foreign_key "lms_program_members", "lms_programs", column: "lms_program_id" unless foreign_key_exists?("lms_program_members", "lms_programs", column: "lms_program_id")
+    add_foreign_key "lms_program_members", "users", column: "user_id" unless foreign_key_exists?("lms_program_members", "users", column: "user_id")
+    add_foreign_key "lms_program_courses", "lms_programs", column: "lms_program_id" unless foreign_key_exists?("lms_program_courses", "lms_programs", column: "lms_program_id")
+    add_foreign_key "lms_program_courses", "lms_courses", column: "course_id" unless foreign_key_exists?("lms_program_courses", "lms_courses", column: "course_id")
+
+    # Badges
+    add_foreign_key "lms_badge_assignments", "lms_badges", column: "badge_id" unless foreign_key_exists?("lms_badge_assignments", "lms_badges", column: "badge_id")
+    add_foreign_key "lms_badge_assignments", "users", column: "member_id" unless foreign_key_exists?("lms_badge_assignments", "users", column: "member_id")
+
+    # Payments
+    add_foreign_key "payments", "users", column: "user_id" unless foreign_key_exists?("payments", "users", column: "user_id")
+    add_foreign_key "payments", "lms_courses", column: "course_id" unless foreign_key_exists?("payments", "lms_courses", column: "course_id")
+    add_foreign_key "payments", "lms_batches", column: "batch_id" unless foreign_key_exists?("payments", "lms_batches", column: "batch_id")
+    add_foreign_key "payments", "lms_programs", column: "program_id" unless foreign_key_exists?("payments", "lms_programs", column: "program_id")
+    add_foreign_key "payments", "payment_gateways", column: "payment_gateway_id" unless foreign_key_exists?("payments", "payment_gateways", column: "payment_gateway_id")
+
+    # Job applications
+    add_foreign_key "job_applications", "job_opportunities", column: "job_opportunity_id" unless foreign_key_exists?("job_applications", "job_opportunities", column: "job_opportunity_id")
+    add_foreign_key "job_applications", "users", column: "user_id" unless foreign_key_exists?("job_applications", "users", column: "user_id")
+
+    # Discussions
+    add_foreign_key "discussions", "users", column: "user_id" unless foreign_key_exists?("discussions", "users", column: "user_id")
+    add_foreign_key "messages", "users", column: "user_id" unless foreign_key_exists?("messages", "users", column: "user_id")
+    add_foreign_key "messages", "discussions", column: "discussion_id" unless foreign_key_exists?("messages", "discussions", column: "discussion_id")
+    add_foreign_key "messages", "messages", column: "parent_message_id" unless foreign_key_exists?("messages", "messages", column: "parent_message_id")
+
+    # Discussion topics and replies
+    add_foreign_key "discussion_topics", "users", column: "owner_id" unless foreign_key_exists?("discussion_topics", "users", column: "owner_id")
+    add_foreign_key "discussion_replies", "discussion_topics", column: "topic_id" unless foreign_key_exists?("discussion_replies", "discussion_topics", column: "topic_id")
+    add_foreign_key "discussion_replies", "users", column: "owner_id" unless foreign_key_exists?("discussion_replies", "users", column: "owner_id")
+
+    # Live classes
+    add_foreign_key "live_class_participants", "live_classes", column: "live_class_id" unless foreign_key_exists?("live_class_participants", "live_classes", column: "live_class_id")
+    add_foreign_key "live_class_participants", "users", column: "participant_id" unless foreign_key_exists?("live_class_participants", "users", column: "participant_id")
+
+    # Programming exercises
+    add_foreign_key "lms_programming_exercise_submissions", "lms_programming_exercises", column: "exercise_id" unless foreign_key_exists?("lms_programming_exercise_submissions", "lms_programming_exercises", column: "exercise_id")
+    add_foreign_key "lms_programming_exercise_submissions", "users", column: "member_id" unless foreign_key_exists?("lms_programming_exercise_submissions", "users", column: "member_id")
+
+    # SCORM
+    add_foreign_key "scorm_completions", "users", column: "user_id" unless foreign_key_exists?("scorm_completions", "users", column: "user_id")
+    add_foreign_key "scorm_completions", "scorm_packages", column: "scorm_package_id" unless foreign_key_exists?("scorm_completions", "scorm_packages", column: "scorm_package_id")
+    add_foreign_key "scorm_completions", "course_lessons", column: "course_lesson_id" unless foreign_key_exists?("scorm_completions", "course_lessons", column: "course_lesson_id")
+
+    # Video tracking
+    add_foreign_key "video_watch_durations", "users", column: "user_id" unless foreign_key_exists?("video_watch_durations", "users", column: "user_id")
+    add_foreign_key "video_watch_durations", "course_lessons", column: "course_lesson_id" unless foreign_key_exists?("video_watch_durations", "course_lessons", column: "course_lesson_id")
+
+    # Lesson progress
+    add_foreign_key "lesson_progresses", "users", column: "user_id" unless foreign_key_exists?("lesson_progresses", "users", column: "user_id")
+    add_foreign_key "lesson_progresses", "course_lessons", column: "lesson_id" unless foreign_key_exists?("lesson_progresses", "course_lessons", column: "lesson_id")
+
+    # Code revisions
+    add_foreign_key "code_revisions", "users", column: "user_id" unless foreign_key_exists?("code_revisions", "users", column: "user_id")
+
+    # PWA tracking
+    add_foreign_key "pwa_install_tracking", "users", column: "user_id" unless foreign_key_exists?("pwa_install_tracking", "users", column: "user_id")
+
+    # Workflows
+    add_foreign_key "workflow_states", "workflows", column: "workflow_id" unless foreign_key_exists?("workflow_states", "workflows", column: "workflow_id")
+    add_foreign_key "workflow_transitions", "workflows", column: "workflow_id" unless foreign_key_exists?("workflow_transitions", "workflows", column: "workflow_id")
+
+    # Roles and permissions
+    add_foreign_key "has_roles", "users", column: "user_id" unless foreign_key_exists?("has_roles", "users", column: "user_id")
+    add_foreign_key "has_roles", "roles", column: "role_id" unless foreign_key_exists?("has_roles", "roles", column: "role_id")
+    add_foreign_key "permissions", "roles", column: "role_id" unless foreign_key_exists?("permissions", "roles", column: "role_id")
+
+    # Notifications
+    add_foreign_key "notifications", "users", column: "user_id" unless foreign_key_exists?("notifications", "users", column: "user_id")
+    add_foreign_key "notification_templates", "users", column: "created_by_id" unless foreign_key_exists?("notification_templates", "users", column: "created_by_id")
+  end
+end

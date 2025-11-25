@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Welcome to <%= @course.title %></h2>
+
+      <p>Dear <%= @user.full_name %>,</p>
+
+      <p>Welcome! You have successfully enrolled in the course "<%= @course.title %>".</p>
+
+      <div style="background-color: #f0f8ff; padding: 15px; margin: 20px 0; border-radius: 5px;">
+        <h3>Enrollment Details:</h3>
+        <p><strong>Course:</strong> <%= @course.title %></p>
+        <p><strong>Instructor:</strong> <%= @course.instructor&.full_name %></p>
+        <% if @batch %>
+          <p><strong>Batch:</strong> <%= @batch.title %></p>
+          <p><strong>Start Date:</strong> <%= @batch.start_date&.strftime('%B %d, %Y') %></p>
+        <% end %>
+        <p><strong>Enrollment Date:</strong> <%= @enrollment.enrolled_at&.strftime('%B %d, %Y') %></p>
+      </div>
+
+      <p>You can now access your course materials and start learning. Track your progress and complete assignments to earn certificates.</p>
+
+      <p>If you have any questions, feel free to reach out to your instructor or our support team.</p>
+
+      <p>Happy learning!</p>
+      <p>Best regards,<br>The LMS Team</p>
+    </div>
+  </body>
+</html>

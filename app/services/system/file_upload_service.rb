@@ -49,26 +49,101 @@ module System
         file_extension = File.extname(original_filename)
         filename = Time.current.to_i.to_s + "_" + (0...8).map { ("a".."z").to_a[rand(26)] }.join + file_extension
 
-        upload_dir = Rails.root.join("public", "uploads", "files")
-        FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
+        # Create upload directory if it doesn't exist
+        upload_dir = Rails.root.join('public', 'uploads', 'files')
+        FileUtils.mkdir_p(upload_dir)
 
         file_path = File.join(upload_dir, filename)
-        File.open(file_path, "wb") { |f| f.write(file.tempfile.read) }
+
+        # Write file to disk
+        File.open(file_path, 'wb') do |f|
+          f.write(file.read)
+        end
+
+        # Validate file type and size
+        validation_result = validate_file(file, original_filename)
+        unless validation_result[:valid]
+          File.delete(file_path) if File.exist?(file_path)
+          return {
+            success: false,
+            error: validation_result[:error]
+          }
+        end
 
         {
           success: true,
           file_url: "/uploads/files/" + filename,
           file_name: original_filename,
           file_type: file.content_type,
-          file_size: file.size
+          file_size: file.size,
+          file_path: file_path
         }
-
       rescue => e
         {
           success: false,
-          error: e.message
+          error: "File processing failed: #{e.message}"
         }
       end
+    end
+
+    def self.validate_file(file, filename)
+      # Check file size (max 10MB)
+      max_size = 10.megabytes
+      if file.size > max_size
+        return { valid: false, error: "File size exceeds maximum allowed size (10MB)" }
+      end
+
+      # Check file type
+      allowed_types = [
+        # Documents
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain',
+        'text/csv',
+
+        # Images
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+
+        # Archives
+        'application/zip',
+        'application/x-zip-compressed',
+
+        # Code files
+        'text/x-python',
+        'text/x-java',
+        'text/javascript',
+        'text/html',
+        'text/css',
+        'application/json'
+      ]
+
+      # Also check file extension for additional security
+      allowed_extensions = [
+        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv',
+        '.jpg', '.jpeg', '.png', '.gif', '.webp',
+        '.zip',
+        '.py', '.java', '.js', '.html', '.css', '.json'
+      ]
+
+      file_extension = File.extname(filename).downcase
+
+      unless allowed_types.include?(file.content_type) || allowed_extensions.include?(file_extension)
+        return { valid: false, error: "File type not allowed" }
+      end
+
+      # Check for malicious file names
+      if filename.include?('..') || filename.include?('/') || filename.include?('\\')
+        return { valid: false, error: "Invalid file name" }
+      end
+
+      { valid: true }
+    end
     end
 
     def self.create_file_record(uploaded_file, current_user)

@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.3.3"
+ruby "~> 3.2"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0"
@@ -51,6 +51,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
+# Zoom API integration (commented out for testing)
+# gem 'zoomrb'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -66,8 +69,15 @@ group :development, :test do
   gem "factory_bot_rails", "~> 6.2"
   gem "faker", "~> 3.2"
   gem "shoulda-matchers", "~> 6.0"
+  gem "capybara", "~> 3.39"
+  gem "selenium-webdriver", "~> 4.1"
+  gem "webmock", "~> 3.18"
 end
 
 group :test do
   gem "database_cleaner-active_record", "~> 2.1"
 end
+
+gem "rubyzip", "~> 3.2"
+
+gem "nokogiri", "~> 1.18"

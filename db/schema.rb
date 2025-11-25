@@ -10,7 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "batch_courses", force: :cascade do |t|
     t.string "name", null: false
     t.string "owner", null: false
@@ -419,6 +447,36 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["title"], name: "index_course_lessons_on_title"
   end
 
+  create_table "discussion_replies", force: :cascade do |t|
+    t.integer "topic_id"
+    t.text "reply"
+    t.string "owner"
+    t.datetime "creation"
+    t.datetime "modified"
+    t.string "modified_by"
+    t.integer "docstatus", default: 0
+    t.integer "idx", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["topic_id"], name: "index_discussion_replies_on_topic_id"
+  end
+
+  create_table "discussion_topics", force: :cascade do |t|
+    t.string "title"
+    t.text "content"
+    t.string "reference_doctype"
+    t.string "reference_docname"
+    t.string "owner"
+    t.datetime "creation"
+    t.datetime "modified"
+    t.string "modified_by"
+    t.integer "docstatus", default: 0
+    t.integer "idx", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reference_doctype", "reference_docname"], name: "idx_on_reference_doctype_reference_docname_b3074dff7c"
+  end
+
   create_table "discussions", force: :cascade do |t|
     t.string "title", null: false
     t.text "content", null: false
@@ -662,6 +720,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.datetime "last_accessed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "Incomplete"
     t.index ["lesson_id"], name: "index_lesson_progresses_on_lesson_id"
     t.index ["user_id", "lesson_id"], name: "index_lesson_progresses_on_user_id_and_lesson_id", unique: true
     t.index ["user_id"], name: "index_lesson_progresses_on_user_id"
@@ -936,10 +995,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "batch_id"
+    t.string "member_type", default: "Student"
+    t.string "role", default: "Member"
     t.index ["batch"], name: "index_lms_batch_enrollments_on_batch"
     t.index ["batch_id"], name: "index_lms_batch_enrollments_on_batch_id"
     t.index ["member"], name: "index_lms_batch_enrollments_on_member"
+    t.index ["member_type"], name: "index_lms_batch_enrollments_on_member_type"
     t.index ["name"], name: "index_lms_batch_enrollments_on_name", unique: true
+    t.index ["role"], name: "index_lms_batch_enrollments_on_role"
     t.index ["user_id", "batch_id"], name: "index_lms_batch_enrollments_on_user_id_and_batch_id", unique: true
     t.index ["user_id"], name: "index_lms_batch_enrollments_on_user_id"
   end
@@ -1437,6 +1500,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["difficulty_level"], name: "index_lms_courses_on_difficulty_level"
     t.index ["enrollments_count"], name: "index_lms_courses_on_enrollments_count"
     t.index ["featured"], name: "index_lms_courses_on_featured"
+    t.index ["instructor_id", "published"], name: "index_lms_courses_on_instructor_and_published"
     t.index ["instructor_id"], name: "index_lms_courses_on_instructor_id"
     t.index ["language"], name: "index_lms_courses_on_language"
     t.index ["price"], name: "index_lms_courses_on_price"
@@ -1448,6 +1512,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["sort_order"], name: "index_lms_courses_on_sort_order"
     t.index ["status"], name: "index_lms_courses_on_status"
     t.index ["title"], name: "index_lms_courses_on_title"
+    t.index ["updated_at"], name: "index_lms_courses_on_updated_at"
   end
 
   create_table "lms_enrollments", force: :cascade do |t|
@@ -1494,10 +1559,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "current_lesson"
+    t.string "role", default: "Member"
     t.index ["approved_by_id"], name: "index_lms_enrollments_on_approved_by_id"
     t.index ["batch_id"], name: "index_lms_enrollments_on_batch_id"
     t.index ["certificate_number"], name: "index_lms_enrollments_on_certificate_number"
     t.index ["completion_date"], name: "index_lms_enrollments_on_completion_date"
+    t.index ["course_id", "created_at"], name: "index_lms_enrollments_on_course_and_created_at"
     t.index ["course_id", "status"], name: "index_lms_enrollments_on_course_id_and_status"
     t.index ["course_id"], name: "index_lms_enrollments_on_course_id"
     t.index ["enrollment_date"], name: "index_lms_enrollments_on_enrollment_date"
@@ -1507,6 +1574,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["last_access_date"], name: "index_lms_enrollments_on_last_access_date"
     t.index ["payment_status"], name: "index_lms_enrollments_on_payment_status"
     t.index ["progress_percentage"], name: "index_lms_enrollments_on_progress_percentage"
+    t.index ["role"], name: "index_lms_enrollments_on_role"
     t.index ["status", "enrollment_date"], name: "index_lms_enrollments_on_status_and_enrollment_date"
     t.index ["status"], name: "index_lms_enrollments_on_status"
     t.index ["student_id", "course_id"], name: "index_lms_enrollments_on_student_id_and_course_id", unique: true
@@ -1633,6 +1701,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "batch_id"
+    t.index ["batch_id", "date"], name: "index_lms_live_classes_on_batch_and_date"
     t.index ["date"], name: "index_lms_live_classes_on_date"
     t.index ["host"], name: "index_lms_live_classes_on_host"
     t.index ["name"], name: "index_lms_live_classes_on_name", unique: true
@@ -1877,63 +1946,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
   end
 
   create_table "lms_questions", force: :cascade do |t|
-    t.string "question_text", null: false
-    t.integer "quiz_id", null: false
-    t.string "question_type", default: "Multiple Choice"
-    t.text "description"
-    t.text "explanation"
-    t.text "question_image"
-    t.string "question_video"
-    t.text "question_audio"
-    t.decimal "marks", precision: 5, scale: 2, default: "1.0"
-    t.decimal "negative_marks", precision: 5, scale: 2, default: "0.0"
-    t.boolean "mandatory", default: false
-    t.integer "difficulty_level", default: 1
-    t.string "difficulty_level_text", default: "Easy"
-    t.string "category"
-    t.text "tags"
-    t.integer "position", default: 0
-    t.boolean "shuffle_options", default: false
-    t.text "options"
-    t.string "correct_answer"
-    t.text "correct_answer_explanation"
-    t.boolean "multiple_correct_answers", default: false
-    t.text "correct_answers"
-    t.boolean "case_sensitive", default: false
-    t.text "validation_rules"
-    t.integer "time_limit_seconds", default: 0
-    t.boolean "show_explanation", default: true
-    t.text "hints"
-    t.integer "attempts_allowed", default: 1
-    t.text "reference_material"
-    t.string "author"
-    t.integer "created_by_id"
-    t.integer "updated_by_id"
-    t.boolean "is_public", default: false
-    t.integer "usage_count", default: 0
-    t.decimal "average_score", precision: 5, scale: 2, default: "0.0"
-    t.integer "total_attempts", default: 0
-    t.decimal "success_rate", precision: 5, scale: 2, default: "0.0"
-    t.text "custom_fields"
+    t.text "question", null: false
+    t.string "type", default: "Choices", null: false
+    t.boolean "multiple", default: false
+    t.string "option_1"
+    t.boolean "is_correct_1", default: false
+    t.string "explanation_1"
+    t.string "option_2"
+    t.boolean "is_correct_2", default: false
+    t.string "explanation_2"
+    t.string "option_3"
+    t.boolean "is_correct_3", default: false
+    t.string "explanation_3"
+    t.string "option_4"
+    t.boolean "is_correct_4", default: false
+    t.string "explanation_4"
+    t.string "possibility_1"
+    t.string "possibility_2"
+    t.string "possibility_3"
+    t.string "possibility_4"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["average_score"], name: "index_lms_questions_on_average_score"
-    t.index ["category", "is_public"], name: "index_lms_questions_on_category_and_is_public"
-    t.index ["category"], name: "index_lms_questions_on_category"
-    t.index ["created_by_id"], name: "index_lms_questions_on_created_by_id"
-    t.index ["difficulty_level"], name: "index_lms_questions_on_difficulty_level"
-    t.index ["is_public"], name: "index_lms_questions_on_is_public"
-    t.index ["mandatory", "position"], name: "index_lms_questions_on_mandatory_and_position"
-    t.index ["mandatory"], name: "index_lms_questions_on_mandatory"
-    t.index ["marks"], name: "index_lms_questions_on_marks"
-    t.index ["position"], name: "index_lms_questions_on_position"
-    t.index ["question_type", "difficulty_level"], name: "index_lms_questions_on_question_type_and_difficulty_level"
-    t.index ["question_type"], name: "index_lms_questions_on_question_type"
-    t.index ["quiz_id", "position"], name: "index_lms_questions_on_quiz_id_and_position"
-    t.index ["quiz_id"], name: "index_lms_questions_on_quiz_id"
-    t.index ["success_rate"], name: "index_lms_questions_on_success_rate"
-    t.index ["updated_by_id"], name: "index_lms_questions_on_updated_by_id"
-    t.index ["usage_count"], name: "index_lms_questions_on_usage_count"
+    t.index ["type"], name: "index_lms_questions_on_type"
   end
 
   create_table "lms_quiz_questions", force: :cascade do |t|
@@ -2062,6 +2096,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.text "custom_fields"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_lms_quiz_submissions_on_created_at"
     t.index ["end_time"], name: "index_lms_quiz_submissions_on_end_time"
     t.index ["enrollment_id"], name: "index_lms_quiz_submissions_on_enrollment_id"
     t.index ["extension_approved_by_id"], name: "index_lms_quiz_submissions_on_extension_approved_by_id"
@@ -2130,14 +2165,18 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.text "custom_fields"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
+    t.integer "creator"
     t.index ["average_score"], name: "index_lms_quizzes_on_average_score"
     t.index ["chapter_id", "status"], name: "index_lms_quizzes_on_chapter_id_and_status"
     t.index ["chapter_id"], name: "index_lms_quizzes_on_chapter_id"
     t.index ["course_id", "status"], name: "index_lms_quizzes_on_course_id_and_status"
     t.index ["course_id"], name: "index_lms_quizzes_on_course_id"
     t.index ["created_by_id"], name: "index_lms_quizzes_on_created_by_id"
+    t.index ["creator"], name: "index_lms_quizzes_on_creator"
     t.index ["duration_minutes"], name: "index_lms_quizzes_on_duration_minutes"
     t.index ["end_date"], name: "index_lms_quizzes_on_end_date"
+    t.index ["name"], name: "index_lms_quizzes_on_name", unique: true
     t.index ["passing_percentage"], name: "index_lms_quizzes_on_passing_percentage"
     t.index ["published_at"], name: "index_lms_quizzes_on_published_at"
     t.index ["quiz_code"], name: "index_lms_quizzes_on_quiz_code", unique: true
@@ -2414,6 +2453,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.string "from_user"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_notifications_on_created_at"
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read"], name: "index_notifications_on_user_id_and_read"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -2442,6 +2482,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["parenttype"], name: "index_payment_countries_on_parenttype"
   end
 
+  create_table "payment_gateways", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "gateway_type", null: false
+    t.string "status", default: "inactive", null: false
+    t.json "settings", default: {}, null: false
+    t.boolean "is_primary", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gateway_type"], name: "index_payment_gateways_on_gateway_type"
+    t.index ["is_primary"], name: "index_payment_gateways_on_is_primary"
+    t.index ["name"], name: "index_payment_gateways_on_name", unique: true
+    t.index ["status"], name: "index_payment_gateways_on_status"
+  end
+
   create_table "payments", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "payable_type", null: false
@@ -2458,6 +2512,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_payments_on_created_at"
     t.index ["gateway_response"], name: "index_payments_on_gateway_response"
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
     t.index ["payment_date"], name: "index_payments_on_payment_date"
@@ -2766,6 +2821,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.boolean "is_moderator", default: false
     t.boolean "is_evaluator", default: false
     t.string "jti"
+    t.datetime "persona_captured_at"
+    t.string "persona_role"
+    t.string "persona_use_case"
+    t.text "persona_responses"
+    t.string "encrypted_password"
     t.index ["city"], name: "index_users_on_city"
     t.index ["company"], name: "index_users_on_company"
     t.index ["country", "city"], name: "index_users_on_country_and_city"
@@ -2807,7 +2867,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.datetime "updated_at", null: false
     t.index ["course_lesson_id"], name: "index_video_durations_on_course_lesson"
     t.index ["course_lesson_id"], name: "index_video_watch_durations_on_course_lesson_id"
+    t.index ["updated_at"], name: "index_video_watch_durations_on_updated_at"
     t.index ["user_id", "course_lesson_id", "video_url"], name: "unique_user_lesson_video", unique: true
+    t.index ["user_id", "course_lesson_id"], name: "index_video_watch_durations_on_user_and_lesson"
     t.index ["user_id", "updated_at"], name: "index_video_durations_on_user_time"
     t.index ["user_id"], name: "index_video_watch_durations_on_user_id"
   end
@@ -2942,6 +3004,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
     t.index ["webhook_enabled"], name: "index_zoom_settings_on_webhook_enabled"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "batch_courses", "course_evaluators", column: "evaluator"
   add_foreign_key "batch_courses", "lms_courses", column: "course"
   add_foreign_key "certificate_requests", "evaluators"
@@ -3016,9 +3080,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_13_205229) do
   add_foreign_key "lms_payments", "users", column: "student_id"
   add_foreign_key "lms_programming_exercise_submissions", "lms_programming_exercises", column: "exercise"
   add_foreign_key "lms_programming_exercise_submissions", "users", column: "member"
-  add_foreign_key "lms_questions", "lms_quizzes", column: "quiz_id"
-  add_foreign_key "lms_questions", "users", column: "created_by_id"
-  add_foreign_key "lms_questions", "users", column: "updated_by_id"
   add_foreign_key "lms_quiz_questions", "lms_questions", column: "question_id"
   add_foreign_key "lms_quiz_questions", "lms_quizzes", column: "quiz_id"
   add_foreign_key "lms_quiz_questions", "users", column: "added_by_id"

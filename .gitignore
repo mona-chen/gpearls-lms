@@ -131,3 +131,6 @@ Thumbs.db
 *.bak
 *.backup
 *.orig
+
+# frappelms
+# ./frappelms/*

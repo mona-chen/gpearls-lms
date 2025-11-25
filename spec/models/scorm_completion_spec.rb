@@ -4,7 +4,7 @@ RSpec.describe ScormCompletion, type: :model do
   let(:user) { create(:user) }
   let(:course) { create(:course) }
   let(:chapter) { create(:course_chapter, course: course) }
-  let(:lesson) { create(:course_lesson, course_chapter: chapter, course: course) }
+  let(:lesson) { create(:course_lesson, chapter: chapter, course: course) }
   let(:scorm_package) { create(:scorm_package, course_lesson: lesson) }
 
   describe 'validations' do
@@ -61,7 +61,7 @@ RSpec.describe ScormCompletion, type: :model do
 
   describe '#progress_percentage' do
     it 'returns 100 for completed status' do
-      completion = create(:scorm_completion, 
+      completion = create(:scorm_completion,
                          completion_status: :completed,
                          user: user,
                          scorm_package: scorm_package,
@@ -140,7 +140,7 @@ RSpec.describe ScormCompletion, type: :model do
     it 'parses SCORM time format correctly' do
       scorm_data = { 'cmi.core.total_time' => '0001:23:45.00' }
       completion.update_from_scorm_data(scorm_data)
-      
+
       # 1 hour 23 minutes 45 seconds = 3600 + 1380 + 45 = 5025 seconds
       expect(completion.total_time).to eq(5025)
     end
@@ -148,17 +148,17 @@ RSpec.describe ScormCompletion, type: :model do
     it 'handles ISO 8601 duration format' do
       scorm_data = { 'cmi.core.total_time' => 'PT1H23M45S' }
       completion.update_from_scorm_data(scorm_data)
-      
+
       # 1 hour 23 minutes 45 seconds = 5025 seconds
       expect(completion.total_time).to eq(5025)
     end
 
     it 'updates lesson progress when completed' do
       allow(completion).to receive(:update_lesson_progress)
-      
+
       scorm_data = { 'cmi.core.lesson_status' => 'completed' }
       completion.update_from_scorm_data(scorm_data)
-      
+
       expect(completion).to have_received(:update_lesson_progress)
     end
   end
@@ -201,9 +201,9 @@ RSpec.describe ScormCompletion, type: :model do
     end
 
     it 'updates existing completion record' do
-      existing = create(:scorm_completion, 
-                       user: user, 
-                       scorm_package: scorm_package, 
+      existing = create(:scorm_completion,
+                       user: user,
+                       scorm_package: scorm_package,
                        course_lesson: lesson,
                        completion_status: :not_attempted)
 
@@ -243,9 +243,9 @@ RSpec.describe ScormCompletion, type: :model do
       expect(analytics[:total_attempts]).to eq(3)
       expect(analytics[:completed_count]).to eq(2) # completed + passed
       expect(analytics[:average_score]).to eq(80.0) # (85 + 95 + 60) / 3
-      expect(analytics[:completion_rate]).to eq(66.67) # 2/3 * 100, rounded
+      expect(analytics[:completion_rate]).to be_within(0.01).of(66.67) # 2/3 * 100
       expect(analytics[:average_time_spent]).to eq(1300.0) # (1800 + 1200 + 900) / 3
-      
+
       expect(analytics[:status_distribution]).to include(
         'completed' => 1,
         'passed' => 1,

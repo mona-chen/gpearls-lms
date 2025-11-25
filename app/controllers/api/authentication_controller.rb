@@ -2,8 +2,14 @@ class Api::AuthenticationController < ApplicationController
   def login
     user = User.find_by(email: params[:usr])
 
-    if user&.authenticate(params[:pwd])
-      # Generate session ID (Frappe style)
+    if user&.valid_password?(params[:pwd])
+      # Generate JWT token
+      token = Warden::JWTAuth::TokenEncoder.new.call({ sub: user.id })
+
+      # Update user's JTI for JWT invalidation
+      user.update(jti: token)
+
+      # Generate session ID (Frappe style) for backward compatibility
       session_id = SecureRandom.hex(16)
 
       # Store session info in Rails session
@@ -31,7 +37,7 @@ class Api::AuthenticationController < ApplicationController
       response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
       response.headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, Accept, Authorization, X-Frappe-CSRF-Token, X-Frappe-CMD, X-Requested-With"
 
-      # Return Frappe-compatible user format
+      # Return Frappe-compatible user format with JWT token
       user_data = {
         name: user.full_name,
         email: user.email,
@@ -51,7 +57,8 @@ class Api::AuthenticationController < ApplicationController
       response_data = {
         message: "Logged In",
         user: user_data,
-        home_page: "/lms"
+        home_page: "/lms",
+        token: token
       }
 
       render json: FrappeApiHelper.format_response(response_data)

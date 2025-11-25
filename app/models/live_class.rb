@@ -1,13 +1,18 @@
 class LiveClass < ApplicationRecord
   self.table_name = "lms_live_classes"
   belongs_to :batch, optional: true
-  belongs_to :instructor, class_name: "User", foreign_key: "host", primary_key: "email", optional: true
+  belongs_to :instructor, class_name: "User", foreign_key: "host", optional: true
   belongs_to :course, optional: true
+  belongs_to :zoom_account, class_name: "ZoomSetting", optional: true
 
-  validates :name, :batch, presence: true
+  validates :title, presence: true
   validates :date, presence: true
+  validates :time, presence: true
+  validates :duration, presence: true
+  validates :timezone, presence: true
+  validates :host, presence: true
 
-  has_many :live_class_attendees, dependent: :destroy
+  has_many :live_class_participants, dependent: :destroy
 
   # Scopes for finding live classes
   scope :upcoming, -> { where("date >= ?", Date.today) }
@@ -37,6 +42,10 @@ class LiveClass < ApplicationRecord
     course&.title
   end
 
+  def batch_name
+    batch&.title
+  end
+
   def formatted_time
     return nil unless time
     time.strftime("%H:%M:%S")
@@ -46,19 +55,36 @@ class LiveClass < ApplicationRecord
     date&.strftime("%Y-%m-%d")
   end
 
+  def attendees_count
+    live_class_participants.count
+  end
+
+  def name
+    id.to_s
+  end
+
   def to_frappe_format
     {
-      name: name,
-      title: title,
-      description: description,
-      time: formatted_time,
-      date: formatted_date,
-      duration: duration,
-      attendees: attendees || [],
-      start_url: start_url,
-      join_url: join_url,
-      owner: instructor&.email,
-      course_title: course_title
+      "name" => id.to_s,
+      "title" => title,
+      "host" => host,
+      "zoom_account" => zoom_account&.name,
+      "batch_name" => batch_name,
+      "date" => formatted_date,
+      "time" => formatted_time,
+      "duration" => duration,
+      "timezone" => timezone,
+      "description" => description,
+      "event" => event,
+      "auto_recording" => auto_recording,
+      "meeting_id" => meeting_id,
+      "uuid" => uuid,
+      "attendees" => attendees_count,
+      "password" => password,
+      "start_url" => start_url,
+      "join_url" => join_url,
+      "creation" => created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      "modified" => updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
