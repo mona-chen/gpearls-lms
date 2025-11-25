@@ -68,7 +68,7 @@ group :development, :test do
   gem "rspec-rails", "~> 6.0"
   gem "factory_bot_rails", "~> 6.2"
   gem "faker", "~> 3.2"
-  gem "shoulda-matchers", "~> 6.0"
+  gem "shoulda-matchers", "~> 7.0"
   gem "capybara", "~> 3.39"
   gem "selenium-webdriver", "~> 4.1"
   gem "webmock", "~> 3.18"
