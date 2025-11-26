@@ -5,17 +5,17 @@ module BatchAndCohortNotificationsJob
     # Class methods for scheduling
     def self.schedule_batch_start_reminders
       # Run daily at 9 AM
-      cron('0 9 * * *') { BatchStartReminderJob.perform_later }
+      cron("0 9 * * *") { BatchStartReminderJob.perform_later }
     end
 
     def self.schedule_cohort_notifications
       # Run daily at 10 AM
-      cron('0 10 * * *') { CohortNotificationJob.perform_later }
+      cron("0 10 * * *") { CohortNotificationJob.perform_later }
     end
 
     def self.schedule_cleanup_tasks
       # Run weekly on Sunday at 2 AM
-      cron('0 2 * * 0') { CleanupJob.perform_later }
+      cron("0 2 * * 0") { CleanupJob.perform_later }
     end
   end
 
@@ -75,7 +75,7 @@ module BatchAndCohortNotificationsJob
       begin
         # Send start reminders for cohorts starting tomorrow
         tomorrow = Date.current + 1.day
-        starting_cohorts = Cohort.where(begin_date: tomorrow, status: 'Upcoming')
+        starting_cohorts = Cohort.where(begin_date: tomorrow, status: "Upcoming")
 
         starting_cohorts.find_each do |cohort|
           results[:start_reminders_sent] += 1
@@ -90,7 +90,7 @@ module BatchAndCohortNotificationsJob
 
         # Send completion notifications for cohorts that completed today
         today = Date.current
-        completed_cohorts = Cohort.where(end_date: today, status: 'Live')
+        completed_cohorts = Cohort.where(end_date: today, status: "Live")
 
         completed_cohorts.find_each do |cohort|
           results[:completion_notifications_sent] += 1
@@ -137,8 +137,8 @@ module BatchAndCohortNotificationsJob
         # Notify inactive cohort members (no activity for 90 days)
         inactive_cutoff = 90.days.ago
         inactive_enrollments = Enrollment.joins(:user)
-                                  .joins('LEFT JOIN lesson_progresses ON lesson_progresses.user_id = users.id AND lesson_progresses.course_id = enrollments.course_id')
-                                  .where('lesson_progresses.updated_at < ? OR lesson_progresses.updated_at IS NULL', inactive_cutoff)
+                                  .joins("LEFT JOIN lesson_progresses ON lesson_progresses.user_id = users.id AND lesson_progresses.course_id = enrollments.course_id")
+                                  .where("lesson_progresses.updated_at < ? OR lesson_progresses.updated_at IS NULL", inactive_cutoff)
                                   .where.not(cohort_id: nil)
                                   .limit(100)
 

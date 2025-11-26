@@ -71,7 +71,7 @@ class CreateZoomSettings < ActiveRecord::Migration[7.2]
     add_index :zoom_settings, :webhook_enabled
     add_index :zoom_settings, :test_mode
     # created_by_id and updated_by_id indexes automatically created by references helpers
-    add_index :zoom_settings, [:enabled, :sync_status]
-    add_index :zoom_settings, [:account_name, :enabled]
+    add_index :zoom_settings, [ :enabled, :sync_status ]
+    add_index :zoom_settings, [ :account_name, :enabled ]
   end
 end

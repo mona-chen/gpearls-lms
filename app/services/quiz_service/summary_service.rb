@@ -3,15 +3,15 @@
 module Quiz
   class SummaryService
     def self.get_summary(quiz_id, user)
-      return { error: 'User not authenticated' } unless user
-      return { error: 'Quiz not found' } unless quiz_id
+      return { error: "User not authenticated" } unless user
+      return { error: "Quiz not found" } unless quiz_id
 
       quiz = Quiz.find_by(id: quiz_id)
-      return { error: 'Quiz not found' } unless quiz
+      return { error: "Quiz not found" } unless quiz
 
       # Check if user is enrolled in the course
       unless user.enrollments.exists?(course_id: quiz.course_id)
-        return { error: 'User not enrolled in this course' }
+        return { error: "User not enrolled in this course" }
       end
 
       # Get user's submission
@@ -31,7 +31,7 @@ module Quiz
         quiz: {
           id: quiz.id,
           title: quiz.title,
-          description: quiz.description || '',
+          description: quiz.description || "",
           total_questions: quiz.quiz_questions.count,
           total_points: quiz.quiz_questions.sum(:points),
           course_id: quiz.course_id,
@@ -43,7 +43,7 @@ module Quiz
           max_score: submission.max_score,
           percentage: submission.max_score > 0 ? ((submission.score.to_f / submission.max_score) * 100).round(2) : 0,
           status: submission.status,
-          submitted_at: submission.submitted_at&.strftime('%Y-%m-%d %H:%M:%S'),
+          submitted_at: submission.submitted_at&.strftime("%Y-%m-%d %H:%M:%S"),
           attempts: QuizSubmission.where(user: user, quiz: quiz).count
         } : nil,
         statistics: quiz_stats,
@@ -53,20 +53,20 @@ module Quiz
       }
     rescue => e
       {
-        error: 'Failed to get quiz summary',
+        error: "Failed to get quiz summary",
         details: e.message
       }
     end
 
     def self.get_course_quiz_summary(course_id, user)
-      return { error: 'User not authenticated' } unless user
+      return { error: "User not authenticated" } unless user
 
       course = Course.find_by(id: course_id)
-      return { error: 'Course not found' } unless course
+      return { error: "Course not found" } unless course
 
       # Check enrollment
       unless user.enrollments.exists?(course_id: course_id)
-        return { error: 'User not enrolled in this course' }
+        return { error: "User not enrolled in this course" }
       end
 
       quizzes = course.quizzes.includes(:quiz_questions, :quiz_submissions)
@@ -82,12 +82,12 @@ module Quiz
           user_score: user_submission&.score || 0,
           max_score: user_submission&.max_score || quiz.quiz_questions.sum(:points),
           percentage: user_submission&.max_score ? ((user_submission.score.to_f / user_submission.max_score) * 100).round(2) : 0,
-          status: user_submission&.status || 'not_attempted',
-          submitted_at: user_submission&.submitted_at&.strftime('%Y-%m-%d %H:%M:%S')
+          status: user_submission&.status || "not_attempted",
+          submitted_at: user_submission&.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
         }
       end
 
-      total_quiz_points = quizzes.joins(:quiz_questions).sum('quiz_questions.points')
+      total_quiz_points = quizzes.joins(:quiz_questions).sum("quiz_questions.points")
       total_user_score = quiz_summaries.sum { |q| q[:user_score] }
       overall_percentage = total_quiz_points > 0 ? ((total_user_score.to_f / total_quiz_points) * 100).round(2) : 0
 
@@ -96,8 +96,8 @@ module Quiz
         course_id: course_id,
         course_title: course.title,
         total_quizzes: quizzes.count,
-        attempted_quizzes: quiz_summaries.count { |q| q[:status] != 'not_attempted' },
-        completed_quizzes: quiz_summaries.count { |q| q[:status] == 'completed' },
+        attempted_quizzes: quiz_summaries.count { |q| q[:status] != "not_attempted" },
+        completed_quizzes: quiz_summaries.count { |q| q[:status] == "completed" },
         total_quiz_points: total_quiz_points,
         total_user_score: total_user_score,
         overall_percentage: overall_percentage,
@@ -105,7 +105,7 @@ module Quiz
       }
     rescue => e
       {
-        error: 'Failed to get course quiz summary',
+        error: "Failed to get course quiz summary",
         details: e.message
       }
     end
@@ -120,11 +120,11 @@ module Quiz
         unique_participants: submissions.select(:user_id).distinct.count,
         average_score: submissions.exists? ? (submissions.average(:score) || 0).round(2) : 0,
         average_percentage: submissions.where.not(max_score: 0).exists? ?
-          (submissions.average('score::float / max_score::float * 100') || 0).round(2) : 0,
+          (submissions.average("score::float / max_score::float * 100") || 0).round(2) : 0,
         highest_score: submissions.maximum(:score) || 0,
         lowest_score: submissions.minimum(:score) || 0,
-        completion_rate: submissions.where(status: 'completed').count > 0 ?
-          ((submissions.where(status: 'completed').count.to_f / submissions.count) * 100).round(2) : 0
+        completion_rate: submissions.where(status: "completed").count > 0 ?
+          ((submissions.where(status: "completed").count.to_f / submissions.count) * 100).round(2) : 0
       }
     end
 
@@ -140,7 +140,7 @@ module Quiz
           user_score: user_result&.score || 0,
           user_correct: user_result&.correct || false,
           correct_answer: question.correct_answer,
-          explanation: question.explanation || '',
+          explanation: question.explanation || "",
           difficulty: calculate_question_difficulty(question),
           success_rate: calculate_question_success_rate(question)
         }
@@ -209,17 +209,17 @@ module Quiz
     def self.calculate_question_difficulty(question)
       submissions = question.quiz_results
 
-      return 'Medium' if submissions.empty?
+      return "Medium" if submissions.empty?
 
       success_rate = submissions.where(correct: true).count.to_f / submissions.count
 
       case success_rate
       when 0..0.3
-        'Hard'
+        "Hard"
       when 0.31..0.7
-        'Medium'
+        "Medium"
       when 0.71..1.0
-        'Easy'
+        "Easy"
       end
     end
 
@@ -245,7 +245,7 @@ module Quiz
     def self.calculate_time_spent(submission)
       # This would require tracking start time
       # For now, return a placeholder
-      'Not tracked'
+      "Not tracked"
     end
   end
 end

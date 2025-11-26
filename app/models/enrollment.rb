@@ -23,7 +23,7 @@ class Enrollment < ApplicationRecord
   # Scopes
   scope :completed, -> { where("progress_percentage >= 100") }
   scope :in_progress, -> { where("progress_percentage < 100") }
-  scope :active, -> { where(status: 'Active') }
+  scope :active, -> { where(status: "Active") }
   scope :by_course, ->(course) { where(course: course) }
 
   # Instance Methods
@@ -50,7 +50,7 @@ class Enrollment < ApplicationRecord
     return 0 if total_lessons.zero?
 
     # Count completed lessons that belong to this course
-    completed_lessons = lesson_progresses.where(status: 'Complete')
+    completed_lessons = lesson_progresses.where(status: "Complete")
                                          .select { |lp| lp.lesson&.course == course }
                                          .count
     (completed_lessons.to_f / total_lessons * 100).round
@@ -61,7 +61,7 @@ class Enrollment < ApplicationRecord
   end
 
   def completed_lessons_count
-    lesson_progresses.where(status: 'Complete')
+    lesson_progresses.where(status: "Complete")
                      .select { |lp| lp.lesson&.course == course }
                      .count
   end
@@ -69,7 +69,7 @@ class Enrollment < ApplicationRecord
   def current_lesson
     # Find the first lesson that is not completed
     course.lessons.each do |lesson|
-      return lesson unless lesson_progresses.where(lesson: lesson, status: 'Complete').exists?
+      return lesson unless lesson_progresses.where(lesson: lesson, status: "Complete").exists?
     end
     # If all lessons are completed, return the last lesson
     course.lessons.last

@@ -27,8 +27,8 @@ class CreateLmsCourseMentorMappings < ActiveRecord::Migration[7.0]
     add_index :lms_course_mentor_mappings, :mentor_name
     add_index :lms_course_mentor_mappings, :creation
     add_index :lms_course_mentor_mappings, :modified
-    add_index :lms_course_mentor_mappings, [:course, :mentor], unique: true, name: 'index_course_mentor_mapping_on_course_and_mentor'
-    add_index :lms_course_mentor_mappings, [:mentor, :course]
+    add_index :lms_course_mentor_mappings, [ :course, :mentor ], unique: true, name: 'index_course_mentor_mapping_on_course_and_mentor'
+    add_index :lms_course_mentor_mappings, [ :mentor, :course ]
 
     # Add foreign key constraints
     add_foreign_key :lms_course_mentor_mappings, :lms_courses, column: :course

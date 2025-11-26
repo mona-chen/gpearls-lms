@@ -27,8 +27,8 @@ class CreatePaymentLogs < ActiveRecord::Migration[7.0]
     add_index :payment_logs, :gateway_type
     add_index :payment_logs, :transaction_reference
     add_index :payment_logs, :processed_at
-    add_index :payment_logs, [:payment_id, :event_type]
-    add_index :payment_logs, [:event_type, :status]
+    add_index :payment_logs, [ :payment_id, :event_type ]
+    add_index :payment_logs, [ :event_type, :status ]
     add_index :payment_logs, :created_at
   end
 end

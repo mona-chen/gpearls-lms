@@ -5,14 +5,14 @@ FactoryBot.define do
 
     association :batch
     association :course
-    association :evaluator, factory: [:user, :evaluator], optional: true
+    association :evaluator, factory: [ :user, :evaluator ], optional: true
 
     trait :with_position do
       position { 1 }
     end
 
     trait :with_evaluator do
-      association :evaluator, factory: [:user, :evaluator]
+      association :evaluator, factory: [ :user, :evaluator ]
     end
   end
 end

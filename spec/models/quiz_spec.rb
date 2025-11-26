@@ -11,7 +11,7 @@ RSpec.describe LmsQuiz, type: :model do
       course: course,
       max_attempts: 3,
       duration_minutes: 60,
-      passing_percentage: 70.0,
+      passing_percentage: 90.0,
       status: 'Draft',
       quiz_type: 'Graded',
       total_marks: 100.0
@@ -94,7 +94,9 @@ RSpec.describe LmsQuiz, type: :model do
     end
 
     it 'returns correct attempt count' do
-      create_list(:quiz_submission, 3, quiz: quiz, user: user)
+      create(:quiz_submission, quiz: quiz, member: user, attempt_number: 1)
+      create(:quiz_submission, quiz: quiz, member: user, attempt_number: 2)
+      create(:quiz_submission, quiz: quiz, member: user, attempt_number: 3)
       expect(quiz.user_attempts(user)).to eq(3)
     end
   end
@@ -106,7 +108,15 @@ RSpec.describe LmsQuiz, type: :model do
       before { quiz.update(max_attempts: nil) }
 
       it 'allows attempts' do
-        create_list(:quiz_submission, 5, quiz: quiz, user: user)
+        puts "Before update: max_attempts = #{quiz.max_attempts}"
+        quiz.update(max_attempts: nil)
+        puts "After update: max_attempts = #{quiz.max_attempts}"
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 1)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 2)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 3)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 4)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 5)
+        puts "user_attempts: #{quiz.user_attempts(user)}"
         expect(quiz.user_can_attempt?(user)).to be_truthy
       end
     end
@@ -115,12 +125,15 @@ RSpec.describe LmsQuiz, type: :model do
       before { quiz.update(max_attempts: 3) }
 
       it 'allows attempts when under limit' do
-        create_list(:quiz_submission, 2, quiz: quiz, user: user)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 1)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 2)
         expect(quiz.user_can_attempt?(user)).to be_truthy
       end
 
       it 'prevents attempts when limit reached' do
-        create_list(:quiz_submission, 3, quiz: quiz, user: user)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 1)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 2)
+        create(:quiz_submission, quiz: quiz, member: user, attempt_number: 3)
         expect(quiz.user_can_attempt?(user)).to be_falsey
       end
     end
@@ -134,9 +147,9 @@ RSpec.describe LmsQuiz, type: :model do
     end
 
     it 'returns highest score' do
-      create(:quiz_submission, quiz: quiz, user: user, score: 80)
-      create(:quiz_submission, quiz: quiz, user: user, score: 95)
-      create(:quiz_submission, quiz: quiz, user: user, score: 70)
+      create(:quiz_submission, quiz: quiz, member: user, percentage: 80, attempt_number: 1)
+      create(:quiz_submission, quiz: quiz, member: user, percentage: 95, attempt_number: 2)
+      create(:quiz_submission, quiz: quiz, member: user, percentage: 70, attempt_number: 3)
       expect(quiz.best_score(user)).to eq(95)
     end
   end
@@ -150,13 +163,13 @@ RSpec.describe LmsQuiz, type: :model do
 
     it 'returns true when best score meets passing percentage' do
       quiz.update(passing_percentage: 80)
-      create(:quiz_submission, quiz: quiz, user: user, score: 85)
+      create(:quiz_submission, quiz: quiz, member: user, percentage: 85)
       expect(quiz.has_passed?(user)).to be_truthy
     end
 
     it 'returns false when best score below passing percentage' do
       quiz.update(passing_percentage: 80)
-      create(:quiz_submission, quiz: quiz, user: user, score: 75)
+      create(:quiz_submission, quiz: quiz, member: user, percentage: 75)
       expect(quiz.has_passed?(user)).to be_falsey
     end
   end

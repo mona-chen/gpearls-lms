@@ -28,7 +28,7 @@ class CreateLmsTestCaseSubmissions < ActiveRecord::Migration[7.0]
     add_index :lms_test_case_submissions, :parent
     add_index :lms_test_case_submissions, :parenttype
     add_index :lms_test_case_submissions, :parentfield
-    add_index :lms_test_case_submissions, [:parent, :parenttype, :parentfield], name: 'index_test_case_sub_on_parent_and_type_and_field'
+    add_index :lms_test_case_submissions, [ :parent, :parenttype, :parentfield ], name: 'index_test_case_sub_on_parent_and_type_and_field'
     add_index :lms_test_case_submissions, :creation
     add_index :lms_test_case_submissions, :modified
   end

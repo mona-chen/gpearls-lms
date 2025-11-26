@@ -35,8 +35,8 @@ class CreateLmsVideoWatchDurations < ActiveRecord::Migration[7.0]
     add_index :lms_video_watch_durations, :source
     add_index :lms_video_watch_durations, :creation
     add_index :lms_video_watch_durations, :modified
-    add_index :lms_video_watch_durations, [:member, :lesson], unique: true, name: 'index_video_watch_on_member_and_lesson'
-    add_index :lms_video_watch_durations, [:course, :member], name: 'index_video_watch_on_course_and_member'
+    add_index :lms_video_watch_durations, [ :member, :lesson ], unique: true, name: 'index_video_watch_on_member_and_lesson'
+    add_index :lms_video_watch_durations, [ :course, :member ], name: 'index_video_watch_on_course_and_member'
 
     # Add foreign key constraints
     # TODO: Add foreign keys when tables exist:

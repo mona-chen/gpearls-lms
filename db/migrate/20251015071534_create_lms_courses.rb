@@ -57,7 +57,7 @@ class CreateLmsCourses < ActiveRecord::Migration[7.2]
     add_index :lms_courses, :course_code, unique: true
     add_index :lms_courses, :slug, unique: true
     add_index :lms_courses, :sort_order
-    add_index :lms_courses, [:published, :featured]
-    add_index :lms_courses, [:category, :published]
+    add_index :lms_courses, [ :published, :featured ]
+    add_index :lms_courses, [ :category, :published ]
   end
 end

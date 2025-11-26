@@ -9,7 +9,7 @@ FactoryBot.define do
     published { false }
     featured { false }
 
-    association :instructor, factory: [:user, :instructor]
+    association :instructor, factory: [ :user, :instructor ]
 
     trait :published do
       published { true }

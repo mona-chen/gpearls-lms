@@ -33,9 +33,9 @@ class CreateCertifications < ActiveRecord::Migration[7.0]
     add_index :certifications, :parent
     add_index :certifications, :parenttype
     add_index :certifications, :parentfield
-    add_index :certifications, [:parent, :parenttype, :parentfield], name: 'index_certifications_on_parent_and_type_and_field'
+    add_index :certifications, [ :parent, :parenttype, :parentfield ], name: 'index_certifications_on_parent_and_type_and_field'
     add_index :certifications, :creation
     add_index :certifications, :modified
-    add_index :certifications, [:organization, :certification_name]
+    add_index :certifications, [ :organization, :certification_name ]
   end
 end

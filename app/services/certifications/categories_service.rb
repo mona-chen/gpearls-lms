@@ -14,7 +14,7 @@ module Certifications
       # Apply filters from request
       if @params[:filters].present?
         filters = @params[:filters].to_unsafe_h
-        categories = categories.where(enabled: true) if filters['published'] == 1
+        categories = categories.where(enabled: true) if filters["published"] == 1
       end
 
       # Apply pagination
@@ -29,13 +29,13 @@ module Certifications
           category_id: category.id,
           description: category.description,
           enabled: category.enabled,
-          creation: category.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: category.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+          creation: category.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: category.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
           certification_count: category.certifications.count
         }
       end
 
-      { 'data' => categories_data }
+      { "data" => categories_data }
     end
   end
 end

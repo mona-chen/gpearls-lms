@@ -27,8 +27,8 @@ class CreateLmsCourseInterests < ActiveRecord::Migration[7.0]
     add_index :lms_course_interests, :email_sent
     add_index :lms_course_interests, :creation
     add_index :lms_course_interests, :modified
-    add_index :lms_course_interests, [:course, :user], unique: true, name: 'index_course_interest_on_course_and_user'
-    add_index :lms_course_interests, [:user, :email_sent]
+    add_index :lms_course_interests, [ :course, :user ], unique: true, name: 'index_course_interest_on_course_and_user'
+    add_index :lms_course_interests, [ :user, :email_sent ]
 
     # Add foreign key constraints
     add_foreign_key :lms_course_interests, :lms_courses, column: :course

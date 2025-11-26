@@ -22,7 +22,7 @@ namespace :payments do
       if defined?(Rails)
         # Check if Sidekiq is running
         begin
-          require 'sidekiq/api'
+          require "sidekiq/api"
 
           # Get Sidekiq processes
           processes = Sidekiq::ProcessSet.new
@@ -76,7 +76,7 @@ namespace :payments do
       # Show Sidekiq queue status
       if defined?(Sidekiq)
         begin
-          require 'sidekiq/api'
+          require "sidekiq/api"
 
           # Get Redis info
           redis_info = Sidekiq.redis_info
@@ -87,7 +87,7 @@ namespace :payments do
 
           # Get queue stats
           stats = Sidekiq::Stats.new
-          queue_stats = stats.queues['payments']
+          queue_stats = stats.queues["payments"]
           if queue_stats
             puts "\n📊 Payments Queue Status:"
             puts "  📊 Queue Size: #{queue_stats['size'] || 0}"
@@ -126,7 +126,7 @@ namespace :payments do
       # Show recent polling activity
       puts "\n📋 Recent Polling Activity:"
       recent_logs = PaymentLog
-        .where(event_type: 'polling_error')
+        .where(event_type: "polling_error")
         .order(created_at: :desc)
         .limit(5)
 
@@ -144,7 +144,7 @@ namespace :payments do
       puts "🧪 Testing Paystack API connection..."
 
       begin
-        gateway = PaymentGateway.active_for_type('paystack')
+        gateway = PaymentGateway.active_for_type("paystack")
         unless gateway
           puts "❌ No active Paystack gateway found"
           exit 1
@@ -172,7 +172,7 @@ namespace :payments do
 
       begin
         # Get test user and course
-        user = User.find_by(email: 'student@lms.test')
+        user = User.find_by(email: "student@lms.test")
         course = Course.first
 
         unless user && course
@@ -181,7 +181,7 @@ namespace :payments do
         end
 
         # Create test payment
-        payment = Payment.create_for_course(user, course, 'paystack')
+        payment = Payment.create_for_course(user, course, "paystack")
 
         puts "✅ Created test payment: #{payment.name}"
         puts "💰 Amount: #{payment.amount} #{payment.currency}"
@@ -200,7 +200,7 @@ namespace :payments do
     end
 
     desc "Monitor specific payment"
-    task :monitor, [:payment_id] => :environment do |t, args|
+    task :monitor, [ :payment_id ] => :environment do |t, args|
       payment_id = args[:payment_id]
 
       unless payment_id
@@ -232,11 +232,11 @@ namespace :payments do
           .limit(10)
           .each do |log|
             status_icon = case log.status
-                        when 'success' then '✅'
-                        when 'error' then '❌'
-                        when 'warning' then '⚠️'
-                        else 'ℹ️'
-                  end
+            when "success" then "✅"
+            when "error" then "❌"
+            when "warning" then "⚠️"
+            else "ℹ️"
+            end
             puts "  #{status_icon} #{log.created_at.strftime('%H:%M:%S')} - #{log.event_type}: #{log.error_message || 'Success'}"
           end
 

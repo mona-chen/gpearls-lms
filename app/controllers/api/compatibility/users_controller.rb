@@ -16,7 +16,7 @@ module Api
           {
             name: user.full_name,
             email: user.email,
-            username: user.email.split('@').first,
+            username: user.email.split("@").first,
             first_name: user.first_name,
             last_name: user.last_name,
             user_image: user.user_image

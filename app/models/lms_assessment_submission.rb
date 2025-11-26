@@ -7,12 +7,12 @@ class LmsAssessmentSubmission < ApplicationRecord
   belongs_to :batch, class_name: "Batch", optional: true
   belongs_to :assessment_attempt, class_name: "AssessmentAttempt", optional: true
   belongs_to :evaluator, class_name: "User", optional: true
-  
+
   has_many :assessment_questions, dependent: :destroy
   has_many :assessment_evaluations, dependent: :destroy
   has_many :assessment_attempts, dependent: :destroy
   has_many :submission_files, dependent: :destroy
-  
+
   # Validations
   validates :assessment, presence: true
   validates :user, presence: true
@@ -21,7 +21,7 @@ class LmsAssessmentSubmission < ApplicationRecord
   validates :percentage, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
   validates :time_taken_seconds, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :attempt_number, numericality: { greater_than: 0, integer_only: true }, allow_nil: true
-  
+
   # Scopes
   scope :draft, -> { where(status: "Draft") }
   scope :submitted, -> { where(status: "Submitted") }
@@ -39,57 +39,57 @@ class LmsAssessmentSubmission < ApplicationRecord
   scope :high_scorers, -> { where("score >= ?", 80) }
   scope :perfect_scores, -> { where("percentage >= ?", 95) }
   scope :failed_attempts, -> { where("score < ?", 40) }
-  
+
   # Callbacks
   before_validation :set_default_values
   before_save :calculate_percentage_and_status
   after_save :update_user_progress
   after_save :trigger_badge_awards
-  
+
   # Instance Methods
   def draft?
     status == "Draft"
   end
-  
+
   def submitted?
     status == "Submitted"
   end
-  
+
   def evaluated?
     status == "Evaluated"
   end
-  
+
   def passed?
     status == "Passed" || status == "Evaluated" && percentage >= assessment.passing_percentage
   end
-  
+
   def failed?
     status == "Failed" || status == "Evaluated" && percentage < assessment.passing_percentage
   end
-  
+
   def returned?
     status == "Returned"
   end
-  
+
   def resubmitted?
     status == "Resubmitted"
   end
-  
+
   def under_review?
     status == "Under Review"
   end
-  
+
   def complete?
     submitted? || evaluated? || passed? || failed?
   end
-  
+
   def time_taken_formatted
     return "0 seconds" if time_taken_seconds.nil? || time_taken_seconds.zero?
-    
+
     hours = time_taken_seconds / 3600
     minutes = (time_taken_seconds % 3600) / 60
     seconds = time_taken_seconds % 60
-    
+
     parts = []
     parts << "#{hours} hour#{s if hours > 1}" if hours > 0
     parts << "#{hours} hour" if hours == 1
@@ -97,40 +97,40 @@ class LmsAssessmentSubmission < ApplicationRecord
     parts << "#{minutes} minute" if minutes == 1
     parts << "#{seconds} second#{s if seconds > 0}" if seconds > 0
     parts << "#{seconds} second" if seconds == 1
-    
+
     parts.join(" ")
   end
-  
+
   def calculate_score
     return 0 if assessment_questions.empty?
-    
+
     total_score = 0
     assessment_questions.each do |question|
       total_score += question.score || 0
     end
-    
+
     total_score
   end
-  
+
   def calculate_max_score
     return 0 if assessment_questions.empty?
-    
+
     total_max_score = 0
     assessment_questions.each do |question|
       total_max_score += question.max_marks || question.question.marks
     end
-    
+
     total_max_score
   end
-  
+
   def get_correct_answers
     assessment_questions.where(correct: true).includes(:question)
   end
-  
+
   def get_incorrect_answers
     assessment_questions.where(correct: false).includes(:question)
   end
-  
+
   def get_question_results
     assessment_questions.includes(:question).map do |question|
       {
@@ -146,10 +146,10 @@ class LmsAssessmentSubmission < ApplicationRecord
       }
     end
   end
-  
+
   def get_performance_summary
     return {} unless submitted? || evaluated?
-    
+
     {
       score: score,
       max_score: max_score,
@@ -164,15 +164,15 @@ class LmsAssessmentSubmission < ApplicationRecord
       attempt_number: attempt_number
     }
   end
-  
+
   def get_submission_files
     submission_files.includes(:file)
   end
-  
+
   def get_evaluations
     assessment_evaluations.includes(:evaluator)
   end
-  
+
   def to_frappe_format
     {
       id: id,
@@ -201,11 +201,11 @@ class LmsAssessmentSubmission < ApplicationRecord
       updated_at: updated_at&.iso8601
     }
   end
-  
+
   # Class Methods
   def self.create_submission(params)
     submission = build_submission_with_defaults(params)
-    
+
     if submission.save
       {
         success: true,
@@ -220,15 +220,15 @@ class LmsAssessmentSubmission < ApplicationRecord
       }
     end
   end
-  
+
   def self.get_user_submissions(user, options = {})
     submissions = user.assessment_submissions.includes(:assessment, :batch, :assessment_questions)
-    
+
     # Apply filters
     submissions = submissions.where(assessment: options[:assessment]) if options[:assessment].present?
     submissions = submissions.where(status: options[:status]) if options[:status].present?
     submissions = submissions.where(batch: options[:batch]) if options[:batch].present?
-    
+
     # Apply sorting
     if options[:sort_by] == "score"
       submissions = submissions.order(score: :desc)
@@ -237,22 +237,22 @@ class LmsAssessmentSubmission < ApplicationRecord
     else
       submissions = submissions.order(created_at: :desc)
     end
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_assessment_submissions(assessment, options = {})
     submissions = assessment.assessment_submissions.includes(:user, :batch, :assessment_questions)
-    
+
     # Apply filters
     submissions = submissions.where(status: options[:status]) if options[:status].present?
     submissions = submissions.where(batch: options[:batch]) if options[:batch].present?
-    
+
     # Apply sorting
     if options[:sort_by] == "score"
       submissions = submissions.order(score: :desc)
@@ -261,104 +261,104 @@ class LmsAssessmentSubmission < ApplicationRecord
     else
       submissions = submissions.order(created_at: :desc)
     end
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_batch_submissions(batch, options = {})
     submissions = batch.assessment_submissions.includes(:user, :assessment, :assessment_questions)
-    
+
     # Apply filters
     submissions = submissions.where(status: options[:status]) if options[:status].present?
     submissions = submissions.where(assessment: options[:assessment]) if options[:assessment].present?
-    
+
     # Apply sorting
     submissions = submissions.order(created_at: :desc)
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_evaluated_submissions(options = {})
     submissions = evaluated.includes(:user, :assessment, :batch, :assessment_questions, :evaluator)
-    
+
     # Apply filters
     submissions = submissions.where(assessment: options[:assessment]) if options[:assessment].present?
     submissions = submissions.where(batch: options[:batch]) if options[:batch].present?
-    
+
     # Apply sorting
     submissions = submissions.order(score: :desc)
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_submissions_by_status(status, options = {})
     submissions = where(status: status).includes(:user, :assessment, :batch, :assessment_questions)
-    
+
     # Apply filters
     submissions = submissions.where(assessment: options[:assessment]) if options[:assessment].present?
     submissions = submissions.where(batch: options[:batch]) if options[:batch].present?
-    
+
     # Apply sorting
     submissions = submissions.order(created_at: :desc)
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_submissions_by_score_range(min_score, max_score, options = {})
     submissions = where("score >= ? AND score <= ?", min_score, max_score)
              .includes(:user, :assessment, :batch, :assessment_questions)
-    
+
     # Apply sorting
     submissions = submissions.order(score: :desc)
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     offset = options[:offset] || 0
     submissions = submissions.limit(limit).offset(offset)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_recent_submissions(options = {})
     submissions = recent.includes(:user, :assessment, :batch, :assessment_questions)
-    
+
     # Apply filters
     submissions = submissions.where(status: options[:status]) if options[:status].present?
-    
+
     # Apply pagination
     limit = options[:limit] || 20
     submissions = submissions.limit(limit)
-    
+
     submissions.map(&:to_frappe_format)
   end
-  
+
   def self.get_top_performers(assessment, limit = 10)
     submissions = assessment.assessment_submissions
                   .includes(:user)
                   .where(status: "Evaluated")
                   .order(score: :desc, percentage: :desc, time_taken_seconds: :asc)
                   .limit(limit)
-    
+
     performers = submissions.map do |submission|
       {
         user: submission.user.to_frappe_format,
@@ -368,15 +368,15 @@ class LmsAssessmentSubmission < ApplicationRecord
         time_taken_formatted: submission.time_taken_formatted,
         attempt_number: submission.attempt_number,
         grade: submission.calculate_grade,
-        rank: nil, # Will be set below
+        rank: nil # Will be set below
       }
     end
-    
+
     # Assign ranks
     performers.each_with_index do |performer, index|
       performer[:rank] = index + 1
     end
-    
+
     {
       success: true,
       assessment: assessment.to_frappe_format,
@@ -384,11 +384,11 @@ class LmsAssessmentSubmission < ApplicationRecord
       total: submissions.count
     }
   end
-  
+
   def self.get_submission_statistics(submission_id)
     submission = find_by(id: submission_id)
     return { error: "Submission not found" } unless submission
-    
+
     {
       success: true,
       submission_id: submission_id,
@@ -407,29 +407,29 @@ class LmsAssessmentSubmission < ApplicationRecord
       performance_summary: submission.get_performance_summary
     }
   end
-  
+
   def self.bulk_grade_submissions(submissions, evaluator, options = {})
     graded_count = 0
     failed_count = 0
     results = []
-    
+
     submissions.each do |submission|
       begin
         # Calculate scores and evaluate submission
         submission.score = submission.calculate_score
         submission.max_score = submission.calculate_max_score
         submission.percentage = submission.max_score > 0 ? (submission.score.to_f / submission.max_score.to_f * 100).round(2) : 0
-        
+
         # Update status based on passing criteria
         if submission.assessment.passing_marks && submission.score >= submission.assessment.passing_marks
           submission.status = "Passed"
         else
           submission.status = "Failed"
         end
-        
+
         submission.evaluator = evaluator
         submission.evaluated_at = Time.current
-        
+
         if submission.save
           graded_count += 1
           results << {
@@ -456,7 +456,7 @@ class LmsAssessmentSubmission < ApplicationRecord
         }
       end
     end
-    
+
     {
       success: true,
       graded_count: graded_count,
@@ -464,9 +464,9 @@ class LmsAssessmentSubmission < ApplicationRecord
       results: results
     }
   end
-  
+
   private
-  
+
   def set_default_values
     self.status ||= "Draft"
     self.score ||= 0
@@ -475,12 +475,12 @@ class LmsAssessmentSubmission < ApplicationRecord
     self.time_taken_seconds ||= 0
     self.attempt_number ||= 1
   end
-  
+
   def calculate_percentage_and_status
     if max_score && max_score > 0 && score
       self.percentage = (score.to_f / max_score.to_f * 100).round(2)
     end
-    
+
     if status == "Submitted" || status == "Evaluated"
       if assessment && assessment.passing_marks && score >= assessment.passing_marks
         self.status = "Passed"
@@ -489,38 +489,38 @@ class LmsAssessmentSubmission < ApplicationRecord
       end
     end
   end
-  
+
   def update_user_progress
     return unless user && assessment && batch
-    
+
     # Update course progress based on assessment performance
     if passed?
       # Mock progress update - in real implementation, this would call CourseProgress service
       # CourseProgressService.update_progress_for_assessment(user, assessment, batch, self)
     end
   end
-  
+
   def trigger_badge_awards
-    return unless user && passed?
-    
+    nil unless user && passed?
+
     # Mock badge awarding - in real implementation, this would call BadgeService
     # BadgeService.check_and_award_badge(user, "Assessment Completed", self)
   end
-  
+
   def calculate_accuracy
     return 0 if assessment_questions.empty?
-    
+
     correct_count = assessment_questions.where(correct: true).count
     total_count = assessment_questions.count
-    
+
     return 0 if total_count.zero?
-    
+
     (correct_count.to_f / total_count * 100).round(2)
   end
-  
+
   def calculate_grade
     return "F" unless percentage
-    
+
     case percentage
     when 90..100
       "A+"
@@ -540,9 +540,9 @@ class LmsAssessmentSubmission < ApplicationRecord
       "F"
     end
   end
-  
+
   private
-  
+
   def build_submission_with_defaults(params)
     LmsAssessmentSubmission.new(
       assessment: params[:assessment],

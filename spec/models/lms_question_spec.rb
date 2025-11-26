@@ -1,7 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe LmsQuestion, type: :model do
-  let(:question) { build(:lms_question) }
+  let(:question) do
+    LmsQuestion.new(
+      question: 'Test Question',
+      type: 'Choices',
+      option_1: 'Option 1',
+      is_correct_1: true,
+      option_2: 'Option 2'
+    )
+  end
 
   describe 'validations' do
     it 'is valid with valid attributes' do

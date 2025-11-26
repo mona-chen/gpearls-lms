@@ -402,7 +402,7 @@ class CreateCoreTables < ActiveRecord::Migration[7.2]
     add_index :users, :jti, unique: true
     add_index :courses, :published
     add_index :courses, :featured
-    add_index :enrollments, [:user_id, :course_id], unique: true
-    add_index :course_progresses, [:user_id, :lesson_id], unique: true
+    add_index :enrollments, [ :user_id, :course_id ], unique: true
+    add_index :course_progresses, [ :user_id, :lesson_id ], unique: true
   end
 end

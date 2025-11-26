@@ -31,9 +31,9 @@ class CreateLmsSidebarItems < ActiveRecord::Migration[7.0]
     add_index :lms_sidebar_items, :parent
     add_index :lms_sidebar_items, :parenttype
     add_index :lms_sidebar_items, :parentfield
-    add_index :lms_sidebar_items, [:parent, :parenttype, :parentfield], name: 'index_sidebar_items_on_parent_and_type_and_field'
+    add_index :lms_sidebar_items, [ :parent, :parenttype, :parentfield ], name: 'index_sidebar_items_on_parent_and_type_and_field'
     add_index :lms_sidebar_items, :creation
     add_index :lms_sidebar_items, :modified
-    add_index :lms_sidebar_items, [:web_page, :title]
+    add_index :lms_sidebar_items, [ :web_page, :title ]
   end
 end

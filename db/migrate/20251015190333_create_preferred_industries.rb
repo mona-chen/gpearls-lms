@@ -25,7 +25,7 @@ class CreatePreferredIndustries < ActiveRecord::Migration[7.0]
     add_index :preferred_industries, :parent
     add_index :preferred_industries, :parenttype
     add_index :preferred_industries, :parentfield
-    add_index :preferred_industries, [:parent, :parenttype, :parentfield], name: 'index_preferred_industries_on_parent_and_type_and_field'
+    add_index :preferred_industries, [ :parent, :parenttype, :parentfield ], name: 'index_preferred_industries_on_parent_and_type_and_field'
     add_index :preferred_industries, :creation
     add_index :preferred_industries, :modified
 

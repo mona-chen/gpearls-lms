@@ -33,11 +33,11 @@ class CreateCohortWebPages < ActiveRecord::Migration[7.0]
     add_index :cohort_web_pages, :parent
     add_index :cohort_web_pages, :parenttype
     add_index :cohort_web_pages, :parentfield
-    add_index :cohort_web_pages, [:parent, :parenttype, :parentfield], name: 'index_cohort_web_pages_on_parent_and_type_and_field'
+    add_index :cohort_web_pages, [ :parent, :parenttype, :parentfield ], name: 'index_cohort_web_pages_on_parent_and_type_and_field'
     add_index :cohort_web_pages, :creation
     add_index :cohort_web_pages, :modified
-    add_index :cohort_web_pages, [:slug, :title]
-    add_index :cohort_web_pages, [:scope, :required_role]
+    add_index :cohort_web_pages, [ :slug, :title ]
+    add_index :cohort_web_pages, [ :scope, :required_role ]
 
     # Add foreign key constraints
     # TODO: Add foreign key when web_templates table exists:

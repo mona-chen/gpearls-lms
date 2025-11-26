@@ -1,7 +1,7 @@
 class SessionsController < ActionController::Base
-  protect_from_forgery with: :exception, except: [:create, :destroy]
+  protect_from_forgery with: :exception, except: [ :create, :destroy ]
 
-  require 'jwt'
+  require "jwt"
 
   # Set Frappe-compatible headers
   before_action :set_frappe_headers
@@ -38,28 +38,28 @@ class SessionsController < ActionController::Base
         httponly: true,
         secure: Rails.env.production?,
         same_site: :lax,
-        path: '/'
+        path: "/"
       }
 
       cookies[:sid] = { value: session_id, **cookie_options }
-      cookies[:system_user] = { value: 'yes', **cookie_options.except(:httponly) }
+      cookies[:system_user] = { value: "yes", **cookie_options.except(:httponly) }
       cookies[:full_name] = { value: CGI.escape(user.full_name), **cookie_options.except(:httponly) }
       cookies[:user_id] = { value: CGI.escape(user.email), **cookie_options.except(:httponly) }
-      cookies[:user_image] = { value: CGI.escape(user.user_image || ''), **cookie_options.except(:httponly) }
+      cookies[:user_image] = { value: CGI.escape(user.user_image || ""), **cookie_options.except(:httponly) }
 
       # Set CORS headers for Frappe compatibility
-      response.headers['Access-Control-Allow-Origin'] = request.origin
-      response.headers['Access-Control-Allow-Credentials'] = 'true'
-      response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-      response.headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept, Authorization, X-Frappe-CSRF-Token, X-Frappe-CMD, X-Requested-With'
+      response.headers["Access-Control-Allow-Origin"] = request.origin
+      response.headers["Access-Control-Allow-Credentials"] = "true"
+      response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+      response.headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, Accept, Authorization, X-Frappe-CSRF-Token, X-Frappe-CMD, X-Requested-With"
 
       render json: {
-        message: 'Logged In',
-        home_page: '/lms',
+        message: "Logged In",
+        home_page: "/lms",
         full_name: user.full_name
       }
     else
-      render json: { message: 'Invalid login credentials' }, status: :unauthorized
+      render json: { message: "Invalid login credentials" }, status: :unauthorized
     end
   end
 
@@ -76,7 +76,7 @@ class SessionsController < ActionController::Base
     # Clear Rails session
     reset_session
 
-    render json: { message: 'Logged Out' }
+    render json: { message: "Logged Out" }
   end
 
   # Handle CORS preflight requests
@@ -87,13 +87,13 @@ class SessionsController < ActionController::Base
   private
 
   def set_frappe_headers
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "no-referrer-when-downgrade"
 
     if Rails.env.production?
-      response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
+      response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
     end
   end
 end

@@ -30,6 +30,6 @@ class CreateCohorts < ActiveRecord::Migration[7.2]
     # Indexes already added by t.index in create_table
 
     # Add unique index for autoname format: {course}/{slug}
-    add_index :cohorts, [:course, :slug], unique: true, name: 'index_cohorts_on_course_and_slug'
+    add_index :cohorts, [ :course, :slug ], unique: true, name: 'index_cohorts_on_course_and_slug'
   end
 end

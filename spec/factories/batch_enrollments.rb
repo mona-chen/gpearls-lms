@@ -3,7 +3,7 @@ FactoryBot.define do
     created_at { Time.current }
 
     association :batch
-    association :user, factory: [:user, :student]
+    association :user, factory: [ :user, :student ]
 
     trait :completed do
       created_at { Time.current }

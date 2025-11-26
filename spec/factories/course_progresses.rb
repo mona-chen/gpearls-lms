@@ -15,11 +15,11 @@ FactoryBot.define do
     end
 
     trait :for_student do
-      association :user, factory: [:user, :student]
+      association :user, factory: [ :user, :student ]
     end
 
     trait :for_instructor do
-      association :user, factory: [:user, :instructor]
+      association :user, factory: [ :user, :instructor ]
     end
   end
 end

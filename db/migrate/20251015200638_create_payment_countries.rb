@@ -25,7 +25,7 @@ class CreatePaymentCountries < ActiveRecord::Migration[7.0]
     add_index :payment_countries, :parent
     add_index :payment_countries, :parenttype
     add_index :payment_countries, :parentfield
-    add_index :payment_countries, [:parent, :parenttype, :parentfield], name: 'index_payment_countries_on_parent_and_type_and_field'
+    add_index :payment_countries, [ :parent, :parenttype, :parentfield ], name: 'index_payment_countries_on_parent_and_type_and_field'
     add_index :payment_countries, :creation
     add_index :payment_countries, :modified
 

@@ -64,11 +64,11 @@ class CreateLmsCertificates < ActiveRecord::Migration[7.2]
     add_index :lms_certificates, :verification_count
     # issued_by_id index automatically created by references helper
     add_index :lms_certificates, :revoked_at
-    add_index :lms_certificates, [:student_id, :certificate_type]
-    add_index :lms_certificates, [:course_id, :student_id]
-    add_index :lms_certificates, [:certificate_type, :status]
-    add_index :lms_certificates, [:status, :issue_date]
-    add_index :lms_certificates, [:student_id, :status]
-    add_index :lms_certificates, [:publicly_accessible, :verification_count]
+    add_index :lms_certificates, [ :student_id, :certificate_type ]
+    add_index :lms_certificates, [ :course_id, :student_id ]
+    add_index :lms_certificates, [ :certificate_type, :status ]
+    add_index :lms_certificates, [ :status, :issue_date ]
+    add_index :lms_certificates, [ :student_id, :status ]
+    add_index :lms_certificates, [ :publicly_accessible, :verification_count ]
   end
 end

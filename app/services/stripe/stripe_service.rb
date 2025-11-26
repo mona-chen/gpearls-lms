@@ -1,8 +1,8 @@
 module Stripe
   class StripeService
     def initialize(gateway = nil)
-      @gateway = gateway || PaymentGateway.active_for_type('stripe')
-      raise Payments::Error::GatewayNotConfiguredError, 'Stripe gateway not configured' unless @gateway&.active?
+      @gateway = gateway || PaymentGateway.active_for_type("stripe")
+      raise Payments::Error::GatewayNotConfiguredError, "Stripe gateway not configured" unless @gateway&.active?
 
       @secret_key = @gateway.credentials[:secret_key]
       @publishable_key = @gateway.credentials[:publishable_key]
@@ -10,7 +10,7 @@ module Stripe
 
     # Initialize a payment intent
     def create_payment_intent(payment)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       intent = Stripe::PaymentIntent.create({
@@ -20,7 +20,7 @@ module Stripe
           payment_id: payment.id,
           payment_description: payment.payment_description
         },
-        confirmation_method: 'manual',
+        confirmation_method: "manual",
         confirm: false
       })
 
@@ -34,13 +34,13 @@ module Stripe
 
     # Confirm a payment
     def confirm_payment(payment_intent_id)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       intent = Stripe::PaymentIntent.confirm(payment_intent_id)
       payment = Payment.find_by(transaction_id: payment_intent_id)
 
-      if intent.status == 'succeeded'
+      if intent.status == "succeeded"
         payment.mark_completed!(intent.to_json)
         process_payment_completion(payment, intent.to_json)
       else
@@ -55,7 +55,7 @@ module Stripe
 
     # Create a customer
     def create_customer(user)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       customer = Stripe::Customer.create({
@@ -74,7 +74,7 @@ module Stripe
 
     # Charge a customer
     def charge_customer(payment, customer_id)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       charge = Stripe::Charge.create({
@@ -87,7 +87,7 @@ module Stripe
         }
       })
 
-      if charge.status == 'succeeded'
+      if charge.status == "succeeded"
         payment.mark_completed!(charge.to_json)
         process_payment_completion(payment, charge.to_json)
       else
@@ -102,7 +102,7 @@ module Stripe
 
     # Process refund
     def process_refund(payment, amount = nil)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       refund = Stripe::Refund.create({
@@ -121,7 +121,7 @@ module Stripe
 
     # Get customer
     def get_customer(customer_id)
-      require 'stripe'
+      require "stripe"
       Stripe.api_key = @secret_key
 
       Stripe::Customer.retrieve(customer_id)
@@ -133,13 +133,13 @@ module Stripe
       # Handle different payment types
       if payment.course.present?
         enrollment = Enrollment.find_or_create_by!(user: payment.user, course: payment.course)
-        enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        enrollment.update!(status: "Active", enrollment_date: Time.current)
       elsif payment.batch.present?
         batch_enrollment = BatchEnrollment.find_or_create_by!(user: payment.user, batch: payment.batch)
-        batch_enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        batch_enrollment.update!(status: "Active", enrollment_date: Time.current)
       elsif payment.program.present?
         program_enrollment = LmsProgramEnrollment.find_or_create_by!(user: payment.user, program: payment.program)
-        program_enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        program_enrollment.update!(status: "Active", enrollment_date: Time.current)
       end
 
       # Send notifications

@@ -28,9 +28,9 @@ class PaymentLog < ApplicationRecord
   validates :status, presence: true, inclusion: { in: %w[success error warning info] }
 
   # Scopes
-  scope :successful, -> { where(status: 'success') }
-  scope :failed, -> { where(status: 'error') }
-  scope :warnings, -> { where(status: 'warning') }
+  scope :successful, -> { where(status: "success") }
+  scope :failed, -> { where(status: "error") }
+  scope :warnings, -> { where(status: "warning") }
   scope :by_event_type, ->(event_type) { where(event_type: event_type) }
   scope :by_gateway, ->(gateway_type) { where(gateway_type: gateway_type) }
   scope :recent, -> { order(created_at: :desc) }
@@ -71,7 +71,7 @@ class PaymentLog < ApplicationRecord
 
   def self.get_error_summary(start_date = 1.week.ago, end_date = Time.current)
     between_dates(start_date, end_date)
-      .where(status: 'error')
+      .where(status: "error")
       .group(:event_type)
       .count
   end
@@ -90,15 +90,15 @@ class PaymentLog < ApplicationRecord
 
   # Instance methods
   def successful?
-    status == 'success'
+    status == "success"
   end
 
   def failed?
-    status == 'error'
+    status == "error"
   end
 
   def warning?
-    status == 'warning'
+    status == "warning"
   end
 
   def has_gateway_response?
@@ -143,8 +143,8 @@ class PaymentLog < ApplicationRecord
       ip_address: ip_address,
       user_agent: user_agent,
       retry_count: retry_count,
-      processed_at: processed_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      creation: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
+      processed_at: processed_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
       notes: notes
     }
   end
@@ -152,7 +152,7 @@ class PaymentLog < ApplicationRecord
   private
 
   def set_defaults
-    self.status ||= 'info'
+    self.status ||= "info"
     self.processed_at ||= Time.current
     self.retry_count ||= 0
   end

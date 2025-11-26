@@ -25,7 +25,7 @@ class CreatePreferredFunctions < ActiveRecord::Migration[7.0]
     add_index :preferred_functions, :parent
     add_index :preferred_functions, :parenttype
     add_index :preferred_functions, :parentfield
-    add_index :preferred_functions, [:parent, :parenttype, :parentfield], name: 'index_preferred_functions_on_parent_and_type_and_field'
+    add_index :preferred_functions, [ :parent, :parenttype, :parentfield ], name: 'index_preferred_functions_on_parent_and_type_and_field'
     add_index :preferred_functions, :creation
     add_index :preferred_functions, :modified
 

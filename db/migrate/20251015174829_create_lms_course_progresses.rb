@@ -35,11 +35,11 @@ class CreateLmsCourseProgresses < ActiveRecord::Migration[7.0]
     add_index :lms_course_progresses, :is_scorm_chapter
     add_index :lms_course_progresses, :creation
     add_index :lms_course_progresses, :modified
-    add_index :lms_course_progresses, [:member, :course], name: 'index_course_prog_on_member_and_course'
-    add_index :lms_course_progresses, [:member, :status], name: 'index_course_prog_on_member_and_status'
-    add_index :lms_course_progresses, [:course, :status], name: 'index_course_prog_on_course_and_status'
-    add_index :lms_course_progresses, [:chapter, :lesson], name: 'index_course_prog_on_chapter_and_lesson'
-    add_index :lms_course_progresses, [:member, :chapter, :lesson], name: 'index_course_prog_on_member_chapter_lesson'
+    add_index :lms_course_progresses, [ :member, :course ], name: 'index_course_prog_on_member_and_course'
+    add_index :lms_course_progresses, [ :member, :status ], name: 'index_course_prog_on_member_and_status'
+    add_index :lms_course_progresses, [ :course, :status ], name: 'index_course_prog_on_course_and_status'
+    add_index :lms_course_progresses, [ :chapter, :lesson ], name: 'index_course_prog_on_chapter_and_lesson'
+    add_index :lms_course_progresses, [ :member, :chapter, :lesson ], name: 'index_course_prog_on_member_chapter_lesson'
 
     # Add foreign key constraints
     add_foreign_key :lms_course_progresses, :users, column: :member

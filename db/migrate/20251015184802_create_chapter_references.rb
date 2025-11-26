@@ -25,7 +25,7 @@ class CreateChapterReferences < ActiveRecord::Migration[7.0]
     add_index :chapter_references, :parent
     add_index :chapter_references, :parenttype
     add_index :chapter_references, :parentfield
-    add_index :chapter_references, [:parent, :parenttype, :parentfield], name: 'index_chapter_refs_on_parent_and_type_and_field'
+    add_index :chapter_references, [ :parent, :parenttype, :parentfield ], name: 'index_chapter_refs_on_parent_and_type_and_field'
     add_index :chapter_references, :creation
     add_index :chapter_references, :modified
 

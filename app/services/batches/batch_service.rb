@@ -7,7 +7,7 @@ module Batches
       completed_lessons = user.lesson_progress
                               .joins(lesson: :chapter)
                               .where(chapters: { course: batch.courses })
-                              .where(status: 'Complete')
+                              .where(status: "Complete")
                               .count
 
       (completed_lessons.to_f / total_lessons * 100).round(2)
@@ -37,10 +37,10 @@ module Batches
           {
             name: live_class.name,
             title: live_class.title,
-            date: live_class.date.strftime('%Y-%m-%d'),
-            start_time: live_class.time.strftime('%H:%M:%S'),
-            end_time: (live_class.time + live_class.duration.minutes).strftime('%H:%M:%S'),
-            reference_doctype: 'LMS Live Class',
+            date: live_class.date.strftime("%Y-%m-%d"),
+            start_time: live_class.time.strftime("%H:%M:%S"),
+            end_time: (live_class.time + live_class.duration.minutes).strftime("%H:%M:%S"),
+            reference_doctype: "LMS Live Class",
             reference_docname: live_class.name,
             url: live_class.join_url,
             duration: live_class.duration,
@@ -53,25 +53,25 @@ module Batches
         {
           name: entry.name,
           title: entry.reference_doc&.title,
-          date: entry.date.strftime('%Y-%m-%d'),
-          start_time: entry.start_time&.strftime('%H:%M:%S'),
-          end_time: entry.end_time&.strftime('%H:%M:%S'),
+          date: entry.date.strftime("%Y-%m-%d"),
+          start_time: entry.start_time&.strftime("%H:%M:%S"),
+          end_time: entry.end_time&.strftime("%H:%M:%S"),
           reference_doctype: entry.reference_doctype,
           reference_docname: entry.reference_docname,
           milestone: entry.milestone
         }
       end
 
-      (timetable_entries + live_classes).sort_by { |entry| [entry[:date], entry[:start_time] || entry[:time]] }
+      (timetable_entries + live_classes).sort_by { |entry| [ entry[:date], entry[:start_time] || entry[:time] ] }
     end
 
     def self.create_live_class(params)
       batch = Batch.find(params[:batch_name])
-      return { error: 'Batch not found' } unless batch
+      return { error: "Batch not found" } unless batch
 
       # Validate Zoom account
       zoom_account = ZoomSetting.find_by(account_name: params[:zoom_account])
-      return { error: 'Zoom account not configured' } unless zoom_account
+      return { error: "Zoom account not configured" } unless zoom_account
 
       # Create live class record
       live_class = LiveClass.new(
@@ -81,7 +81,7 @@ module Batches
         date: params[:date],
         time: params[:time],
         duration: params[:duration],
-        auto_recording: params[:auto_recording] || 'No Recording',
+        auto_recording: params[:auto_recording] || "No Recording",
         zoom_account: zoom_account.name,
         host: Current.user&.email
       )
@@ -101,7 +101,7 @@ module Batches
           add_students_to_event(live_class, batch)
           live_class.to_frappe_format
         else
-          { error: live_class.errors.full_messages.join(', ') }
+          { error: live_class.errors.full_messages.join(", ") }
         end
       else
         { error: zoom_response[:error] }
@@ -112,11 +112,11 @@ module Batches
       enrollments = BatchEnrollment.by_batch(batch).includes(:user)
 
       case status_filter
-      when 'active'
+      when "active"
         enrollments = enrollments.active
-      when 'upcoming'
+      when "upcoming"
         enrollments = enrollments.upcoming
-      when 'completed'
+      when "completed"
         enrollments = enrollments.completed
       end
 
@@ -182,27 +182,27 @@ module Batches
     private
 
     def self.create_zoom_meeting(zoom_account, params)
-      require 'net/http'
-      require 'uri'
-      require 'json'
-      require 'base64'
+      require "net/http"
+      require "uri"
+      require "json"
+      require "base64"
 
       begin
         # Get Zoom credentials
         credentials = zoom_account.credentials
-        return { success: false, error: 'Zoom credentials not configured' } unless credentials
+        return { success: false, error: "Zoom credentials not configured" } unless credentials
 
         # Get access token using OAuth
         access_token = get_zoom_access_token(credentials)
-        return { success: false, error: 'Failed to get Zoom access token' } unless access_token
+        return { success: false, error: "Failed to get Zoom access token" } unless access_token
 
         # Create meeting
         meeting_data = {
           topic: params[:title] || "Live Class",
           type: 2, # Scheduled meeting
-          start_time: params[:start_time]&.strftime('%Y-%m-%dT%H:%M:%S'),
+          start_time: params[:start_time]&.strftime("%Y-%m-%dT%H:%M:%S"),
           duration: params[:duration] || 60,
-          timezone: params[:timezone] || 'UTC',
+          timezone: params[:timezone] || "UTC",
           agenda: params[:description],
           settings: {
             host_video: true,
@@ -212,8 +212,8 @@ module Batches
             watermark: false,
             use_pmi: false,
             approval_type: 0, # Automatically approve
-            audio: 'both', # Both telephone and computer audio
-            auto_recording: zoom_account.auto_record_meetings ? 'cloud' : 'none',
+            audio: "both", # Both telephone and computer audio
+            auto_recording: zoom_account.auto_record_meetings ? "cloud" : "none",
             waiting_room: zoom_account.enable_waiting_room
           }
         }
@@ -224,21 +224,21 @@ module Batches
         http.use_ssl = true
 
         request = Net::HTTP::Post.new(uri.request_uri)
-        request['Authorization'] = "Bearer #{access_token}"
-        request['Content-Type'] = 'application/json'
+        request["Authorization"] = "Bearer #{access_token}"
+        request["Content-Type"] = "application/json"
         request.body = meeting_data.to_json
 
         response = http.request(request)
         meeting = JSON.parse(response.body)
 
-        if response.code.to_i == 201 && meeting['id']
+        if response.code.to_i == 201 && meeting["id"]
           {
             success: true,
-            start_url: meeting['start_url'],
-            join_url: meeting['join_url'],
-            meeting_id: meeting['id'].to_s,
-            uuid: meeting['uuid'],
-            password: meeting['password']
+            start_url: meeting["start_url"],
+            join_url: meeting["join_url"],
+            meeting_id: meeting["id"].to_s,
+            uuid: meeting["uuid"],
+            password: meeting["password"]
           }
         else
           { success: false, error: "Zoom API Error: #{meeting['message'] || 'Failed to create meeting'}" }
@@ -251,20 +251,20 @@ module Batches
     end
 
     def self.get_zoom_access_token(credentials)
-      uri = URI.parse('https://zoom.us/oauth/token')
+      uri = URI.parse("https://zoom.us/oauth/token")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
 
       request = Net::HTTP::Post.new(uri.request_uri)
-      request['Authorization'] = "Basic #{Base64.strict_encode64("#{credentials[:api_key]}:#{credentials[:api_secret]}")}"
-      request['Content-Type'] = 'application/x-www-form-urlencoded'
-      request.body = 'grant_type=account_credentials&account_id=' + credentials[:account_id]
+      request["Authorization"] = "Basic #{Base64.strict_encode64("#{credentials[:api_key]}:#{credentials[:api_secret]}")}"
+      request["Content-Type"] = "application/x-www-form-urlencoded"
+      request.body = "grant_type=account_credentials&account_id=" + credentials[:account_id]
 
       response = http.request(request)
       token_data = JSON.parse(response.body)
 
-      if response.code.to_i == 200 && token_data['access_token']
-        token_data['access_token']
+      if response.code.to_i == 200 && token_data["access_token"]
+        token_data["access_token"]
       else
         Rails.logger.error "Zoom OAuth failed: #{token_data['reason'] || token_data['error']}"
         nil
@@ -279,7 +279,7 @@ module Batches
       batch.batch_enrollments.includes(:user).find_each do |enrollment|
         EventParticipant.find_or_create_by!(
           event: live_class.event,
-          reference_doctype: 'User',
+          reference_doctype: "User",
           reference_docname: enrollment.user.email,
           email: enrollment.user.email
         )
@@ -299,11 +299,11 @@ module Batches
       payments = Payment.where(payable: batch)
 
       {
-        total_revenue: payments.where(status: 'Completed').sum(:amount),
-        pending_payments: payments.where(status: 'Pending').count,
-        completed_payments: payments.where(status: 'Completed').count,
-        refunded_payments: payments.where(status: 'Refunded').count,
-        average_payment: payments.where(status: 'Completed').average(:amount)&.round(2) || 0
+        total_revenue: payments.where(status: "Completed").sum(:amount),
+        pending_payments: payments.where(status: "Pending").count,
+        completed_payments: payments.where(status: "Completed").count,
+        refunded_payments: payments.where(status: "Refunded").count,
+        average_payment: payments.where(status: "Completed").average(:amount)&.round(2) || 0
       }
     end
 
@@ -349,7 +349,7 @@ module Batches
       cutoff_date = 30.days.ago
       dropouts = BatchEnrollment.joins(:user)
                                 .where(batch: batch)
-                                .where('batch_enrollments.created_at < ?', cutoff_date)
+                                .where("batch_enrollments.created_at < ?", cutoff_date)
                                 .left_joins(:course_progresses)
                                 .where(course_progresses: { id: nil })
                                 .count
@@ -365,7 +365,7 @@ module Batches
       CourseProgress.joins(:user)
                     .where(users: { id: user_ids })
                     .where(course: batch.courses)
-                    .where('course_progresses.updated_at > ?', active_cutoff)
+                    .where("course_progresses.updated_at > ?", active_cutoff)
                     .distinct
                     .count
     end

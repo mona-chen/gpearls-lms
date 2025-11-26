@@ -68,11 +68,11 @@ class CreateLmsQuizSubmissions < ActiveRecord::Migration[7.2]
     # graded_by_id index automatically created by references helper
     add_index :lms_quiz_submissions, :review_completed
     add_index :lms_quiz_submissions, :late_submission
-    add_index :lms_quiz_submissions, [:quiz_id, :student_id]
-    add_index :lms_quiz_submissions, [:student_id, :quiz_id]
-    add_index :lms_quiz_submissions, [:quiz_id, :status]
-    add_index :lms_quiz_submissions, [:student_id, :status]
-    add_index :lms_quiz_submissions, [:status, :start_time]
-    add_index :lms_quiz_submissions, [:quiz_id, :student_id, :attempt_number], unique: true
+    add_index :lms_quiz_submissions, [ :quiz_id, :student_id ]
+    add_index :lms_quiz_submissions, [ :student_id, :quiz_id ]
+    add_index :lms_quiz_submissions, [ :quiz_id, :status ]
+    add_index :lms_quiz_submissions, [ :student_id, :status ]
+    add_index :lms_quiz_submissions, [ :status, :start_time ]
+    add_index :lms_quiz_submissions, [ :quiz_id, :student_id, :attempt_number ], unique: true
   end
 end

@@ -65,11 +65,11 @@ class CreateLmsAssignmentSubmissions < ActiveRecord::Migration[7.2]
     add_index :lms_assignment_submissions, :plagiarism_checked
     add_index :lms_assignment_submissions, :peer_review_completed
     add_index :lms_assignment_submissions, :returned_to_student
-    add_index :lms_assignment_submissions, [:assignment_id, :student_id]
-    add_index :lms_assignment_submissions, [:student_id, :assignment_id]
-    add_index :lms_assignment_submissions, [:assignment_id, :status]
-    add_index :lms_assignment_submissions, [:student_id, :status]
-    add_index :lms_assignment_submissions, [:status, :submitted_at]
-    add_index :lms_assignment_submissions, [:assignment_id, :student_id, :attempt_number], unique: true
+    add_index :lms_assignment_submissions, [ :assignment_id, :student_id ]
+    add_index :lms_assignment_submissions, [ :student_id, :assignment_id ]
+    add_index :lms_assignment_submissions, [ :assignment_id, :status ]
+    add_index :lms_assignment_submissions, [ :student_id, :status ]
+    add_index :lms_assignment_submissions, [ :status, :submitted_at ]
+    add_index :lms_assignment_submissions, [ :assignment_id, :student_id, :attempt_number ], unique: true
   end
 end

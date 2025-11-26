@@ -45,8 +45,8 @@ class CreateExerciseLatestSubmissions < ActiveRecord::Migration[7.0]
     add_index :exercise_latest_submissions, :latest_submission
     add_index :exercise_latest_submissions, :creation
     add_index :exercise_latest_submissions, :modified
-    add_index :exercise_latest_submissions, [:exercise, :member], unique: true, name: 'index_exercise_latest_on_exercise_and_member'
-    add_index :exercise_latest_submissions, [:member, :status], name: 'index_exercise_latest_on_member_and_status'
+    add_index :exercise_latest_submissions, [ :exercise, :member ], unique: true, name: 'index_exercise_latest_on_exercise_and_member'
+    add_index :exercise_latest_submissions, [ :member, :status ], name: 'index_exercise_latest_on_member_and_status'
 
     # Add foreign key constraints
     add_foreign_key :exercise_latest_submissions, :lms_exercises, column: :exercise

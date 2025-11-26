@@ -1,13 +1,14 @@
 FactoryBot.define do
   factory :user do
-    username { Faker::Internet.username(specifier: 6..20) }
+    sequence(:username) { |n| "user#{n}" }
     email { Faker::Internet.email }
-    password { "Password123!" }
-    password_confirmation { "Password123!" }
     full_name { Faker::Name.name }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     profile_image { Faker::Internet.url }
+
+    password { "Password123!" }
+    password_confirmation { "Password123!" }
 
     after(:build) do |user|
       # Assign default student role immediately for both build and create

@@ -25,7 +25,7 @@ class CreateRelatedCourses < ActiveRecord::Migration[7.2]
     add_index :related_courses, :parent
     add_index :related_courses, :parenttype
     add_index :related_courses, :parentfield
-    add_index :related_courses, [:parent, :parenttype, :parentfield], name: 'index_related_courses_on_parent_and_type_and_field'
+    add_index :related_courses, [ :parent, :parenttype, :parentfield ], name: 'index_related_courses_on_parent_and_type_and_field'
     add_index :related_courses, :creation
     add_index :related_courses, :modified
 

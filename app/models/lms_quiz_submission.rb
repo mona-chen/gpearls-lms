@@ -4,7 +4,12 @@ class LmsQuizSubmission < ApplicationRecord
   # Associations
   belongs_to :quiz, class_name: "LmsQuiz"
   belongs_to :member, class_name: "User", foreign_key: :member
-  belongs_to :course, optional: true
+  belongs_to :enrollment, class_name: "LmsEnrollment", optional: true
+
+  # Alias for compatibility
+  alias_attribute :user, :member
+  alias_attribute :student, :member
+  alias_attribute :score, :percentage
 
   # Validations
   validates :quiz, presence: true
@@ -61,7 +66,7 @@ class LmsQuizSubmission < ApplicationRecord
   private
 
   def set_defaults
-    self.started_at ||= Time.current
+    self.start_time ||= Time.current
     self.passing_percentage ||= quiz&.passing_percentage || 50
   end
 end

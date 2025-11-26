@@ -75,7 +75,7 @@ module Settings
         enable_dark_mode: true,
         enable_multilingual: true,
         default_language: "en",
-        supported_languages: ["en"],
+        supported_languages: [ "en" ],
         timezone: "UTC",
         date_format: "YYYY-MM-DD",
         time_format: "24h",

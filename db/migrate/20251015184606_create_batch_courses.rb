@@ -29,10 +29,10 @@ class CreateBatchCourses < ActiveRecord::Migration[7.0]
     add_index :batch_courses, :parent
     add_index :batch_courses, :parenttype
     add_index :batch_courses, :parentfield
-    add_index :batch_courses, [:parent, :parenttype, :parentfield], name: 'index_batch_courses_on_parent_and_type_and_field'
+    add_index :batch_courses, [ :parent, :parenttype, :parentfield ], name: 'index_batch_courses_on_parent_and_type_and_field'
     add_index :batch_courses, :creation
     add_index :batch_courses, :modified
-    add_index :batch_courses, [:course, :evaluator]
+    add_index :batch_courses, [ :course, :evaluator ]
 
     # Add foreign key constraints
     add_foreign_key :batch_courses, :lms_courses, column: :course

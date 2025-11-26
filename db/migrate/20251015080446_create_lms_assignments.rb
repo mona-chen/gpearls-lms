@@ -73,10 +73,10 @@ class CreateLmsAssignments < ActiveRecord::Migration[7.2]
     add_index :lms_assignments, :published_at
     # created_by_id index automatically created by references helper
     add_index :lms_assignments, :sort_order
-    add_index :lms_assignments, [:course_id, :status]
-    add_index :lms_assignments, [:status, :due_date]
-    add_index :lms_assignments, [:chapter_id, :status]
-    add_index :lms_assignments, [:assignment_type, :status]
-    add_index :lms_assignments, [:course_id, :due_date]
+    add_index :lms_assignments, [ :course_id, :status ]
+    add_index :lms_assignments, [ :status, :due_date ]
+    add_index :lms_assignments, [ :chapter_id, :status ]
+    add_index :lms_assignments, [ :assignment_type, :status ]
+    add_index :lms_assignments, [ :course_id, :due_date ]
   end
 end

@@ -38,7 +38,7 @@ module Analytics
 
     def fetch_activity_dates
       LessonProgress.where(user: @user)
-        .where('last_accessed_at >= ?', 30.days.ago)
+        .where("last_accessed_at >= ?", 30.days.ago)
         .order(last_accessed_at: :desc)
         .pluck(:last_accessed_at)
         .map(&:to_date)
@@ -77,7 +77,7 @@ module Analytics
           current_streak = 1
         end
 
-        longest_streak = [longest_streak, current_streak].max
+        longest_streak = [ longest_streak, current_streak ].max
         previous_date = date
       end
 

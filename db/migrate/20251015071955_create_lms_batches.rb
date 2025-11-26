@@ -62,8 +62,8 @@ class CreateLmsBatches < ActiveRecord::Migration[7.2]
     add_index :lms_batches, :enrollment_start_date
     add_index :lms_batches, :enrollment_end_date
     add_index :lms_batches, :sort_order
-    add_index :lms_batches, [:course_id, :status]
-    add_index :lms_batches, [:status, :start_date]
-    add_index :lms_batches, [:instructor_id, :status]
+    add_index :lms_batches, [ :course_id, :status ]
+    add_index :lms_batches, [ :status, :start_date ]
+    add_index :lms_batches, [ :instructor_id, :status ]
   end
 end

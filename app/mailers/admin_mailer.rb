@@ -1,5 +1,5 @@
 class AdminMailer < ApplicationMailer
-  default from: 'admin@lms.test'
+  default from: "admin@lms.test"
 
   def payment_dispute_notification(payment, dispute_data)
     @payment = payment
@@ -8,7 +8,7 @@ class AdminMailer < ApplicationMailer
     @item = payment.course || payment.batch || payment.program
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "🚨 Payment Dispute - #{@item&.title || 'Payment'} ##{payment.name}"
     )
   end
@@ -20,7 +20,7 @@ class AdminMailer < ApplicationMailer
     @error_details = error_details
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "⚠️ Payment Failed - #{@item&.title || 'Payment'} ##{payment.name}"
     )
   end
@@ -31,7 +31,7 @@ class AdminMailer < ApplicationMailer
     @item = payment.course || payment.batch || payment.program
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "💰 High Value Payment - #{@item&.title} - #{payment.amount} #{payment.currency}"
     )
   end
@@ -42,7 +42,7 @@ class AdminMailer < ApplicationMailer
     @timestamp = Time.current
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "🔌 Gateway Connection Failed - #{@gateway_name}"
     )
   end
@@ -55,7 +55,7 @@ class AdminMailer < ApplicationMailer
     @item = payment.course || payment.batch || payment.program
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "🚨 Fraud Alert - High Risk Payment Detected"
     )
   end
@@ -68,7 +68,7 @@ class AdminMailer < ApplicationMailer
     @item = payment.course || payment.batch || payment.program
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "📋 Refund Request - #{@item&.title} - #{@refund_amount} #{@payment.currency}"
     )
   end
@@ -83,7 +83,7 @@ class AdminMailer < ApplicationMailer
     @refunds = stats[:refunds] || 0
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "📊 Daily Payment Summary - #{@date.strftime('%B %d, %Y')}"
     )
   end
@@ -104,7 +104,7 @@ class AdminMailer < ApplicationMailer
     @payment_method = payment_method
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "💳 New Payment Method Added - #{@user.email}"
     )
   end
@@ -116,7 +116,7 @@ class AdminMailer < ApplicationMailer
     @item = subscription.course || subscription.batch || subscription.program
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "⏰ Subscription Cancellation Warning - #{@item&.title}"
     )
   end
@@ -128,7 +128,7 @@ class AdminMailer < ApplicationMailer
     @growth_percentage = calculate_growth_percentage(current_revenue, milestone_amount)
 
     mail(
-      to: Rails.application.config.admin_email || 'admin@lms.test',
+      to: Rails.application.config.admin_email || "admin@lms.test",
       subject: "🎯 Revenue Milestone Reached - #{current_revenue} USD"
     )
   end

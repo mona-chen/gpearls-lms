@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Api::Courses', type: :request do
   let(:user) { create(:user) }
   let(:instructor) { create(:user, email: 'instructor@example.com') }
-  let(:course) { create(:course, title: 'Test Course', instructors: [instructor]) }
+  let(:course) { create(:course, title: 'Test Course', instructors: [ instructor ]) }
   let(:chapter) { create(:course_chapter, course: course) }
   let(:lesson) { create(:course_lesson, course_chapter: chapter, course: course) }
 
@@ -19,7 +19,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'returns published courses' do
       get '/api/courses'
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json['courses'].count).to eq(3)
@@ -28,19 +28,19 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'includes course details' do
       get '/api/courses'
-      
+
       json = JSON.parse(response.body)
       course_data = json['courses'].first
-      
+
       expect(course_data).to include(
-        'id', 'name', 'title', 'short_introduction', 
+        'id', 'name', 'title', 'short_introduction',
         'description', 'image', 'published'
       )
     end
 
     it 'supports pagination' do
       get '/api/courses', params: { page: 1, limit: 2 }
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json['courses'].count).to be <= 2
@@ -49,9 +49,9 @@ RSpec.describe 'Api::Courses', type: :request do
     it 'supports filtering by category' do
       category = create(:lms_category, title: 'Programming')
       create(:course, published: true, category: category)
-      
+
       get '/api/courses', params: { category: category.id }
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json['courses'].all? { |c| c['category_id'] == category.id }).to be_truthy
@@ -65,10 +65,10 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'returns course details' do
       get "/api/courses/#{course.name}"
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
-      
+
       expect(json).to include(
         'id' => course.id,
         'name' => course.name,
@@ -78,7 +78,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'includes course chapters and lessons' do
       get "/api/courses/#{course.name}"
-      
+
       json = JSON.parse(response.body)
       expect(json['chapters']).to be_present
       expect(json['chapters'].first['lessons']).to be_present
@@ -86,9 +86,9 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'includes enrollment status for authenticated user' do
       create(:enrollment, user: user, course: course)
-      
+
       get "/api/courses/#{course.name}"
-      
+
       json = JSON.parse(response.body)
       expect(json['is_enrolled']).to be_truthy
       expect(json['progress_percentage']).to be_present
@@ -96,24 +96,24 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'returns 404 for non-existent course' do
       get '/api/courses/non-existent'
-      
+
       expect(response).to have_http_status(:not_found)
     end
 
     it 'returns 404 for unpublished course for non-instructor' do
       course.update(published: false)
-      
+
       get "/api/courses/#{course.name}"
-      
+
       expect(response).to have_http_status(:not_found)
     end
 
     it 'allows instructor to view unpublished course' do
       course.update(published: false)
       sign_in instructor
-      
+
       get "/api/courses/#{course.name}"
-      
+
       expect(response).to have_http_status(:ok)
     end
   end
@@ -130,7 +130,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
     context 'when user is authorized' do
       before do
-        user.update(roles: ['instructor']) # or however you handle permissions
+        user.update(roles: [ 'instructor' ]) # or however you handle permissions
         sign_in user
       end
 
@@ -138,7 +138,7 @@ RSpec.describe 'Api::Courses', type: :request do
         expect do
           post '/api/courses', params: { course: valid_attributes }
         end.to change(Course, :count).by(1)
-        
+
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
         expect(json['title']).to eq('New Course')
@@ -146,14 +146,14 @@ RSpec.describe 'Api::Courses', type: :request do
 
       it 'assigns current user as instructor' do
         post '/api/courses', params: { course: valid_attributes }
-        
+
         new_course = Course.last
         expect(new_course.instructors).to include(user)
       end
 
       it 'returns validation errors for invalid data' do
         post '/api/courses', params: { course: { title: '' } }
-        
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
         expect(json['errors']).to be_present
@@ -163,7 +163,7 @@ RSpec.describe 'Api::Courses', type: :request do
     context 'when user is not authorized' do
       it 'returns unauthorized status' do
         post '/api/courses', params: { course: valid_attributes }
-        
+
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -184,7 +184,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
       it 'updates the course' do
         put "/api/courses/#{course.name}", params: { course: update_attributes }
-        
+
         expect(response).to have_http_status(:ok)
         course.reload
         expect(course.title).to eq('Updated Course Title')
@@ -193,7 +193,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
       it 'returns validation errors for invalid data' do
         put "/api/courses/#{course.name}", params: { course: { title: '' } }
-        
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
         expect(json['errors']).to be_present
@@ -203,7 +203,7 @@ RSpec.describe 'Api::Courses', type: :request do
     context 'when user is not course instructor' do
       it 'returns unauthorized status' do
         put "/api/courses/#{course.name}", params: { course: update_attributes }
-        
+
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -211,7 +211,7 @@ RSpec.describe 'Api::Courses', type: :request do
     it 'returns 404 for non-existent course' do
       sign_in instructor
       put '/api/courses/non-existent', params: { course: update_attributes }
-      
+
       expect(response).to have_http_status(:not_found)
     end
   end
@@ -224,20 +224,20 @@ RSpec.describe 'Api::Courses', type: :request do
 
       it 'deletes the course' do
         course_id = course.id
-        
+
         expect do
           delete "/api/courses/#{course.name}"
         end.to change(Course, :count).by(-1)
-        
+
         expect(response).to have_http_status(:ok)
         expect { Course.find(course_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'deletes associated data' do
         enrollment = create(:enrollment, course: course)
-        
+
         delete "/api/courses/#{course.name}"
-        
+
         expect { Enrollment.find(enrollment.id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -245,7 +245,7 @@ RSpec.describe 'Api::Courses', type: :request do
     context 'when user is not course instructor' do
       it 'returns unauthorized status' do
         delete "/api/courses/#{course.name}"
-        
+
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -253,7 +253,7 @@ RSpec.describe 'Api::Courses', type: :request do
     it 'returns 404 for non-existent course' do
       sign_in instructor
       delete '/api/courses/non-existent'
-      
+
       expect(response).to have_http_status(:not_found)
     end
   end
@@ -267,7 +267,7 @@ RSpec.describe 'Api::Courses', type: :request do
       expect do
         post "/api/courses/#{course.name}/enroll"
       end.to change(user.enrollments, :count).by(1)
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json['message']).to include('enrolled')
@@ -275,9 +275,9 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'prevents duplicate enrollment' do
       create(:enrollment, user: user, course: course)
-      
+
       post "/api/courses/#{course.name}/enroll"
-      
+
       expect(response).to have_http_status(:unprocessable_entity)
       json = JSON.parse(response.body)
       expect(json['error']).to include('already enrolled')
@@ -285,9 +285,9 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'prevents enrollment in unpublished course' do
       course.update(published: false)
-      
+
       post "/api/courses/#{course.name}/enroll"
-      
+
       expect(response).to have_http_status(:unprocessable_entity)
       json = JSON.parse(response.body)
       expect(json['error']).to include('not available')
@@ -300,7 +300,7 @@ RSpec.describe 'Api::Courses', type: :request do
 
       it 'requires payment for paid course' do
         post "/api/courses/#{course.name}/enroll"
-        
+
         expect(response).to have_http_status(:payment_required)
         json = JSON.parse(response.body)
         expect(json['payment_required']).to be_truthy
@@ -314,9 +314,9 @@ RSpec.describe 'Api::Courses', type: :request do
 
     it 'returns user progress in course' do
       create(:lesson_progress, user: user, lesson: lesson, status: 'Complete')
-      
+
       get "/api/courses/#{course.name}/progress"
-      
+
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json['progress_percentage']).to be > 0
@@ -327,9 +327,9 @@ RSpec.describe 'Api::Courses', type: :request do
     it 'returns 404 for non-enrolled user' do
       other_user = create(:user)
       sign_in other_user
-      
+
       get "/api/courses/#{course.name}/progress"
-      
+
       expect(response).to have_http_status(:not_found)
     end
   end

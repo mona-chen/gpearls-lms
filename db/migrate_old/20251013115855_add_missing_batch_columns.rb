@@ -32,6 +32,6 @@ class AddMissingBatchColumns < ActiveRecord::Migration[7.0]
     add_index :batch_courses, :evaluator_id unless index_exists?(:batch_courses, :evaluator_id)
 
     # Add indexes for batch courses uniqueness and performance
-    add_index :batch_courses, [:batch_id, :course_id], unique: true unless index_exists?(:batch_courses, [:batch_id, :course_id])
+    add_index :batch_courses, [ :batch_id, :course_id ], unique: true unless index_exists?(:batch_courses, [ :batch_id, :course_id ])
   end
 end

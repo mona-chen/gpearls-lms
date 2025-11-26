@@ -24,6 +24,6 @@ class CreateCohortSubgroups < ActiveRecord::Migration[7.2]
     # Indexes already added by t.index in create_table
 
     # Add unique index for autoname format: {title} ({cohort})
-    add_index :cohort_subgroups, [:title, :cohort], unique: true, name: 'index_cohort_subgroups_on_title_and_cohort'
+    add_index :cohort_subgroups, [ :title, :cohort ], unique: true, name: 'index_cohort_subgroups_on_title_and_cohort'
   end
 end

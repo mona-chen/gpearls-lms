@@ -19,7 +19,7 @@ class CreatePaymentGateways < ActiveRecord::Migration[7.0]
     add_index :payment_gateways, :gateway_type
     add_index :payment_gateways, :status
     add_index :payment_gateways, :is_primary
-    add_index :payment_gateways, [:gateway_type, :status]
+    add_index :payment_gateways, [ :gateway_type, :status ]
 
     # Insert default Paystack gateway configuration
     reversible do |dir|

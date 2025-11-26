@@ -32,8 +32,8 @@ class CreateLmsProgrammingExerciseSubmissions < ActiveRecord::Migration[7.0]
     add_index :lms_programming_exercise_submissions, :status
     add_index :lms_programming_exercise_submissions, :creation
     add_index :lms_programming_exercise_submissions, :modified
-    add_index :lms_programming_exercise_submissions, [:exercise, :member], unique: true, name: 'index_prog_exercise_sub_on_exercise_and_member'
-    add_index :lms_programming_exercise_submissions, [:member, :status]
+    add_index :lms_programming_exercise_submissions, [ :exercise, :member ], unique: true, name: 'index_prog_exercise_sub_on_exercise_and_member'
+    add_index :lms_programming_exercise_submissions, [ :member, :status ]
 
     # Add foreign key constraints
     add_foreign_key :lms_programming_exercise_submissions, :lms_programming_exercises, column: :exercise

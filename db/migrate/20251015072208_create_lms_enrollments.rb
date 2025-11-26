@@ -58,9 +58,9 @@ class CreateLmsEnrollments < ActiveRecord::Migration[7.2]
     add_index :lms_enrollments, :last_access_date
     add_index :lms_enrollments, :enrollment_type
     add_index :lms_enrollments, :expiry_date
-    add_index :lms_enrollments, [:student_id, :course_id], unique: true
-    add_index :lms_enrollments, [:course_id, :status]
-    add_index :lms_enrollments, [:student_id, :status]
-    add_index :lms_enrollments, [:status, :enrollment_date]
+    add_index :lms_enrollments, [ :student_id, :course_id ], unique: true
+    add_index :lms_enrollments, [ :course_id, :status ]
+    add_index :lms_enrollments, [ :student_id, :status ]
+    add_index :lms_enrollments, [ :status, :enrollment_date ]
   end
 end

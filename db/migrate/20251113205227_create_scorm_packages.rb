@@ -13,12 +13,12 @@ class CreateScormPackages < ActiveRecord::Migration[7.0]
       t.text :error_message
       t.json :metadata
       t.datetime :extracted_at
-      
+
       t.timestamps
     end
-    
-    add_index :scorm_packages, [:course_lesson_id], name: 'index_scorm_packages_on_lesson'
-    add_index :scorm_packages, [:status], name: 'index_scorm_packages_on_status'
-    add_index :scorm_packages, [:uploaded_by_id], name: 'index_scorm_packages_on_uploader'
+
+    add_index :scorm_packages, [ :course_lesson_id ], name: 'index_scorm_packages_on_lesson'
+    add_index :scorm_packages, [ :status ], name: 'index_scorm_packages_on_status'
+    add_index :scorm_packages, [ :uploaded_by_id ], name: 'index_scorm_packages_on_uploader'
   end
 end

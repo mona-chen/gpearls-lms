@@ -1,38 +1,32 @@
 FactoryBot.define do
-  factory :quiz_submission do
-    score { rand(0..100) }
+  factory :quiz_submission, class: 'LmsQuizSubmission' do
+    submission_code { "SUB#{rand(10000..99999)}" }
+    attempt_number { 1 }
     percentage { rand(0..100) }
-    quiz_title { Faker::Educator.subject }
     total_marks { 100 }
 
-    association :user
+    association :member, factory: :user
     association :quiz
-    association :course, optional: true
 
-    trait :passed do
-      score { rand(70..100) }
-      percentage { rand(70..100) }
-    end
+  trait :passed do
+    percentage { rand(70..100) }
+  end
 
-    trait :failed do
-      score { rand(0..69) }
-      percentage { rand(0..69) }
-    end
+  trait :failed do
+    percentage { rand(0..69) }
+  end
 
-    trait :perfect_score do
-      score { 100 }
-      percentage { 100.0 }
-    end
+  trait :perfect_score do
+    percentage { 100.0 }
+  end
 
-    trait :high_score do
-      score { rand(90..99) }
-      percentage { rand(90..99) }
-    end
+  trait :high_score do
+    percentage { rand(90..99) }
+  end
 
-    trait :low_score do
-      score { rand(0..30) }
-      percentage { rand(0..30) }
-    end
+  trait :low_score do
+    percentage { rand(0..30) }
+  end
 
     trait :with_course do
       association :course, :published
@@ -47,7 +41,7 @@ FactoryBot.define do
     end
 
     trait :for_student do
-      association :user, factory: [:user, :student]
+      association :user, factory: [ :user, :student ]
     end
 
     trait :graded do

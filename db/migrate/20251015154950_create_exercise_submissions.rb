@@ -35,7 +35,7 @@ class CreateExerciseSubmissions < ActiveRecord::Migration[7.0]
     add_index :exercise_submissions, :status
     add_index :exercise_submissions, :course
     add_index :exercise_submissions, :lesson
-    add_index :exercise_submissions, [:exercise, :member], unique: true
+    add_index :exercise_submissions, [ :exercise, :member ], unique: true
     add_index :exercise_submissions, :creation
     add_index :exercise_submissions, :modified
 

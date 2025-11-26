@@ -1,5 +1,5 @@
 class Api::CoursesController < Api::BaseController
-  skip_before_action :authenticate_user!, only: [ :index, :show, :create ]
+  skip_before_action :authenticate_user!, only: [ :index, :show ]
 
   def index
     filters = filter_params.slice(:enrolled, :created, :certification, :title)

@@ -1,7 +1,7 @@
 class VideoWatchDuration < ApplicationRecord
   belongs_to :user
   belongs_to :course_lesson
-  
+
    validates :video_url, presence: true
    validates :duration_watched, presence: true, numericality: { greater_than: 0 }
    validates :video_length, presence: true, numericality: { greater_than: 0 }
@@ -12,19 +12,19 @@ class VideoWatchDuration < ApplicationRecord
 
    before_create :set_first_watched_at
    before_save :update_last_watched_at
-  
+
   def progress_percentage
     return 0 if video_length.zero?
-    [(duration_watched.to_f / video_length * 100).round(2), 100].min
+    [ (duration_watched.to_f / video_length * 100).round(2), 100 ].min
   end
-  
+
   def completed?
     progress_percentage >= 90 # Consider 90%+ as completed
   end
-  
+
   def self.track_duration(user, lesson, video_url, duration_watched, video_length)
     existing = find_by(user: user, course_lesson: lesson, video_url: video_url)
-    
+
     if existing
       # Update with maximum duration watched
       if duration_watched > existing.duration_watched
@@ -46,7 +46,7 @@ class VideoWatchDuration < ApplicationRecord
       )
     end
   end
-  
+
   def self.get_analytics_for_lesson(lesson)
     durations = where(course_lesson: lesson)
 

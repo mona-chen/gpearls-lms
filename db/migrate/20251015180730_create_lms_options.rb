@@ -27,9 +27,9 @@ class CreateLmsOptions < ActiveRecord::Migration[7.0]
     add_index :lms_options, :parent
     add_index :lms_options, :parenttype
     add_index :lms_options, :parentfield
-    add_index :lms_options, [:parent, :parenttype, :parentfield], name: 'index_options_on_parent_and_type_and_field'
+    add_index :lms_options, [ :parent, :parenttype, :parentfield ], name: 'index_options_on_parent_and_type_and_field'
     add_index :lms_options, :creation
     add_index :lms_options, :modified
-    add_index :lms_options, [:parent, :is_correct]
+    add_index :lms_options, [ :parent, :is_correct ]
   end
 end

@@ -8,7 +8,7 @@ class CohortMentor < ApplicationRecord
   validates :cohort, presence: true
   validates :cohort_subgroup, presence: true
   validates :user, presence: true
-  validates :user_id, uniqueness: { scope: [:cohort_id, :cohort_subgroup_id],
+  validates :user_id, uniqueness: { scope: [ :cohort_id, :cohort_subgroup_id ],
                                    message: "User is already a mentor for this subgroup" }
   validate :validate_cohort_consistency
   validate :validate_course_consistency
@@ -91,8 +91,8 @@ class CohortMentor < ApplicationRecord
       course_title: course&.title,
       is_primary_mentor: is_primary_mentor?,
       can_manage_subgroup: can_manage_subgroup?,
-      creation: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      modified: updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
@@ -111,8 +111,8 @@ class CohortMentor < ApplicationRecord
   def self.get_primary_mentors(cohort)
     joins(:cohort_subgroup)
       .where(cohort: cohort)
-      .select('DISTINCT ON (cohort_subgroup_id) *')
-      .order('cohort_subgroup_id, created_at ASC')
+      .select("DISTINCT ON (cohort_subgroup_id) *")
+      .order("cohort_subgroup_id, created_at ASC")
   end
 
   def self.promote_to_primary(mentor)

@@ -31,9 +31,9 @@ class CreateLmsMentorRequests < ActiveRecord::Migration[7.0]
     add_index :lms_mentor_requests, :status
     add_index :lms_mentor_requests, :creation
     add_index :lms_mentor_requests, :modified
-    add_index :lms_mentor_requests, [:member, :course], unique: true, name: 'index_mentor_req_on_member_and_course'
-    add_index :lms_mentor_requests, [:course, :status], name: 'index_mentor_req_on_course_and_status'
-    add_index :lms_mentor_requests, [:member, :status], name: 'index_mentor_req_on_member_and_status'
+    add_index :lms_mentor_requests, [ :member, :course ], unique: true, name: 'index_mentor_req_on_member_and_course'
+    add_index :lms_mentor_requests, [ :course, :status ], name: 'index_mentor_req_on_course_and_status'
+    add_index :lms_mentor_requests, [ :member, :status ], name: 'index_mentor_req_on_member_and_status'
 
     # Add foreign key constraints
     add_foreign_key :lms_mentor_requests, :users, column: :member

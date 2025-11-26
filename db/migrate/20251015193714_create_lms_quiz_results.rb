@@ -33,11 +33,11 @@ class CreateLmsQuizResults < ActiveRecord::Migration[7.0]
     add_index :lms_quiz_results, :parent
     add_index :lms_quiz_results, :parenttype
     add_index :lms_quiz_results, :parentfield
-    add_index :lms_quiz_results, [:parent, :parenttype, :parentfield], name: 'index_quiz_results_on_parent_and_type_and_field'
+    add_index :lms_quiz_results, [ :parent, :parenttype, :parentfield ], name: 'index_quiz_results_on_parent_and_type_and_field'
     add_index :lms_quiz_results, :creation
     add_index :lms_quiz_results, :modified
-    add_index :lms_quiz_results, [:question_name, :is_correct]
-    add_index :lms_quiz_results, [:parent, :question_name]
+    add_index :lms_quiz_results, [ :question_name, :is_correct ]
+    add_index :lms_quiz_results, [ :parent, :question_name ]
 
     # Add foreign key constraints
     add_foreign_key :lms_quiz_results, :lms_questions, column: :question_name

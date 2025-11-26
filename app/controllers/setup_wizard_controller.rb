@@ -3,24 +3,24 @@ class SetupWizardController < ApplicationController
   before_action :check_setup_completion
 
   def index
-    @step = params[:step].presence || 'welcome'
+    @step = params[:step].presence || "welcome"
     @setup_data = session[:setup_data] || {}
 
     case @step
-    when 'welcome'
+    when "welcome"
       render :welcome
-    when 'site_settings'
+    when "site_settings"
       render :site_settings
-    when 'admin_user'
+    when "admin_user"
       render :admin_user
-    when 'payment_settings'
+    when "payment_settings"
       render :payment_settings
-    when 'email_settings'
+    when "email_settings"
       render :email_settings
-    when 'complete'
+    when "complete"
       render :complete
     else
-      redirect_to setup_wizard_path(step: 'welcome')
+      redirect_to setup_wizard_path(step: "welcome")
     end
   end
 
@@ -29,44 +29,44 @@ class SetupWizardController < ApplicationController
     @setup_data = session[:setup_data] || {}
 
     case @step
-    when 'welcome'
+    when "welcome"
       # Just proceed to next step
-      redirect_to setup_wizard_path(step: 'site_settings')
-    when 'site_settings'
+      redirect_to setup_wizard_path(step: "site_settings")
+    when "site_settings"
       if update_site_settings
-        redirect_to setup_wizard_path(step: 'admin_user')
+        redirect_to setup_wizard_path(step: "admin_user")
       else
         render :site_settings
       end
-    when 'admin_user'
+    when "admin_user"
       if create_admin_user
-        redirect_to setup_wizard_path(step: 'payment_settings')
+        redirect_to setup_wizard_path(step: "payment_settings")
       else
         render :admin_user
       end
-    when 'payment_settings'
+    when "payment_settings"
       if update_payment_settings
-        redirect_to setup_wizard_path(step: 'email_settings')
+        redirect_to setup_wizard_path(step: "email_settings")
       else
         render :payment_settings
       end
-    when 'email_settings'
+    when "email_settings"
       if update_email_settings
         complete_setup
-        redirect_to setup_wizard_path(step: 'complete')
+        redirect_to setup_wizard_path(step: "complete")
       else
         render :email_settings
       end
     else
-      redirect_to setup_wizard_path(step: 'welcome')
+      redirect_to setup_wizard_path(step: "welcome")
     end
   end
 
   private
 
   def check_setup_completion
-    if LmsSetting.get_value('setup_completed', false)
-      redirect_to root_path, notice: 'Setup has already been completed.'
+    if LmsSetting.get_value("setup_completed", false)
+      redirect_to root_path, notice: "Setup has already been completed."
     end
   end
 
@@ -117,7 +117,7 @@ class SetupWizardController < ApplicationController
 
         true
       else
-        @error = admin.errors.full_messages.join(', ')
+        @error = admin.errors.full_messages.join(", ")
         false
       end
     rescue => e
@@ -144,20 +144,20 @@ class SetupWizardController < ApplicationController
       if payment_params[:enable_payments] && payment_params[:default_gateway].present?
         PaymentGateway.find_or_create_by!(name: payment_params[:default_gateway]) do |gateway|
           gateway.gateway_type = payment_params[:default_gateway].downcase
-          gateway.status = 'active'
+          gateway.status = "active"
           gateway.is_primary = true
           gateway.settings = case payment_params[:default_gateway].downcase
-                            when 'stripe'
+          when "stripe"
                               {
                                 publishable_key: payment_params[:stripe_publishable_key],
                                 secret_key: payment_params[:stripe_secret_key]
                               }
-                            when 'paypal'
+          when "paypal"
                               {
                                 client_id: payment_params[:paypal_client_id],
                                 client_secret: payment_params[:paypal_client_secret]
                               }
-                            end
+          end
         end
       end
 
@@ -202,9 +202,9 @@ class SetupWizardController < ApplicationController
       Lms::InstallService.after_sync
 
       # Mark setup as completed
-      LmsSetting.find_or_create_by!(key: 'setup_completed') do |setting|
+      LmsSetting.find_or_create_by!(key: "setup_completed") do |setting|
         setting.value = true
-        setting.value_type = 'Boolean'
+        setting.value_type = "Boolean"
       end
 
       # Clear session data
@@ -215,9 +215,9 @@ class SetupWizardController < ApplicationController
       if admin_user
         Notification.create!(
           user: admin_user,
-          title: 'Welcome to LMS!',
-          message: 'Your Learning Management System has been successfully set up. You can now create courses, manage users, and start building your educational platform.',
-          notification_type: 'system'
+          title: "Welcome to LMS!",
+          message: "Your Learning Management System has been successfully set up. You can now create courses, manage users, and start building your educational platform.",
+          notification_type: "system"
         )
       end
 

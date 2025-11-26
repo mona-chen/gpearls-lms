@@ -19,8 +19,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: course.instructor.email,
       subject: "Your course '#{course.title}' has been approved",
-      template_path: 'notification_mailer',
-      template_name: 'course_approved'
+      template_path: "notification_mailer",
+      template_name: "course_approved"
     )
   end
 
@@ -32,8 +32,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: course.instructor.email,
       subject: "Your course '#{course.title}' requires revisions",
-      template_path: 'notification_mailer',
-      template_name: 'course_rejected'
+      template_path: "notification_mailer",
+      template_name: "course_rejected"
     )
   end
 
@@ -44,8 +44,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: batch.instructor.email,
       subject: "Your batch '#{batch.title}' has been approved",
-      template_path: 'notification_mailer',
-      template_name: 'batch_approved'
+      template_path: "notification_mailer",
+      template_name: "batch_approved"
     )
   end
 
@@ -57,8 +57,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: batch.instructor.email,
       subject: "Your batch '#{batch.title}' requires revisions",
-      template_path: 'notification_mailer',
-      template_name: 'batch_rejected'
+      template_path: "notification_mailer",
+      template_name: "batch_rejected"
     )
   end
 
@@ -71,8 +71,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: "Welcome to #{@course.title}#{@batch ? " - #{@batch.title}" : ''}",
-      template_path: 'notification_mailer',
-      template_name: 'enrollment_confirmation'
+      template_path: "notification_mailer",
+      template_name: "enrollment_confirmation"
     )
   end
 
@@ -85,8 +85,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: "Congratulations! You've earned a certificate",
-      template_path: 'notification_mailer',
-      template_name: 'certificate_issued'
+      template_path: "notification_mailer",
+      template_name: "certificate_issued"
     )
   end
 
@@ -99,8 +99,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: "Your quiz submission has been graded",
-      template_path: 'notification_mailer',
-      template_name: 'quiz_graded'
+      template_path: "notification_mailer",
+      template_name: "quiz_graded"
     )
   end
 
@@ -113,8 +113,8 @@ class NotificationMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: "Your assignment has been graded",
-      template_path: 'notification_mailer',
-      template_name: 'assignment_graded'
+      template_path: "notification_mailer",
+      template_name: "assignment_graded"
     )
   end
 end

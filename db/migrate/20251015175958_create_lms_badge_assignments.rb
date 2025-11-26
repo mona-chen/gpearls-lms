@@ -32,9 +32,9 @@ class CreateLmsBadgeAssignments < ActiveRecord::Migration[7.0]
     add_index :lms_badge_assignments, :issued_on
     add_index :lms_badge_assignments, :creation
     add_index :lms_badge_assignments, :modified
-    add_index :lms_badge_assignments, [:member, :badge], unique: true, name: 'index_badge_assign_on_member_and_badge'
-    add_index :lms_badge_assignments, [:badge, :issued_on], name: 'index_badge_assign_on_badge_and_issued_on'
-    add_index :lms_badge_assignments, [:member, :issued_on], name: 'index_badge_assign_on_member_and_issued_on'
+    add_index :lms_badge_assignments, [ :member, :badge ], unique: true, name: 'index_badge_assign_on_member_and_badge'
+    add_index :lms_badge_assignments, [ :badge, :issued_on ], name: 'index_badge_assign_on_badge_and_issued_on'
+    add_index :lms_badge_assignments, [ :member, :issued_on ], name: 'index_badge_assign_on_member_and_issued_on'
 
     # Add foreign key constraints
     add_foreign_key :lms_badge_assignments, :users, column: :member

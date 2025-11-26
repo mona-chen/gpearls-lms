@@ -93,7 +93,7 @@ RSpec.describe VideoWatchDuration, type: :model do
       expect do
         VideoWatchDuration.track_duration(user, lesson, video_url, 120, 300)
       end.to change(VideoWatchDuration, :count).by(1)
-      
+
       duration = VideoWatchDuration.last
       expect(duration.user).to eq(user)
       expect(duration.course_lesson).to eq(lesson)
@@ -158,7 +158,7 @@ RSpec.describe VideoWatchDuration, type: :model do
 
     it 'calculates correct analytics' do
       analytics = VideoWatchDuration.get_analytics_for_lesson(lesson)
-      
+
       expect(analytics[:total_views]).to eq(3)
       expect(analytics[:unique_viewers]).to eq(3)
       expect(analytics[:average_completion]).to eq(240.0) # (270 + 150 + 300) / 3
@@ -210,10 +210,10 @@ RSpec.describe VideoWatchDuration, type: :model do
     it 'updates last watched time on save' do
       duration = create(:video_watch_duration, user: user, course_lesson: lesson)
       original_time = duration.last_watched_at
-      
+
       sleep 0.1 # Ensure time difference
       duration.update!(duration_watched: duration.duration_watched + 10)
-      
+
       expect(duration.last_watched_at).to be > original_time
     end
   end

@@ -42,7 +42,7 @@
                         data-fieldtype="Check" data-fieldname="terms" id="signup-terms" required>
                     </span>
                     <span class="label-area">
-                    <%= custom_signup_content.html_safe %>
+                    <%= sanitize(custom_signup_content, tags: %w[p br strong em a ul ol li h1 h2 h3 h4 h5 h6], attributes: %w[href target]) %>
                     </span>
                 </label>
             </div>

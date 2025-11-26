@@ -3,11 +3,11 @@ FactoryBot.define do
     question { Faker::Lorem.question }
     type { "Choices" }
 
-    # Choice options
+    # Choice options - minimum 2 required for Choices type
     option_1 { "Option 1" }
     option_2 { "Option 2" }
-    option_3 { "Option 3" }
-    option_4 { "Option 4" }
+    option_3 { nil }
+    option_4 { nil }
     is_correct_1 { true }
     is_correct_2 { false }
     is_correct_3 { false }
@@ -26,7 +26,9 @@ FactoryBot.define do
       if evaluator.question_type == 'User Input' || question.type == 'User Input'
         question.type = 'User Input'
         question.possibility_1 = 'Answer 1'
-        question.possibility_2 = 'Answer 2'
+        question.possibility_2 = nil
+        question.possibility_3 = nil
+        question.possibility_4 = nil
         # Clear choice options
         question.option_1 = nil
         question.option_2 = nil
@@ -50,7 +52,9 @@ FactoryBot.define do
     trait :user_input do
       type { "User Input" }
       possibility_1 { "Answer 1" }
-      possibility_2 { "Answer 2" }
+      possibility_2 { nil }
+      possibility_3 { nil }
+      possibility_4 { nil }
       option_1 { nil }
       option_2 { nil }
       option_3 { nil }
@@ -71,6 +75,10 @@ FactoryBot.define do
       is_correct_2 { nil }
       is_correct_3 { nil }
       is_correct_4 { nil }
+      possibility_1 { nil }
+      possibility_2 { nil }
+      possibility_3 { nil }
+      possibility_4 { nil }
     end
   end
 end

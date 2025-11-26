@@ -14,7 +14,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohorts, [:course_id, :slug], unique: true unless index_exists?(:cohorts, [:course_id, :slug])
+    add_index :cohorts, [ :course_id, :slug ], unique: true unless index_exists?(:cohorts, [ :course_id, :slug ])
     add_index :cohorts, :instructor_id unless index_exists?(:cohorts, :instructor_id)
     add_index :cohorts, :status unless index_exists?(:cohorts, :status)
 
@@ -29,7 +29,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_subgroups, [:cohort_id, :slug], unique: true unless index_exists?(:cohort_subgroups, [:cohort_id, :slug])
+    add_index :cohort_subgroups, [ :cohort_id, :slug ], unique: true unless index_exists?(:cohort_subgroups, [ :cohort_id, :slug ])
     add_index :cohort_subgroups, :invite_code, unique: true unless index_exists?(:cohort_subgroups, :invite_code)
     add_index :cohort_subgroups, :course_id unless index_exists?(:cohort_subgroups, :course_id)
 
@@ -42,7 +42,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_mentors, [:cohort_id, :cohort_subgroup_id, :user_id], unique: true, name: "idx_cohort_mentors_unique" unless index_exists?(:cohort_mentors, [:cohort_id, :cohort_subgroup_id, :user_id])
+    add_index :cohort_mentors, [ :cohort_id, :cohort_subgroup_id, :user_id ], unique: true, name: "idx_cohort_mentors_unique" unless index_exists?(:cohort_mentors, [ :cohort_id, :cohort_subgroup_id, :user_id ])
     add_index :cohort_mentors, :user_id unless index_exists?(:cohort_mentors, :user_id)
     add_index :cohort_mentors, :course_id unless index_exists?(:cohort_mentors, :course_id)
 
@@ -58,7 +58,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_join_requests, [:cohort_id, :cohort_subgroup_id, :user_id], unique: true, name: "idx_cohort_join_requests_unique" unless index_exists?(:cohort_join_requests, [:cohort_id, :cohort_subgroup_id, :user_id])
+    add_index :cohort_join_requests, [ :cohort_id, :cohort_subgroup_id, :user_id ], unique: true, name: "idx_cohort_join_requests_unique" unless index_exists?(:cohort_join_requests, [ :cohort_id, :cohort_subgroup_id, :user_id ])
     add_index :cohort_join_requests, :status unless index_exists?(:cohort_join_requests, :status)
     add_index :cohort_join_requests, :user_id unless index_exists?(:cohort_join_requests, :user_id)
 
@@ -71,7 +71,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_staffs, [:cohort_id, :user_id], unique: true unless index_exists?(:cohort_staffs, [:cohort_id, :user_id])
+    add_index :cohort_staffs, [ :cohort_id, :user_id ], unique: true unless index_exists?(:cohort_staffs, [ :cohort_id, :user_id ])
     add_index :cohort_staffs, :user_id unless index_exists?(:cohort_staffs, :user_id)
     add_index :cohort_staffs, :course_id unless index_exists?(:cohort_staffs, :course_id)
 
@@ -86,7 +86,7 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_web_pages, [:cohort_id, :slug], unique: true unless index_exists?(:cohort_web_pages, [:cohort_id, :slug])
+    add_index :cohort_web_pages, [ :cohort_id, :slug ], unique: true unless index_exists?(:cohort_web_pages, [ :cohort_id, :slug ])
     add_index :cohort_web_pages, :scope unless index_exists?(:cohort_web_pages, :scope)
 
     # Create batch_timetables table
@@ -102,8 +102,8 @@ class CreateCohortSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :batch_timetables, [:batch_id, :date] unless index_exists?(:batch_timetables, [:batch_id, :date])
-    add_index :batch_timetables, [:reference_doctype, :reference_docname], name: "idx_batch_timetables_ref" unless index_exists?(:batch_timetables, [:reference_doctype, :reference_docname])
+    add_index :batch_timetables, [ :batch_id, :date ] unless index_exists?(:batch_timetables, [ :batch_id, :date ])
+    add_index :batch_timetables, [ :reference_doctype, :reference_docname ], name: "idx_batch_timetables_ref" unless index_exists?(:batch_timetables, [ :reference_doctype, :reference_docname ])
 
     # Create sources table for batch enrollment source tracking
     create_table :sources do |t|

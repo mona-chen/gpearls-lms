@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "shellwords"
+
 module Quiz
   class ProgrammingSubmissionService
     def self.create(params, user)
@@ -221,13 +223,13 @@ module Quiz
     end
 
     def self.execute_python_code(code, input)
-      require 'timeout'
-      require 'tempfile'
+      require "timeout"
+      require "tempfile"
 
       # Create temporary files
-      code_file = Tempfile.new(['code', '.py'])
-      input_file = Tempfile.new(['input', '.txt'])
-      output_file = Tempfile.new(['output', '.txt'])
+      code_file = Tempfile.new([ "code", ".py" ])
+      input_file = Tempfile.new([ "input", ".txt" ])
+      output_file = Tempfile.new([ "output", ".txt" ])
 
       begin
         # Write code and input to files
@@ -239,10 +241,10 @@ module Quiz
         # Execute with timeout and resource limits
         Timeout.timeout(10) do
           # Use docker to sandbox execution if available, otherwise basic execution
-          if system('docker --version > /dev/null 2>&1')
-            execute_in_docker(code_file.path, input_file.path, output_file.path, 'python')
+          if system("docker --version > /dev/null 2>&1")
+            execute_in_docker(code_file.path, input_file.path, output_file.path, "python")
           else
-            execute_direct(code_file.path, input_file.path, output_file.path, 'python3')
+            execute_direct(code_file.path, input_file.path, output_file.path, "python3")
           end
         end
 
@@ -254,7 +256,7 @@ module Quiz
         "Execution error: #{e.message}"
       ensure
         # Clean up temporary files
-        [code_file, input_file, output_file].each do |file|
+        [ code_file, input_file, output_file ].each do |file|
           file.close
           file.unlink
         end
@@ -262,12 +264,12 @@ module Quiz
     end
 
     def self.execute_javascript_code(code, input)
-      require 'timeout'
-      require 'tempfile'
+      require "timeout"
+      require "tempfile"
 
-      code_file = Tempfile.new(['code', '.js'])
-      input_file = Tempfile.new(['input', '.txt'])
-      output_file = Tempfile.new(['output', '.txt'])
+      code_file = Tempfile.new([ "code", ".js" ])
+      input_file = Tempfile.new([ "input", ".txt" ])
+      output_file = Tempfile.new([ "output", ".txt" ])
 
       begin
         code_file.write(code)
@@ -276,10 +278,10 @@ module Quiz
         input_file.flush
 
         Timeout.timeout(10) do
-          if system('docker --version > /dev/null 2>&1')
-            execute_in_docker(code_file.path, input_file.path, output_file.path, 'node')
+          if system("docker --version > /dev/null 2>&1")
+            execute_in_docker(code_file.path, input_file.path, output_file.path, "node")
           else
-            execute_direct(code_file.path, input_file.path, output_file.path, 'node')
+            execute_direct(code_file.path, input_file.path, output_file.path, "node")
           end
         end
 
@@ -289,7 +291,7 @@ module Quiz
       rescue => e
         "Execution error: #{e.message}"
       ensure
-        [code_file, input_file, output_file].each do |file|
+        [ code_file, input_file, output_file ].each do |file|
           file.close
           file.unlink
         end
@@ -297,13 +299,13 @@ module Quiz
     end
 
     def self.execute_java_code(code, input)
-      require 'timeout'
-      require 'tempfile'
+      require "timeout"
+      require "tempfile"
 
       # For Java, we need to create a proper class structure
-      class_file = Tempfile.new(['Main', '.java'])
-      input_file = Tempfile.new(['input', '.txt'])
-      output_file = Tempfile.new(['output', '.txt'])
+      class_file = Tempfile.new([ "Main", ".java" ])
+      input_file = Tempfile.new([ "input", ".txt" ])
+      output_file = Tempfile.new([ "output", ".txt" ])
 
       begin
         # Wrap code in a proper Java class
@@ -325,7 +327,7 @@ module Quiz
         input_file.flush
 
         Timeout.timeout(15) do
-          if system('docker --version > /dev/null 2>&1')
+          if system("docker --version > /dev/null 2>&1")
             execute_java_in_docker(class_file.path, input_file.path, output_file.path)
           else
             execute_java_direct(class_file.path, input_file.path, output_file.path)
@@ -338,7 +340,7 @@ module Quiz
       rescue => e
         "Execution error: #{e.message}"
       ensure
-        [class_file, input_file, output_file].each do |file|
+        [ class_file, input_file, output_file ].each do |file|
           file.close
           file.unlink
         end
@@ -350,13 +352,13 @@ module Quiz
     def self.execute_in_docker(code_path, input_path, output_path, runtime)
       # Create a docker command with resource limits
       docker_cmd = [
-        'docker', 'run', '--rm',
-        '--memory=128m', '--cpus=0.5', '--network=none',
-        '-v', "#{code_path}:/code",
-        '-v', "#{input_path}:/input",
-        '-v', "#{output_path}:/output",
-        'sandbox-executor',
-        runtime, '/code', '<', '/input', '>', '/output', '2>&1'
+        "docker", "run", "--rm",
+        "--memory=128m", "--cpus=0.5", "--network=none",
+        "-v", "#{code_path}:/code",
+        "-v", "#{input_path}:/input",
+        "-v", "#{output_path}:/output",
+        "sandbox-executor",
+        runtime, "/code", "<", "/input", ">", "/output", "2>&1"
       ]
 
       success = system(*docker_cmd)
@@ -364,19 +366,20 @@ module Quiz
     end
 
     def self.execute_direct(code_path, input_path, output_path, command)
-      # Basic execution with some safety measures
-      system("#{command} #{code_path} < #{input_path} > #{output_path} 2>&1")
+      # Basic execution with shell escaping for security
+      escaped_command = "#{Shellwords.escape(command)} #{Shellwords.escape(code_path)} < #{Shellwords.escape(input_path)} > #{Shellwords.escape(output_path)} 2>&1"
+      system(escaped_command)
     end
 
     def self.execute_java_in_docker(class_path, input_path, output_path)
       docker_cmd = [
-        'docker', 'run', '--rm',
-        '--memory=256m', '--cpus=0.5', '--network=none',
-        '-v', "#{class_path}:/Main.java",
-        '-v', "#{input_path}:/input",
-        '-v', "#{output_path}:/output",
-        'java-sandbox',
-        'sh', '-c', 'javac Main.java && java Main < /input > /output 2>&1'
+        "docker", "run", "--rm",
+        "--memory=256m", "--cpus=0.5", "--network=none",
+        "-v", "#{class_path}:/Main.java",
+        "-v", "#{input_path}:/input",
+        "-v", "#{output_path}:/output",
+        "java-sandbox",
+        "sh", "-c", "javac Main.java && java Main < /input > /output 2>&1"
       ]
 
       success = system(*docker_cmd)
@@ -384,8 +387,10 @@ module Quiz
     end
 
     def self.execute_java_direct(class_path, input_path, output_path)
-      # Compile and run Java
-      system("javac #{class_path} && java Main < #{input_path} > #{output_path} 2>&1")
+      # Compile and run Java with shell escaping for security
+      compile_cmd = "javac #{Shellwords.escape(class_path)}"
+      run_cmd = "java Main < #{Shellwords.escape(input_path)} > #{Shellwords.escape(output_path)} 2>&1"
+      system("#{compile_cmd} && #{run_cmd}")
     end
 
     def self.generate_feedback(results)

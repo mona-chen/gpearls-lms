@@ -23,7 +23,7 @@ class LmsQuiz < ApplicationRecord
   validates :description, presence: true
   validates :course, presence: true
 
-  validates :max_attempts, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 10 }
+   validates :max_attempts, numericality: { greater_than: 0, less_than_or_equal_to: 10 }, allow_nil: true
   validates :duration_minutes, presence: true, numericality: { greater_than: 0 }
   validates :passing_percentage, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :status, presence: true, inclusion: { in: %w[Draft Published Ended] }
@@ -86,26 +86,24 @@ class LmsQuiz < ApplicationRecord
   end
 
   def user_attempts(user)
-    quiz_submissions.where(user: user).count
-  end
-
-  def user_can_attempt?(user)
-    return false unless active?
-    return false unless user.enrolled_in?(course)
-    return true if max_attempts.nil?
-
-    user_attempts(user) < max_attempts
+    quiz_submissions.where(member: user).count
   end
 
   def best_score(user)
-    quiz_submissions.where(user: user).maximum(:score) || 0
+    quiz_submissions.where(member: user).maximum(:percentage) || 0
   end
 
   def has_passed?(user)
-    best_score = quiz_submissions.where(user: user).maximum(:score)
+    best_score = quiz_submissions.where(member: user).maximum(:percentage)
     return false if best_score.nil?
 
-    best_score >= passing_marks
+    best_score >= passing_percentage
+  end
+
+  def user_can_attempt?(user)
+    return true if max_attempts.nil?
+
+    user_attempts(user) < max_attempts
   end
 
   def can_start?(user)

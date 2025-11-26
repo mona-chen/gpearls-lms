@@ -11,15 +11,15 @@ module Api
 
       def authenticate_user_from_token!
         # JWT token authentication
-        token = request.headers['Authorization']&.split(' ')&.last
+        token = request.headers["Authorization"]&.split(" ")&.last
 
         if token.present?
           begin
-            decoded = JWT.decode(token, ENV.fetch('DEVISE_JWT_SECRET_KEY', Rails.application.secret_key_base), true, { algorithm: 'HS256' })
+            decoded = JWT.decode(token, ENV.fetch("DEVISE_JWT_SECRET_KEY", Rails.application.secret_key_base), true, { algorithm: "HS256" })
             payload = decoded[0]
-            user = User.find_by(id: payload['sub'], jti: payload['jti'])
+            user = User.find_by(id: payload["sub"], jti: payload["jti"])
 
-            if user && payload['exp'] > Time.now.to_i
+            if user && payload["exp"] > Time.now.to_i
               return user
             end
           rescue JWT::DecodeError, JWT::ExpiredSignature => e
@@ -41,11 +41,11 @@ module Api
         nil
       end
 
-      def render_unauthorized(message = 'Not authenticated')
+      def render_unauthorized(message = "Not authenticated")
         render json: { message: message }, status: :unauthorized
       end
 
-      def render_not_found(message = 'Not found')
+      def render_not_found(message = "Not found")
         render json: { message: message }, status: :not_found
       end
 

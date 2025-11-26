@@ -1,7 +1,7 @@
 class Api::CohortsController < Api::BaseController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_cohort, only: [:show, :update, :destroy, :join, :leave, :subgroups, :join_requests, :statistics, :add_mentor, :remove_mentor, :add_staff, :remove_staff]
-  before_action :require_cohort_instructor_or_admin!, only: [:update, :destroy, :add_mentor, :remove_mentor, :add_staff, :remove_staff, :join_requests, :statistics]
+  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :set_cohort, only: [ :show, :update, :destroy, :join, :leave, :subgroups, :join_requests, :statistics, :add_mentor, :remove_mentor, :add_staff, :remove_staff ]
+  before_action :require_cohort_instructor_or_admin!, only: [ :update, :destroy, :add_mentor, :remove_mentor, :add_staff, :remove_staff, :join_requests, :statistics ]
 
   # GET /api/cohorts
   def index
@@ -14,10 +14,10 @@ class Api::CohortsController < Api::BaseController
                     .order(created_at: :desc)
 
     cohorts = cohorts.by_course(filters[:course_id]) if filters[:course_id].present?
-    cohorts = cohorts.by_instructor(current_user) if filters[:my_cohorts] == 'true'
-    cohorts = cohorts.active if filters[:status] == 'active'
-    cohorts = cohorts.upcoming if filters[:status] == 'upcoming'
-    cohorts = cohorts.completed if filters[:status] == 'completed'
+    cohorts = cohorts.by_instructor(current_user) if filters[:my_cohorts] == "true"
+    cohorts = cohorts.active if filters[:status] == "active"
+    cohorts = cohorts.upcoming if filters[:status] == "upcoming"
+    cohorts = cohorts.completed if filters[:status] == "completed"
 
     # Apply search
     if search.present?
@@ -82,7 +82,7 @@ class Api::CohortsController < Api::BaseController
 
   # POST /api/cohorts/:id/join
   def join
-    subgroup_slug = params[:subgroup] || 'main'
+    subgroup_slug = params[:subgroup] || "main"
     subgroup = @cohort.get_subgroup(subgroup_slug)
 
     if subgroup.nil?
@@ -136,11 +136,11 @@ class Api::CohortsController < Api::BaseController
     requests = CohortJoinRequest.by_cohort(@cohort).recent
 
     case status_filter
-    when 'pending'
+    when "pending"
       requests = requests.pending
-    when 'accepted'
+    when "accepted"
       requests = requests.accepted
-    when 'rejected'
+    when "rejected"
       requests = requests.rejected
     end
 
@@ -191,7 +191,7 @@ class Api::CohortsController < Api::BaseController
   # POST /api/cohorts/:id/add-mentor
   def add_mentor
     user_id = params[:user_id]
-    subgroup_slug = params[:subgroup] || 'main'
+    subgroup_slug = params[:subgroup] || "main"
 
     user = User.find(user_id)
     subgroup = @cohort.get_subgroup(subgroup_slug)
@@ -231,7 +231,7 @@ class Api::CohortsController < Api::BaseController
   # POST /api/cohorts/:id/add-staff
   def add_staff
     user_id = params[:user_id]
-    role = params[:role] || 'Staff'
+    role = params[:role] || "Staff"
 
     user = User.find(user_id)
     return render json: { error: "User not found" }, status: :not_found unless user
@@ -320,14 +320,14 @@ class Api::CohortsController < Api::BaseController
       :end_date,
       :duration,
       :slug,
-      cohort_web_pages_attributes: [:id, :slug, :title, :content, :scope, :template_html, :_destroy]
+      cohort_web_pages_attributes: [ :id, :slug, :title, :content, :scope, :template_html, :_destroy ]
     )
   end
 
   def require_cohort_instructor_or_admin!
     return true if @cohort.instructor == current_user
     return true if @cohort.is_admin?(current_user)
-    return true if current_user.has_role?('System Manager') || current_user.has_role?('Administrator')
+    return true if current_user.has_role?("System Manager") || current_user.has_role?("Administrator")
 
     render json: { error: "Unauthorized" }, status: :forbidden
   end
@@ -341,7 +341,7 @@ class Api::CohortsController < Api::BaseController
     completed_lessons = user.lesson_progress
                           .joins(lesson: :chapter)
                           .where(chapters: { course: course })
-                          .where(status: 'Complete')
+                          .where(status: "Complete")
                           .count
 
     (completed_lessons.to_f / total_lessons * 100).round(2)
@@ -372,7 +372,7 @@ class Api::CohortsController < Api::BaseController
                                  .count
 
     {
-      labels: enrollments_by_month.keys.map { |date| date.strftime('%B %Y') },
+      labels: enrollments_by_month.keys.map { |date| date.strftime("%B %Y") },
       data: enrollments_by_month.values
     }
   end
@@ -381,7 +381,7 @@ class Api::CohortsController < Api::BaseController
     # Calculate activity metrics
     total_lessons = cohort.course.lessons.count
     total_completions = cohort.enrollments.joins(user: :lesson_progress)
-                                         .where(lesson_progresses: { status: 'Complete' })
+                                         .where(lesson_progresses: { status: "Complete" })
                                          .distinct
                                          .count
 
@@ -390,7 +390,7 @@ class Api::CohortsController < Api::BaseController
       total_completions: total_completions,
       average_completion_rate: total_lessons > 0 ? (total_completions.to_f / total_lessons * 100).round(2) : 0,
       active_members: cohort.enrollments.joins(user: :lesson_progress)
-                                       .where('lesson_progresses.updated_at > ?', 7.days.ago)
+                                       .where("lesson_progresses.updated_at > ?", 7.days.ago)
                                        .distinct
                                        .count
     }
@@ -404,7 +404,7 @@ class Api::CohortsController < Api::BaseController
         enrollment.user.lesson_progress
                    .joins(lesson: :chapter)
                    .where(chapters: { course: cohort.course })
-                   .where('lesson_progresses.updated_at > ?', 30.days.ago)
+                   .where("lesson_progresses.updated_at > ?", 30.days.ago)
                    .exists?
       end
 

@@ -23,6 +23,6 @@ class CreateUserSkills < ActiveRecord::Migration[7.2]
     add_index :user_skills, :proficiency_level
     add_index :user_skills, :verified
     add_index :user_skills, :years_of_experience
-    add_index :user_skills, [:user_id, :skill_name], unique: true
+    add_index :user_skills, [ :user_id, :skill_name ], unique: true
   end
 end

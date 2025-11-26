@@ -37,10 +37,10 @@ class CreateLmsQuizQuestions < ActiveRecord::Migration[7.2]
     add_index :lms_quiz_questions, :is_active
     add_index :lms_quiz_questions, :added_at
     # added_by_id index automatically created by references helper
-    add_index :lms_quiz_questions, [:quiz_id, :position], unique: true
-    add_index :lms_quiz_questions, [:quiz_id, :question_id], unique: true
-    add_index :lms_quiz_questions, [:quiz_id, :is_active]
-    add_index :lms_quiz_questions, [:question_id, :is_active]
-    add_index :lms_quiz_questions, [:mandatory, :position]
+    add_index :lms_quiz_questions, [ :quiz_id, :position ], unique: true
+    add_index :lms_quiz_questions, [ :quiz_id, :question_id ], unique: true
+    add_index :lms_quiz_questions, [ :quiz_id, :is_active ]
+    add_index :lms_quiz_questions, [ :question_id, :is_active ]
+    add_index :lms_quiz_questions, [ :mandatory, :position ]
   end
 end

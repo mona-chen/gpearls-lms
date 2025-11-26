@@ -1,8 +1,8 @@
 module Razorpay
   class RazorpayService
     def initialize(gateway = nil)
-      @gateway = gateway || PaymentGateway.active_for_type('razorpay')
-      raise Payments::Error::GatewayNotConfiguredError, 'Razorpay gateway not configured' unless @gateway&.active?
+      @gateway = gateway || PaymentGateway.active_for_type("razorpay")
+      raise Payments::Error::GatewayNotConfiguredError, "Razorpay gateway not configured" unless @gateway&.active?
 
       @key_id = @gateway.credentials[:key_id]
       @key_secret = @gateway.credentials[:key_secret]
@@ -10,7 +10,7 @@ module Razorpay
 
     # Create a payment order
     def create_order(payment)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       order = Razorpay::Order.create(
@@ -34,13 +34,13 @@ module Razorpay
 
     # Capture a payment
     def capture_payment(payment_id, amount)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       payment = Razorpay::Payment.capture(payment_id, amount)
       payment_record = Payment.find_by(transaction_id: payment.order_id)
 
-      if payment.status == 'captured'
+      if payment.status == "captured"
         payment_record.mark_completed!(payment.to_json)
         process_payment_completion(payment_record, payment.to_json)
       else
@@ -55,7 +55,7 @@ module Razorpay
 
     # Create a customer
     def create_customer(user)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       customer = Razorpay::Customer.create(
@@ -75,7 +75,7 @@ module Razorpay
 
     # Create payment for customer
     def create_customer_payment(payment, customer_id)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       razorpay_payment = Razorpay::Payment.create(
@@ -101,7 +101,7 @@ module Razorpay
 
     # Process refund
     def process_refund(payment, amount = nil)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       refund_data = {
@@ -121,7 +121,7 @@ module Razorpay
 
     # Get customer
     def get_customer(customer_id)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       Razorpay::Customer.retrieve(customer_id)
@@ -129,7 +129,7 @@ module Razorpay
 
     # Verify webhook signature
     def validate_webhook_signature(payload, signature)
-      require 'razorpay'
+      require "razorpay"
       Razorpay.setup(@key_id, @key_secret)
 
       Razorpay::Utility.verify_webhook_signature(
@@ -141,33 +141,33 @@ module Razorpay
 
     # Process webhook events
     def process_webhook(payload)
-      event = payload['event']
-      data = payload['payload']
+      event = payload["event"]
+      data = payload["payload"]
 
       case event
-      when 'payment.captured'
+      when "payment.captured"
         handle_successful_payment(data)
-      when 'payment.failed'
+      when "payment.failed"
         handle_failed_payment(data)
-      when 'refund.processed'
+      when "refund.processed"
         handle_refund_processed(data)
       else
         Rails.logger.info "Unhandled Razorpay webhook event: #{event}"
       end
 
-      { status: 'processed', event: event }
+      { status: "processed", event: event }
     end
 
     private
 
     def payment_currency(currency)
       case currency.upcase
-      when 'USD'
-        'USD'
-      when 'INR'
-        'INR'
+      when "USD"
+        "USD"
+      when "INR"
+        "INR"
       else
-        'INR' # Default to INR for Razorpay
+        "INR" # Default to INR for Razorpay
       end
     end
 
@@ -175,13 +175,13 @@ module Razorpay
       # Handle different payment types
       if payment.course.present?
         enrollment = Enrollment.find_or_create_by!(user: payment.user, course: payment.course)
-        enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        enrollment.update!(status: "Active", enrollment_date: Time.current)
       elsif payment.batch.present?
         batch_enrollment = BatchEnrollment.find_or_create_by!(user: payment.user, batch: payment.batch)
-        batch_enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        batch_enrollment.update!(status: "Active", enrollment_date: Time.current)
       elsif payment.program.present?
         program_enrollment = LmsProgramEnrollment.find_or_create_by!(user: payment.user, program: payment.program)
-        program_enrollment.update!(status: 'Active', enrollment_date: Time.current)
+        program_enrollment.update!(status: "Active", enrollment_date: Time.current)
       end
 
       # Send notifications
@@ -189,7 +189,7 @@ module Razorpay
     end
 
     def handle_successful_payment(data)
-      payment = Payment.find_by(transaction_id: data['order_id'])
+      payment = Payment.find_by(transaction_id: data["order_id"])
       return unless payment
 
       payment.mark_completed!(data)
@@ -197,7 +197,7 @@ module Razorpay
     end
 
     def handle_failed_payment(data)
-      payment = Payment.find_by(transaction_id: data['order_id'])
+      payment = Payment.find_by(transaction_id: data["order_id"])
       return unless payment
 
       payment.mark_failed!(data)
@@ -205,7 +205,7 @@ module Razorpay
     end
 
     def handle_refund_processed(data)
-      payment = Payment.find_by(transaction_id: data['payment_id'])
+      payment = Payment.find_by(transaction_id: data["payment_id"])
       return unless payment
 
       payment.mark_refunded!(data)

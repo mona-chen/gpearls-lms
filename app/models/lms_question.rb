@@ -8,6 +8,9 @@ class LmsQuestion < ApplicationRecord
   # Temporary storage for quiz association during creation
   attr_accessor :quiz, :marks
 
+  # Ensure name attribute is accessible
+  attr_accessor :name
+
   # Associations
   has_many :lms_quiz_questions, dependent: :destroy
   has_many :lms_quizzes, through: :lms_quiz_questions
@@ -172,7 +175,7 @@ class LmsQuestion < ApplicationRecord
   end
 
   def generate_name
-    return if name.present?
+    return if self.name.present?
 
     # Generate name like QTS-2025-00001 (matching Frappe autoname)
     year = Time.current.year

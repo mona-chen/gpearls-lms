@@ -2,7 +2,7 @@
 users = User.limit(3)
 courses = Course.limit(3)
 
-categories = ['Programming', 'Web Development', 'Data Science', 'Mobile Development', 'UI/UX Design']
+categories = [ 'Programming', 'Web Development', 'Data Science', 'Mobile Development', 'UI/UX Design' ]
 
 users.each_with_index do |user, index|
   course = courses[index % courses.length]

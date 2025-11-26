@@ -38,10 +38,10 @@ class CreateLmsBatchTimetables < ActiveRecord::Migration[7.0]
     add_index :lms_batch_timetables, :parent
     add_index :lms_batch_timetables, :parenttype
     add_index :lms_batch_timetables, :parentfield
-    add_index :lms_batch_timetables, [:parent, :parenttype, :parentfield], name: 'index_batch_tt_on_parent_and_type_and_field'
+    add_index :lms_batch_timetables, [ :parent, :parenttype, :parentfield ], name: 'index_batch_tt_on_parent_and_type_and_field'
     add_index :lms_batch_timetables, :creation
     add_index :lms_batch_timetables, :modified
-    add_index :lms_batch_timetables, [:reference_doctype, :reference_docname], name: 'index_batch_tt_on_ref_doctype_and_docname'
-    add_index :lms_batch_timetables, [:date, :start_time]
+    add_index :lms_batch_timetables, [ :reference_doctype, :reference_docname ], name: 'index_batch_tt_on_ref_doctype_and_docname'
+    add_index :lms_batch_timetables, [ :date, :start_time ]
   end
 end

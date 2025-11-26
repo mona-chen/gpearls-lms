@@ -38,7 +38,7 @@ class CreateLmsPrograms < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :lms_program_members, [:lms_program_id, :user_id], unique: true, name: 'index_lms_program_members_on_program_and_user'
+    add_index :lms_program_members, [ :lms_program_id, :user_id ], unique: true, name: 'index_lms_program_members_on_program_and_user'
 
     # LMS Program Courses table (join table for courses in programs)
     create_table :lms_program_courses do |t|
@@ -51,7 +51,7 @@ class CreateLmsPrograms < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :lms_program_courses, [:lms_program_id, :course_id], unique: true, name: 'index_lms_program_courses_on_program_and_course'
+    add_index :lms_program_courses, [ :lms_program_id, :course_id ], unique: true, name: 'index_lms_program_courses_on_program_and_course'
     add_index :lms_program_courses, :position, name: 'index_lms_program_courses_on_position'
   end
 end

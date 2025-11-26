@@ -25,7 +25,7 @@ class CreateLessonReferences < ActiveRecord::Migration[7.0]
     add_index :lesson_references, :parent
     add_index :lesson_references, :parenttype
     add_index :lesson_references, :parentfield
-    add_index :lesson_references, [:parent, :parenttype, :parentfield], name: 'index_lesson_refs_on_parent_and_type_and_field'
+    add_index :lesson_references, [ :parent, :parenttype, :parentfield ], name: 'index_lesson_refs_on_parent_and_type_and_field'
     add_index :lesson_references, :creation
     add_index :lesson_references, :modified
 

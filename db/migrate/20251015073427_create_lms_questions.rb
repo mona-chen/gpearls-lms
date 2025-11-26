@@ -57,9 +57,9 @@ class CreateLmsQuestions < ActiveRecord::Migration[7.2]
     add_index :lms_questions, :average_score
     add_index :lms_questions, :success_rate
     # created_by_id and updated_by_id indexes automatically created by references helpers
-    add_index :lms_questions, [:quiz_id, :position]
-    add_index :lms_questions, [:question_type, :difficulty_level]
-    add_index :lms_questions, [:category, :is_public]
-    add_index :lms_questions, [:mandatory, :position]
+    add_index :lms_questions, [ :quiz_id, :position ]
+    add_index :lms_questions, [ :question_type, :difficulty_level ]
+    add_index :lms_questions, [ :category, :is_public ]
+    add_index :lms_questions, [ :mandatory, :position ]
   end
 end

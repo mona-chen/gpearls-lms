@@ -45,7 +45,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :batch_courses, [:batch_id, :course_id], unique: true
+    add_index :batch_courses, [ :batch_id, :course_id ], unique: true
     add_index :batch_courses, :evaluator_id
 
     # Create batch_enrollments table
@@ -58,7 +58,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :batch_enrollments, [:user_id, :batch_id], unique: true
+    add_index :batch_enrollments, [ :user_id, :batch_id ], unique: true
     add_index :batch_enrollments, :payment_id
     add_index :batch_enrollments, :source_id
 
@@ -75,8 +75,8 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :batch_timetables, [:batch_id, :date]
-    add_index :batch_timetables, [:reference_doctype, :reference_docname]
+    add_index :batch_timetables, [ :batch_id, :date ]
+    add_index :batch_timetables, [ :reference_doctype, :reference_docname ]
 
     # Create cohorts table
     create_table :cohorts do |t|
@@ -92,7 +92,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohorts, [:course_id, :slug], unique: true
+    add_index :cohorts, [ :course_id, :slug ], unique: true
     add_index :cohorts, :instructor_id
     add_index :cohorts, :status
 
@@ -107,7 +107,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_subgroups, [:cohort_id, :slug], unique: true
+    add_index :cohort_subgroups, [ :cohort_id, :slug ], unique: true
     add_index :cohort_subgroups, :invite_code, unique: true
     add_index :cohort_subgroups, :course_id
 
@@ -120,7 +120,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_mentors, [:cohort_id, :cohort_subgroup_id, :user_id], unique: true
+    add_index :cohort_mentors, [ :cohort_id, :cohort_subgroup_id, :user_id ], unique: true
     add_index :cohort_mentors, :user_id
     add_index :cohort_mentors, :course_id
 
@@ -136,7 +136,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_join_requests, [:cohort_id, :cohort_subgroup_id, :user_id], unique: true
+    add_index :cohort_join_requests, [ :cohort_id, :cohort_subgroup_id, :user_id ], unique: true
     add_index :cohort_join_requests, :status
     add_index :cohort_join_requests, :user_id
 
@@ -149,7 +149,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_staffs, [:cohort_id, :user_id], unique: true
+    add_index :cohort_staffs, [ :cohort_id, :user_id ], unique: true
     add_index :cohort_staffs, :user_id
     add_index :cohort_staffs, :course_id
 
@@ -164,7 +164,7 @@ class CreateBatchSystem < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :cohort_web_pages, [:cohort_id, :slug], unique: true
+    add_index :cohort_web_pages, [ :cohort_id, :slug ], unique: true
     add_index :cohort_web_pages, :scope
 
     # Add columns to enrollments table for cohort support

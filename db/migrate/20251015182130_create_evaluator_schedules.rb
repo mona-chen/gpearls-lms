@@ -29,10 +29,10 @@ class CreateEvaluatorSchedules < ActiveRecord::Migration[7.0]
     add_index :evaluator_schedules, :parent
     add_index :evaluator_schedules, :parenttype
     add_index :evaluator_schedules, :parentfield
-    add_index :evaluator_schedules, [:parent, :parenttype, :parentfield], name: 'index_evaluator_schedules_on_parent_and_type_and_field'
+    add_index :evaluator_schedules, [ :parent, :parenttype, :parentfield ], name: 'index_evaluator_schedules_on_parent_and_type_and_field'
     add_index :evaluator_schedules, :creation
     add_index :evaluator_schedules, :modified
-    add_index :evaluator_schedules, [:day, :start_time], name: 'index_evaluator_schedules_on_day_and_start_time'
-    add_index :evaluator_schedules, [:day, :end_time], name: 'index_evaluator_schedules_on_day_and_end_time'
+    add_index :evaluator_schedules, [ :day, :start_time ], name: 'index_evaluator_schedules_on_day_and_start_time'
+    add_index :evaluator_schedules, [ :day, :end_time ], name: 'index_evaluator_schedules_on_day_and_end_time'
   end
 end

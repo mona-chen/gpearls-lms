@@ -8,7 +8,7 @@ class ApplicationController < ActionController::API
     if user_signed_in?
       @current_user = current_user
     else
-      render json: { error: 'Not Authorized' }, status: :unauthorized
+      render json: { error: "Not Authorized" }, status: :unauthorized
     end
   end
 
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::API
   end
 
   def warden
-    request.env['warden']
+    request.env["warden"]
   end
 
   # Strong parameter methods for common use cases
@@ -33,14 +33,16 @@ class ApplicationController < ActionController::API
     params.permit(:search, :q)
   end
 
+  # Filter parameters for search/filtering operations only
+  # NOT for mass assignment to models
   def filter_params
     params.permit(:status, :category, :type, :enrolled, :created, :certification, :title,
                   :my_batches, :my_cohorts, :starting_soon, :paid, :course_id, :instructor_id,
                   :date_range, :timeframe, :chart_name, :order_by, :reference, :currency,
                   :method_type, :item_type, :item_id, :payment_method, :amount, :reason,
                   :start_date, :end_date, :template, :lesson_id, :file, :doctype, :docname,
-                  :file_url, :report_config, :format, :course_id, :subgroup, :invite_code,
-                  :request_id, :user_id, :role, :member_type, :source, :assessment_type,
+                  :file_url, :report_config, :format, :subgroup, :invite_code,
+                  :request_id, :user_id, :member_type, :source, :assessment_type,
                   :assessment_name, :due_date, :max_marks, :reference_doctype, :reference_docname,
                   :date, :start_time, :end_time, :milestone, :scorm_data, :element, :value)
   end
@@ -53,8 +55,10 @@ class ApplicationController < ActionController::API
                   :disable_self_learning, :published_on, :workflow_state)
   end
 
+  # User parameters for setup wizard (admin user creation)
+  # Restricted to safe attributes only
   def user_params
-    params.permit(:email, :username, :full_name, :profile_image, :status, :role,
+    params.permit(:email, :username, :full_name, :profile_image,
                   :country, :timezone, :user_category, :verify_terms, :bio,
                   :linkedin_profile, :github_profile, :website, :phone)
   end
@@ -67,7 +71,7 @@ class ApplicationController < ActionController::API
   def quiz_params
     params.permit(:title, :description, :course_id, :lesson_id, :passing_score,
                   :time_limit, :max_attempts, :show_answers, :randomize_questions,
-                  :questions_attributes => [:id, :question, :question_type, :options, :correct_answer, :explanation, :points])
+                  questions_attributes: [ :id, :question, :question_type, :options, :correct_answer, :explanation, :points ])
   end
 
   def assignment_params

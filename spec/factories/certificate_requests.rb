@@ -10,7 +10,7 @@ FactoryBot.define do
 
     association :user
     association :course
-    association :evaluator, factory: [:user, :evaluator], optional: true
+    association :evaluator, factory: [ :user, :evaluator ], optional: true
 
     trait :pending do
       status { 'Pending' }
@@ -41,7 +41,7 @@ FactoryBot.define do
     end
 
     trait :for_student do
-      association :user, factory: [:user, :student]
+      association :user, factory: [ :user, :student ]
     end
 
     trait :with_batch do

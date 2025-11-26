@@ -1,5 +1,5 @@
 class BatchMailer < ApplicationMailer
-  default from: Rails.application.credentials.dig(:email, :from) || 'noreply@lms.test'
+  default from: Rails.application.credentials.dig(:email, :from) || "noreply@lms.test"
 
   def batch_published(batch)
     @batch = batch
@@ -11,7 +11,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: interested_users.pluck(:email),
       subject: @subject,
-      template_name: 'batch_published'
+      template_name: "batch_published"
     )
   end
 
@@ -20,12 +20,12 @@ class BatchMailer < ApplicationMailer
     @subject = "Batch Started: #{@batch.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'batch_started'
+      template_name: "batch_started"
     )
   end
 
@@ -34,12 +34,12 @@ class BatchMailer < ApplicationMailer
     @subject = "Batch Completed: #{@batch.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'batch_completed'
+      template_name: "batch_completed"
     )
   end
 
@@ -49,12 +49,12 @@ class BatchMailer < ApplicationMailer
     @subject = "Batch Cancelled: #{@batch.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'batch_cancelled'
+      template_name: "batch_cancelled"
     )
   end
 
@@ -64,12 +64,12 @@ class BatchMailer < ApplicationMailer
     @subject = "Batch Updated: #{@batch.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'batch_updated'
+      template_name: "batch_updated"
     )
   end
 
@@ -85,7 +85,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'new_enrollment'
+      template_name: "new_enrollment"
     )
   end
 
@@ -102,7 +102,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'enrollment_cancelled'
+      template_name: "enrollment_cancelled"
     )
   end
 
@@ -116,7 +116,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'payment_reminder'
+      template_name: "payment_reminder"
     )
   end
 
@@ -126,12 +126,12 @@ class BatchMailer < ApplicationMailer
     @subject = "New Assessment: #{@assessment.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'assessment_created'
+      template_name: "assessment_created"
     )
   end
 
@@ -141,12 +141,12 @@ class BatchMailer < ApplicationMailer
     @subject = "Live Class Scheduled: #{@live_class.title}"
 
     # Send to all enrolled students
-    student_emails = batch.batch_enrollments.joins(:user).pluck('users.email')
+    student_emails = batch.batch_enrollments.joins(:user).pluck("users.email")
 
     mail(
       to: student_emails,
       subject: @subject,
-      template_name: 'live_class_scheduled'
+      template_name: "live_class_scheduled"
     )
   end
 
@@ -160,7 +160,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'batch_full'
+      template_name: "batch_full"
     )
   end
 
@@ -175,7 +175,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'batch_almost_full'
+      template_name: "batch_almost_full"
     )
   end
 
@@ -190,7 +190,7 @@ class BatchMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'batch_statistics'
+      template_name: "batch_statistics"
     )
   end
 

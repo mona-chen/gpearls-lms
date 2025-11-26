@@ -18,8 +18,8 @@ class CertificationCategory < ApplicationRecord
       name: name,
       description: description,
       enabled: enabled,
-      creation: created_at.strftime('%Y-%m-%d %H:%M:%S'),
-      modified: updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      creation: created_at.strftime("%Y-%m-%d %H:%M:%S"),
+      modified: updated_at.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 end

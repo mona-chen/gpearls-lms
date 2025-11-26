@@ -35,7 +35,7 @@ class CreateLmsBadges < ActiveRecord::Migration[7.0]
     add_index :lms_badges, :event
     add_index :lms_badges, :creation
     add_index :lms_badges, :modified
-    add_index :lms_badges, [:enabled, :event]
-    add_index :lms_badges, [:reference_doctype, :event]
+    add_index :lms_badges, [ :enabled, :event ]
+    add_index :lms_badges, [ :reference_doctype, :event ]
   end
 end

@@ -44,7 +44,7 @@ module Api
             course_id: quiz.course.id,
             quiz: quiz.title,
             quiz_id: quiz.id,
-            scheduled_date: quiz.scheduled_date || Date.today.strftime('%Y-%m-%d'),
+            scheduled_date: quiz.scheduled_date || Date.today.strftime("%Y-%m-%d"),
             duration: quiz.duration || 30,
             max_attempts: quiz.max_attempts || 3,
             passing_percentage: quiz.passing_percentage || 70,
@@ -61,11 +61,11 @@ module Api
         return batches unless params[:filters].present?
 
         filters = params[:filters].to_unsafe_h
-        if filters['start_date']
-          start_date = filters['start_date'].first == ">=" ? Date.today : filters['start_date'].first
+        if filters["start_date"]
+          start_date = filters["start_date"].first == ">=" ? Date.today : filters["start_date"].first
           batches = batches.where("start_date >= ?", start_date)
         end
-        batches = batches.where(published: true) if filters['published'] == 1
+        batches = batches.where(published: true) if filters["published"] == 1
         batches
       end
 
@@ -76,15 +76,15 @@ module Api
           batch_id: batch.id,
           course_id: batch.course&.id,
           course_title: batch.course&.title,
-          start_date: batch.start_date&.strftime('%Y-%m-%d'),
-          end_date: batch.end_date&.strftime('%Y-%m-%d'),
+          start_date: batch.start_date&.strftime("%Y-%m-%d"),
+          end_date: batch.end_date&.strftime("%Y-%m-%d"),
           instructor: batch.instructor&.full_name,
           description: batch.description,
           max_students: batch.max_students,
           current_students: batch.batch_enrollments.count,
           published: batch.published,
-          creation: batch.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: batch.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+          creation: batch.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: batch.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
           owner: batch.instructor&.email
         }
       end

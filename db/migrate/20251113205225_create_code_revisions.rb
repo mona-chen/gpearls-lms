@@ -7,11 +7,11 @@ class CreateCodeRevisions < ActiveRecord::Migration[7.0]
       t.references :user, null: false, foreign_key: true
       t.text :notes
       t.json :metadata
-      
+
       t.timestamps
     end
-    
-    add_index :code_revisions, [:section_id, :section_type, :user_id]
-    add_index :code_revisions, [:user_id, :created_at]
+
+    add_index :code_revisions, [ :section_id, :section_type, :user_id ]
+    add_index :code_revisions, [ :user_id, :created_at ]
   end
 end

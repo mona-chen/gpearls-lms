@@ -22,29 +22,29 @@ class Api::OnboardingController < Api::BaseController
   # Frappe compatibility methods
   def handle_method
     case params[:method_path]
-    when 'lms.onboarding.is_onboarding_complete'
+    when "lms.onboarding.is_onboarding_complete"
       render json: Onboarding::OnboardingService.call(user: current_user)
-    when 'lms.onboarding.get_first_course'
+    when "lms.onboarding.get_first_course"
       course_name = Onboarding::OnboardingService.new(current_user).get_first_course
       render json: course_name || {}
-    when 'lms.onboarding.get_first_batch'
+    when "lms.onboarding.get_first_batch"
       batch_name = Onboarding::OnboardingService.new(current_user).get_first_batch
       render json: batch_name || {}
-    when 'frappe.client.set_value'
+    when "frappe.client.set_value"
       handle_set_value
     else
-      render json: { error: 'Unknown method' }, status: :not_found
+      render json: { error: "Unknown method" }, status: :not_found
     end
   end
 
   private
 
   def handle_set_value
-    if params[:doctype] == 'LMS Settings' && params[:fieldname] == 'is_onboarding_complete'
+    if params[:doctype] == "LMS Settings" && params[:fieldname] == "is_onboarding_complete"
       LmsSetting.set_onboarding_complete(params[:value] == 1)
       render json: { success: true }
     else
-      render json: { error: 'Invalid parameters' }, status: :unprocessable_entity
+      render json: { error: "Invalid parameters" }, status: :unprocessable_entity
     end
   end
 end

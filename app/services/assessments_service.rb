@@ -63,13 +63,13 @@ class AssessmentsService
       # Process file uploads using FileUploadService
       uploaded_files = []
       submission_data[:files].each do |file|
-        upload_result = System::FileUploadService.call({ 'file' => file }, user)
-        if upload_result['status'] == 'success'
+        upload_result = System::FileUploadService.call({ "file" => file }, user)
+        if upload_result["status"] == "success"
           uploaded_files << {
-            file_name: upload_result['data']['file_name'],
-            file_url: upload_result['data']['file_url'],
-            file_type: upload_result['data']['file_type'],
-            file_size: upload_result['data']['file_size']
+            file_name: upload_result["data"]["file_name"],
+            file_url: upload_result["data"]["file_url"],
+            file_type: upload_result["data"]["file_type"],
+            file_size: upload_result["data"]["file_size"]
           }
         end
       end
@@ -161,15 +161,15 @@ class AssessmentsService
 
   def self.check_answer(question, answer)
     case question.type
-    when 'Choices'
+    when "Choices"
       # Check if the answer matches any of the correct options
       correct_options = question.correct_options
       correct_options.include?(answer)
-    when 'User Input'
+    when "User Input"
       # For user input, check against possible answers
       possible_answers = question.possible_answers
       possible_answers.any? { |possible| possible.downcase.strip == answer.downcase.strip }
-    when 'Open Ended'
+    when "Open Ended"
       # Open ended questions require manual grading
       false
     else

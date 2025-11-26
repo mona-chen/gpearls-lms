@@ -32,7 +32,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_enrollments, [:course_id, :user_id], unique: true, name: 'index_lms_enrollments_on_course_and_user'
+      add_index :lms_enrollments, [ :course_id, :user_id ], unique: true, name: 'index_lms_enrollments_on_course_and_user'
       add_index :lms_enrollments, :status, name: 'index_lms_enrollments_on_status'
       add_index :lms_enrollments, :user_id unless index_exists?(:lms_enrollments, :user_id)
     end
@@ -79,7 +79,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_quiz_questions, [:quiz_id, :question_id], unique: true
+      add_index :lms_quiz_questions, [ :quiz_id, :question_id ], unique: true
       add_index :lms_quiz_questions, :position
     end
 
@@ -103,7 +103,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_quiz_results, [:quiz_id, :user_id], name: 'index_lms_quiz_results_on_quiz_and_user'
+      add_index :lms_quiz_results, [ :quiz_id, :user_id ], name: 'index_lms_quiz_results_on_quiz_and_user'
       add_index :lms_quiz_results, :status, name: 'index_lms_quiz_results_on_status'
     end
 
@@ -122,7 +122,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_quiz_submissions, [:quiz_result_id, :question_id], unique: true
+      add_index :lms_quiz_submissions, [ :quiz_result_id, :question_id ], unique: true
     end
 
     # LMS Assessment - Course assessments
@@ -203,7 +203,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_assignment_submissions, [:assignment_id, :user_id], unique: true
+      add_index :lms_assignment_submissions, [ :assignment_id, :user_id ], unique: true
     end
 
     # LMS Badge - Achievement badges
@@ -242,7 +242,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_badge_assignments, [:badge_id, :user_id], unique: true
+      add_index :lms_badge_assignments, [ :badge_id, :user_id ], unique: true
       add_index :lms_badge_assignments, :user_id unless index_exists?(:lms_badge_assignments, :user_id)
     end
 
@@ -281,7 +281,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_course_reviews, [:course_id, :user_id], unique: true
+      add_index :lms_course_reviews, [ :course_id, :user_id ], unique: true
       add_index :lms_course_reviews, :rating unless index_exists?(:lms_course_reviews, :rating)
       add_index :lms_course_reviews, :status unless index_exists?(:lms_course_reviews, :status)
     end
@@ -304,7 +304,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_course_progresses, [:course_id, :user_id, :chapter_id, :lesson_id], unique: true, name: 'index_course_progress_unique'
+      add_index :lms_course_progresses, [ :course_id, :user_id, :chapter_id, :lesson_id ], unique: true, name: 'index_course_progress_unique'
       add_index :lms_course_progresses, :user_id unless index_exists?(:lms_course_progresses, :user_id)
       add_index :lms_course_progresses, :status unless index_exists?(:lms_course_progresses, :status)
     end
@@ -326,7 +326,7 @@ class CreateCriticalLmsDoctypes < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :lms_mentor_requests, [:course_id, :user_id], unique: true
+      add_index :lms_mentor_requests, [ :course_id, :user_id ], unique: true
       add_index :lms_mentor_requests, :status unless index_exists?(:lms_mentor_requests, :status)
     end
 

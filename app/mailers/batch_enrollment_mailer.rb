@@ -1,5 +1,5 @@
 class BatchEnrollmentMailer < ApplicationMailer
-  default from: Rails.application.credentials.dig(:email, :from) || 'noreply@lms.test'
+  default from: Rails.application.credentials.dig(:email, :from) || "noreply@lms.test"
 
   def confirmation_email(batch_enrollment)
     @batch_enrollment = batch_enrollment
@@ -10,7 +10,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'batch_confirmation'
+      template_name: "batch_confirmation"
     )
   end
 
@@ -23,7 +23,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'batch_start_reminder'
+      template_name: "batch_start_reminder"
     )
   end
 
@@ -37,7 +37,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'batch_payment_confirmation'
+      template_name: "batch_payment_confirmation"
     )
   end
 
@@ -50,7 +50,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'batch_completion'
+      template_name: "batch_completion"
     )
   end
 
@@ -64,7 +64,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'batch_cancellation'
+      template_name: "batch_cancellation"
     )
   end
 
@@ -76,7 +76,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'seat_available'
+      template_name: "seat_available"
     )
   end
 
@@ -90,11 +90,11 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'enrollment_reminder'
+      template_name: "enrollment_reminder"
     )
   end
 
-  def instructor_notification(batch_enrollment, action = 'enrolled')
+  def instructor_notification(batch_enrollment, action = "enrolled")
     @batch_enrollment = batch_enrollment
     @batch = batch_enrollment.batch
     @user = batch_enrollment.user
@@ -107,7 +107,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: instructor_emails,
       subject: @subject,
-      template_name: 'instructor_notification'
+      template_name: "instructor_notification"
     )
   end
 
@@ -121,7 +121,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'assessment_reminder'
+      template_name: "assessment_reminder"
     )
   end
 
@@ -135,7 +135,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'live_class_reminder'
+      template_name: "live_class_reminder"
     )
   end
 
@@ -149,7 +149,7 @@ class BatchEnrollmentMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: @subject,
-      template_name: 'certificate_issued'
+      template_name: "certificate_issued"
     )
   end
 

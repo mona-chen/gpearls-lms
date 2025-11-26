@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe 'API::Authentication', type: :request do
-  let(:user) { create(:user, email: 'test@example.com', password: 'password123', full_name: 'Test User') }
-  let(:instructor) { create(:user, :instructor, email: 'instructor@example.com', password: 'password123') }
-  let(:moderator) { create(:user, :moderator, email: 'moderator@example.com', password: 'password123') }
-  let(:evaluator) { create(:user, :evaluator, email: 'evaluator@example.com', password: 'password123') }
+  let(:user) { create(:user, email: 'test@example.com', full_name: 'Test User') }
+  let(:instructor) { create(:user, :instructor, email: 'instructor@example.com') }
+  let(:moderator) { create(:user, :moderator, email: 'moderator@example.com') }
+  let(:evaluator) { create(:user, :evaluator, email: 'evaluator@example.com') }
 
   describe 'POST /api/login' do
     context 'with valid credentials' do
       it 'logs in successfully and returns Frappe-compatible response' do
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         expect(response).to have_http_status(:success)
 
@@ -21,7 +21,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns correct user data structure' do
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         json_response = JSON.parse(response.body)
         user_data = json_response['user']
@@ -38,7 +38,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'sets proper cookies for Frappe compatibility' do
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         expect(cookies['sid']).to be_present
         expect(cookies['system_user']).to eq('yes')
@@ -48,7 +48,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'sets CORS headers for Frappe compatibility' do
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         expect(response.headers['Access-Control-Allow-Origin']).to be_present
         expect(response.headers['Access-Control-Allow-Credentials']).to eq('true')
@@ -56,7 +56,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns instructor-specific data for instructor users' do
-        post '/api/login', params: { usr: instructor.email, pwd: 'password123' }
+        post '/api/login', params: { usr: instructor.email, pwd: 'Password123!' }
 
         json_response = JSON.parse(response.body)
         user_data = json_response['user']
@@ -68,7 +68,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns moderator-specific data for moderator users' do
-        post '/api/login', params: { usr: moderator.email, pwd: 'password123' }
+        post '/api/login', params: { usr: moderator.email, pwd: 'Password123!' }
 
         json_response = JSON.parse(response.body)
         user_data = json_response['user']
@@ -80,7 +80,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns evaluator-specific data for evaluator users' do
-        post '/api/login', params: { usr: evaluator.email, pwd: 'password123' }
+        post '/api/login', params: { usr: evaluator.email, pwd: 'Password123!' }
 
         json_response = JSON.parse(response.body)
         user_data = json_response['user']
@@ -94,7 +94,7 @@ RSpec.describe 'API::Authentication', type: :request do
       it 'updates user JTI for JWT invalidation' do
         old_jti = user.jti
 
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         user.reload
         expect(user.jti).not_to eq(old_jti)
@@ -102,7 +102,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns valid JWT token' do
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         json_response = JSON.parse(response.body)
         token = json_response['token']
@@ -128,7 +128,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns unauthorized for non-existent user' do
-        post '/api/login', params: { usr: 'nonexistent@example.com', pwd: 'password123' }
+        post '/api/login', params: { usr: 'nonexistent@example.com', pwd: 'Password123!' }
 
         expect(response).to have_http_status(:unauthorized)
 
@@ -147,7 +147,7 @@ RSpec.describe 'API::Authentication', type: :request do
       it 'returns unauthorized for disabled user' do
         user.update!(enabled: false)
 
-        post '/api/login', params: { usr: user.email, pwd: 'password123' }
+        post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -160,7 +160,7 @@ RSpec.describe 'API::Authentication', type: :request do
         {
           signup_email: 'newuser@example.com',
           full_name: 'New User',
-          password: 'password123'
+          password: 'Password123!'
         }
       end
 
@@ -195,7 +195,7 @@ RSpec.describe 'API::Authentication', type: :request do
 
     context 'with invalid parameters' do
       it 'returns bad request for missing email' do
-        post '/api/signup', params: { full_name: 'Test User', password: 'password123' }
+        post '/api/signup', params: { full_name: 'Test User', password: 'Password123!' }
 
         expect(response).to have_http_status(:bad_request)
 
@@ -204,7 +204,7 @@ RSpec.describe 'API::Authentication', type: :request do
       end
 
       it 'returns bad request for missing full_name' do
-        post '/api/signup', params: { signup_email: 'test@example.com', password: 'password123' }
+        post '/api/signup', params: { signup_email: 'test@example.com', password: 'Password123!' }
 
         expect(response).to have_http_status(:bad_request)
 
@@ -218,7 +218,7 @@ RSpec.describe 'API::Authentication', type: :request do
         post '/api/signup', params: {
           signup_email: existing_user.email,
           full_name: 'Another User',
-          password: 'password123'
+          password: 'Password123!'
         }
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -233,7 +233,7 @@ RSpec.describe 'API::Authentication', type: :request do
         post '/api/signup', params: {
           signup_email: existing_user.email,
           full_name: 'Another User',
-          password: 'password123'
+          password: 'Password123!'
         }
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -248,7 +248,7 @@ RSpec.describe 'API::Authentication', type: :request do
         post '/api/signup', params: {
           signup_email: 'normal@example.com',
           full_name: 'Normal User',
-          password: 'password123'
+          password: 'Password123!'
         }
 
         expect(response).to have_http_status(:success)
@@ -261,7 +261,7 @@ RSpec.describe 'API::Authentication', type: :request do
         post '/api/signup', params: {
           signup_email: 'excessive@example.com',
           full_name: 'Excessive User',
-          password: 'password123'
+          password: 'Password123!'
         }
 
         expect(response).to have_http_status(:too_many_requests)
@@ -290,7 +290,7 @@ RSpec.describe 'API::Authentication', type: :request do
   describe 'POST /api/logout' do
     before do
       # Login first to set up session
-      post '/api/login', params: { usr: user.email, pwd: 'password123' }
+      post '/api/login', params: { usr: user.email, pwd: 'Password123!' }
     end
 
     it 'logs out successfully' do

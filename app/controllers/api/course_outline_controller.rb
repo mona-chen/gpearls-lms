@@ -1,13 +1,13 @@
 class Api::CourseOutlineController < Api::BaseController
-  skip_before_action :authenticate_user!, only: [:show]
+  skip_before_action :authenticate_user!, only: [ :show ]
 
   def show
     course = Course.find(params[:course])
-    return render json: { error: 'Course not found' }, status: :not_found unless course
+    return render json: { error: "Course not found" }, status: :not_found unless course
 
     # Check permissions
     unless course.published || (current_user && (current_user.moderator? || course.instructor == current_user))
-      return render json: { error: 'Unauthorized' }, status: :forbidden
+      return render json: { error: "Unauthorized" }, status: :forbidden
     end
 
     outline = course.chapters.order(:idx).map do |chapter|

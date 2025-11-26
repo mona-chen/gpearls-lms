@@ -10,18 +10,18 @@ module Search
 
     def call
       query = @params[:q]
-      return { 'data' => [] } if query.blank?
+      return { "data" => [] } if query.blank?
 
       results = []
 
       # Search courses
-      if @params[:doctype].blank? || @params[:doctype] == 'Course'
-        courses = Course.where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%")
+      if @params[:doctype].blank? || @params[:doctype] == "Course"
+        courses = Course.where("title ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%")
                        .limit(5)
         results += courses.map do |course|
           {
             name: course.title,
-            type: 'Course',
+            type: "Course",
             url: "/courses/#{course.id}",
             description: course.description&.truncate(100),
             image: course.image
@@ -30,13 +30,13 @@ module Search
       end
 
       # Search batches
-      if @params[:doctype].blank? || @params[:doctype] == 'Batch'
-        batches = Batch.where('name ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%")
+      if @params[:doctype].blank? || @params[:doctype] == "Batch"
+        batches = Batch.where("name ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%")
                       .limit(5)
         results += batches.map do |batch|
           {
             name: batch.name,
-            type: 'Batch',
+            type: "Batch",
             url: "/batches/#{batch.id}",
             description: batch.description&.truncate(100),
             start_date: batch.start_date
@@ -45,14 +45,14 @@ module Search
       end
 
       # Search users (if applicable)
-      if @params[:doctype].blank? || @params[:doctype] == 'User'
-        users = User.where('first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?',
+      if @params[:doctype].blank? || @params[:doctype] == "User"
+        users = User.where("first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
                           "%#{query}%", "%#{query}%", "%#{query}%")
                    .limit(5)
         results += users.map do |user|
           {
             name: user.full_name,
-            type: 'User',
+            type: "User",
             url: "/users/#{user.id}",
             description: user.email,
             image: user.user_image
@@ -60,7 +60,7 @@ module Search
         end
       end
 
-      { 'data' => results }
+      { "data" => results }
     end
   end
 end

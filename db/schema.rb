@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_26_071232) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -1946,6 +1946,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
   end
 
   create_table "lms_questions", force: :cascade do |t|
+    t.string "name"
     t.text "question", null: false
     t.string "type", default: "Choices", null: false
     t.boolean "multiple", default: false
@@ -2046,7 +2047,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
 
   create_table "lms_quiz_submissions", force: :cascade do |t|
     t.integer "quiz_id", null: false
-    t.integer "student_id", null: false
+    t.integer "member", null: false
     t.integer "enrollment_id"
     t.string "submission_code", null: false
     t.integer "attempt_number", default: 1
@@ -2103,19 +2104,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
     t.index ["graded_at"], name: "index_lms_quiz_submissions_on_graded_at"
     t.index ["graded_by_id"], name: "index_lms_quiz_submissions_on_graded_by_id"
     t.index ["late_submission"], name: "index_lms_quiz_submissions_on_late_submission"
+    t.index ["member", "quiz_id"], name: "index_lms_quiz_submissions_on_member_and_quiz_id"
+    t.index ["member", "status"], name: "index_lms_quiz_submissions_on_member_and_status"
+    t.index ["member"], name: "index_lms_quiz_submissions_on_member"
     t.index ["passed"], name: "index_lms_quiz_submissions_on_passed"
     t.index ["percentage"], name: "index_lms_quiz_submissions_on_percentage"
+    t.index ["quiz_id", "member", "attempt_number"], name: "idx_on_quiz_id_member_attempt_number_44a636447d", unique: true
+    t.index ["quiz_id", "member"], name: "index_lms_quiz_submissions_on_quiz_id_and_member"
     t.index ["quiz_id", "status"], name: "index_lms_quiz_submissions_on_quiz_id_and_status"
-    t.index ["quiz_id", "student_id", "attempt_number"], name: "idx_on_quiz_id_student_id_attempt_number_4670806a17", unique: true
-    t.index ["quiz_id", "student_id"], name: "index_lms_quiz_submissions_on_quiz_id_and_student_id"
     t.index ["quiz_id"], name: "index_lms_quiz_submissions_on_quiz_id"
     t.index ["review_completed"], name: "index_lms_quiz_submissions_on_review_completed"
     t.index ["start_time"], name: "index_lms_quiz_submissions_on_start_time"
     t.index ["status", "start_time"], name: "index_lms_quiz_submissions_on_status_and_start_time"
     t.index ["status"], name: "index_lms_quiz_submissions_on_status"
-    t.index ["student_id", "quiz_id"], name: "index_lms_quiz_submissions_on_student_id_and_quiz_id"
-    t.index ["student_id", "status"], name: "index_lms_quiz_submissions_on_student_id_and_status"
-    t.index ["student_id"], name: "index_lms_quiz_submissions_on_student_id"
     t.index ["submission_code"], name: "index_lms_quiz_submissions_on_submission_code", unique: true
     t.index ["total_marks"], name: "index_lms_quiz_submissions_on_total_marks"
   end
@@ -3088,7 +3089,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_103529) do
   add_foreign_key "lms_quiz_submissions", "lms_quizzes", column: "quiz_id"
   add_foreign_key "lms_quiz_submissions", "users", column: "extension_approved_by_id"
   add_foreign_key "lms_quiz_submissions", "users", column: "graded_by_id"
-  add_foreign_key "lms_quiz_submissions", "users", column: "student_id"
+  add_foreign_key "lms_quiz_submissions", "users", column: "member"
   add_foreign_key "lms_quizzes", "course_chapters", column: "chapter_id"
   add_foreign_key "lms_quizzes", "lms_courses", column: "course_id"
   add_foreign_key "lms_quizzes", "users", column: "created_by_id"

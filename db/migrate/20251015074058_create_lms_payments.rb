@@ -70,11 +70,11 @@ class CreateLmsPayments < ActiveRecord::Migration[7.2]
     add_index :lms_payments, :invoice_number
     add_index :lms_payments, :refund_amount
     # processed_by_id index automatically created by references helper
-    add_index :lms_payments, [:student_id, :status]
-    add_index :lms_payments, [:status, :payment_date]
-    add_index :lms_payments, [:payment_type, :status]
-    add_index :lms_payments, [:gateway, :status]
-    add_index :lms_payments, [:course_id, :student_id]
-    add_index :lms_payments, [:enrollment_id, :student_id]
+    add_index :lms_payments, [ :student_id, :status ]
+    add_index :lms_payments, [ :status, :payment_date ]
+    add_index :lms_payments, [ :payment_type, :status ]
+    add_index :lms_payments, [ :gateway, :status ]
+    add_index :lms_payments, [ :course_id, :student_id ]
+    add_index :lms_payments, [ :enrollment_id, :student_id ]
   end
 end

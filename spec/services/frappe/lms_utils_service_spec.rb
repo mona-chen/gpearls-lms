@@ -21,7 +21,7 @@ RSpec.describe Frappe::LmsUtilsService, type: :service do
 
         tags = Frappe::LmsUtilsService.get_tags(course.id)
 
-        expect(tags).to eq(['ruby', ' rails', ' testing'])
+        expect(tags).to eq([ 'ruby', ' rails', ' testing' ])
       end
 
       it 'handles single tag without comma' do
@@ -29,7 +29,7 @@ RSpec.describe Frappe::LmsUtilsService, type: :service do
 
         tags = Frappe::LmsUtilsService.get_tags(course.id)
 
-        expect(tags).to eq(['programming'])
+        expect(tags).to eq([ 'programming' ])
       end
     end
 
@@ -55,7 +55,7 @@ RSpec.describe Frappe::LmsUtilsService, type: :service do
 
         tags = Frappe::LmsUtilsService.get_tags(course.id)
 
-        expect(tags).to eq([''])
+        expect(tags).to eq([ '' ])
       end
     end
   end
@@ -523,7 +523,7 @@ RSpec.describe Frappe::LmsUtilsService, type: :service do
       it 'filters evaluations by courses' do
         other_cert_request = create(:certificate_request, user: user, course: other_course, status: 'Upcoming')
 
-        upcoming_evals = Frappe::LmsUtilsService.get_upcoming_evals([course.id])
+        upcoming_evals = Frappe::LmsUtilsService.get_upcoming_evals([ course.id ])
 
         course_ids = upcoming_evals.map { |e| e[:course] }
         expect(course_ids).to include(course.id)

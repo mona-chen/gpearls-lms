@@ -35,8 +35,8 @@ class CreateLmsZoomSettings < ActiveRecord::Migration[7.0]
     add_index :lms_zoom_settings, :client_id
     add_index :lms_zoom_settings, :creation
     add_index :lms_zoom_settings, :modified
-    add_index :lms_zoom_settings, [:member, :enabled]
-    add_index :lms_zoom_settings, [:account_name, :member]
+    add_index :lms_zoom_settings, [ :member, :enabled ]
+    add_index :lms_zoom_settings, [ :account_name, :member ]
 
     # Add foreign key constraints
     add_foreign_key :lms_zoom_settings, :users, column: :member

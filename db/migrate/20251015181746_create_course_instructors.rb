@@ -25,7 +25,7 @@ class CreateCourseInstructors < ActiveRecord::Migration[7.0]
     add_index :course_instructors, :parent
     add_index :course_instructors, :parenttype
     add_index :course_instructors, :parentfield
-    add_index :course_instructors, [:parent, :parenttype, :parentfield], name: 'index_course_instructors_on_parent_and_type_and_field'
+    add_index :course_instructors, [ :parent, :parenttype, :parentfield ], name: 'index_course_instructors_on_parent_and_type_and_field'
     add_index :course_instructors, :creation
     add_index :course_instructors, :modified
 

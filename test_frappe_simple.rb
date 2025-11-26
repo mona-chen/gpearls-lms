@@ -31,7 +31,7 @@ if response.code == 200
   puts '✅ frappe.client.get: Status 200 (SUCCESS)'
   data = JSON.parse(response.body)
   user_data = data['message']
-  
+
   if user_data
     puts '📋 User Found: ' + user_data['name'] + ' | ' + user_data['email']
     puts '🔗 User ID: ' + user_data['name']

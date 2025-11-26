@@ -56,10 +56,10 @@ class Api::CompatibilityController < ApplicationController
     when "lms.api.capture_user_persona"
       if Current.user
         # Parse the responses JSON and capture persona
-        responses = JSON.parse(safe_params[:responses] || '{}') rescue {}
+        responses = JSON.parse(safe_params[:responses] || "{}") rescue {}
         Current.user.update!(
-          persona_role: responses['role'],
-          persona_use_case: responses['use_case'],
+          persona_role: responses["role"],
+          persona_use_case: responses["use_case"],
           persona_responses: safe_params[:responses],
           persona_captured_at: Time.current
         )

@@ -16,19 +16,19 @@ class LmsBadge < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   validates :title, presence: true
   validates :description, presence: true
-  validates :badge_type, presence: true, inclusion: { in: ["Course Completion", "Quiz Master", "High Scorer", "Perfect Attendance", "Streak Champion", "Early Bird", "Helper", "Collaborator", "Innovator", "Top Performer", "First Timers", "Milestone", "Achievement", "Special"] }
+  validates :badge_type, presence: true, inclusion: { in: [ "Course Completion", "Quiz Master", "High Scorer", "Perfect Attendance", "Streak Champion", "Early Bird", "Helper", "Collaborator", "Innovator", "Top Performer", "First Timers", "Milestone", "Achievement", "Special" ] }
   validates :category, presence: true, inclusion: { in: %w[Academic Performance Participation Engagement Collaboration Leadership Innovation Special] }
   validates :difficulty_level, presence: true, inclusion: { in: %w[Bronze Silver Gold Platinum Diamond Legendary] }, allow_nil: true
   validates :points, presence: true, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :level, presence: true, inclusion: { in: [1, 2, 3, 4, 5] }, allow_nil: true
+  validates :level, presence: true, inclusion: { in: [ 1, 2, 3, 4, 5 ] }, allow_nil: true
   validates :tier, presence: true, inclusion: { in: %w[Basic Standard Premium Elite Legendary] }, allow_nil: true
   validates :color, presence: true, format: { with: /\A#[0-9a-fA-F]{6}\z/ }, allow_nil: true
   validates :icon, presence: true, allow_nil: true
   validates :status, presence: true, inclusion: { in: %w[Active Inactive Archived Draft] }
   validates :issuance_limit, presence: true, numericality: { greater_than: 0 }, allow_nil: true
   validates :expires_after_days, presence: true, numericality: { greater_than: 0 }, allow_nil: true
-  validates :is_hidden, inclusion: { in: [true, false] }, allow_nil: true
-  validates :is_system_generated, inclusion: { in: [true, false] }, allow_nil: true
+  validates :is_hidden, inclusion: { in: [ true, false ] }, allow_nil: true
+  validates :is_system_generated, inclusion: { in: [ true, false ] }, allow_nil: true
 
   # Scopes
   scope :active, -> { where(status: "Active") }
@@ -412,7 +412,7 @@ class LmsBadge < ApplicationRecord
   def self.get_user_badges(user, options = {})
     badges = user.badge_assignments.includes(:badge)
                   .where(badge: { status: "Active" })
-                  .includes(:badge => [:owner, :course, :batch])
+                  .includes(badge: [ :owner, :course, :batch ])
 
     # Apply filters
     badges = badges.joins(:badge).where("lms_badges.badge_type": options[:badge_type]) if options[:badge_type].present?
@@ -931,7 +931,7 @@ class LmsBadge < ApplicationRecord
     awards.joins(:user, "JOIN enrollments ON users.id = enrollments.user_id")
          .group("enrollments.course_id")
          .count
-         .transform_keys { |k, v| [Course.find(k).name, v] }.to_h
+         .transform_keys { |k, v| [ Course.find(k).name, v ] }.to_h
   end
 
   def get_awards_by_batch(awards)
@@ -940,7 +940,7 @@ class LmsBadge < ApplicationRecord
     awards.joins(:user, "JOIN batch_enrollments ON users.id = batch_enrollments.user_id")
          .group("batch_enrollments.batch_id")
          .count
-         .transform_keys { |k, v| [Batch.find(k).name, v] }.to_h
+         .transform_keys { |k, v| [ Batch.find(k).name, v ] }.to_h
   end
 
   def get_award_progression(awards)

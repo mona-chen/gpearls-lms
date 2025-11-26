@@ -2,7 +2,7 @@ class CohortSubgroup < ApplicationRecord
   belongs_to :cohort
   has_many :cohort_mentors, dependent: :destroy
   has_many :cohort_join_requests, dependent: :destroy
-  has_many :enrollments, class_name: 'Enrollment', foreign_key: 'cohort_subgroup_id', dependent: :destroy
+  has_many :enrollments, class_name: "Enrollment", foreign_key: "cohort_subgroup_id", dependent: :destroy
   has_many :users, through: :enrollments, source: :user
   has_many :mentors, through: :cohort_mentors, source: :user
 
@@ -34,19 +34,19 @@ class CohortSubgroup < ApplicationRecord
   end
 
   def get_students
-    enrollments.where(member_type: 'Student').includes(:user)
+    enrollments.where(member_type: "Student").includes(:user)
   end
 
   def pending_join_requests
-    cohort_join_requests.where(status: 'Pending').includes(:user)
+    cohort_join_requests.where(status: "Pending").includes(:user)
   end
 
   def accepted_join_requests
-    cohort_join_requests.where(status: 'Accepted').includes(:user)
+    cohort_join_requests.where(status: "Accepted").includes(:user)
   end
 
   def rejected_join_requests
-    cohort_join_requests.where(status: 'Rejected').includes(:user)
+    cohort_join_requests.where(status: "Rejected").includes(:user)
   end
 
   def add_mentor(user)
@@ -71,15 +71,15 @@ class CohortSubgroup < ApplicationRecord
     return false unless user && cohort
 
     # Check if there's an approved join request
-    join_request = cohort_join_requests.find_by(user: user, status: 'Accepted')
+    join_request = cohort_join_requests.find_by(user: user, status: "Accepted")
     if join_request
       enrollments.create!(
         user: user,
         course: cohort.course,
         cohort: cohort,
         cohort_subgroup: self,
-        member_type: 'Student',
-        role: 'Member'
+        member_type: "Student",
+        role: "Member"
       )
     else
       false
@@ -87,14 +87,14 @@ class CohortSubgroup < ApplicationRecord
   end
 
   def remove_student(user)
-    enrollments.where(user: user, member_type: 'Student').destroy_all
+    enrollments.where(user: user, member_type: "Student").destroy_all
   end
 
   def create_join_request(user, message: nil)
     return false unless user && cohort
 
     # Check if user is already a member
-    return false if enrollments.exists?(user: user, member_type: 'Student')
+    return false if enrollments.exists?(user: user, member_type: "Student")
 
     # Check if request already exists
     existing_request = cohort_join_requests.find_by(user: user)
@@ -104,7 +104,7 @@ class CohortSubgroup < ApplicationRecord
       user: user,
       cohort: cohort,
       message: message,
-      status: 'Pending'
+      status: "Pending"
     )
   end
 
@@ -112,7 +112,7 @@ class CohortSubgroup < ApplicationRecord
     return false unless request.pending? && can_approve_requests?
 
     ActiveRecord::Base.transaction do
-      request.update!(status: 'Accepted')
+      request.update!(status: "Accepted")
 
       # Create enrollment
       enrollments.create!(
@@ -120,8 +120,8 @@ class CohortSubgroup < ApplicationRecord
         course: cohort.course,
         cohort: cohort,
         cohort_subgroup: self,
-        member_type: 'Student',
-        role: 'Member'
+        member_type: "Student",
+        role: "Member"
       )
     end
 
@@ -132,7 +132,7 @@ class CohortSubgroup < ApplicationRecord
     return false unless request.pending? && can_approve_requests?
 
     request.update!(
-      status: 'Rejected',
+      status: "Rejected",
       rejection_reason: reason
     )
 
@@ -149,7 +149,7 @@ class CohortSubgroup < ApplicationRecord
   end
 
   def member_count
-    enrollments.where(member_type: 'Student').count
+    enrollments.where(member_type: "Student").count
   end
 
   def mentor_count
@@ -181,8 +181,8 @@ class CohortSubgroup < ApplicationRecord
       invite_code: invite_code,
       description: description,
       stats: get_stats,
-      creation: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      modified: updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
@@ -201,7 +201,7 @@ class CohortSubgroup < ApplicationRecord
     return if slug.blank?
 
     unless slug.match?(/\A[a-z0-9-]+\z/)
-      errors.add(:slug, 'can only contain lowercase letters, numbers, and hyphens')
+      errors.add(:slug, "can only contain lowercase letters, numbers, and hyphens")
     end
   end
 

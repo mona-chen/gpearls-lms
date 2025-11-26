@@ -1,5 +1,5 @@
 class Api::DiscussionsController < Api::BaseController
-  skip_before_action :authenticate_user!, only: [ :create, :create_reply ]
+  # Authentication required for all discussion actions
 
   def create
     create_discussion_topic

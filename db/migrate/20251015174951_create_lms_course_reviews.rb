@@ -26,8 +26,8 @@ class CreateLmsCourseReviews < ActiveRecord::Migration[7.0]
     add_index :lms_course_reviews, :rating
     add_index :lms_course_reviews, :creation
     add_index :lms_course_reviews, :modified
-    add_index :lms_course_reviews, [:course, :rating], name: 'index_course_review_on_course_and_rating'
-    add_index :lms_course_reviews, [:course, :creation], name: 'index_course_review_on_course_and_creation'
+    add_index :lms_course_reviews, [ :course, :rating ], name: 'index_course_review_on_course_and_rating'
+    add_index :lms_course_reviews, [ :course, :creation ], name: 'index_course_review_on_course_and_creation'
 
     # Add foreign key constraints
     add_foreign_key :lms_course_reviews, :lms_courses, column: :course

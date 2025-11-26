@@ -31,8 +31,8 @@ module Programs
         .joins(:lms_program)
         .where(user: Current.user)
         .select(
-          'lms_programs.name as name',
-          'lms_program_members.progress as progress'
+          "lms_programs.name as name",
+          "lms_program_members.progress as progress"
         )
 
       # For each program, get additional details: frappe.db.get_value("LMS Program", program.name, ["name", "course_count", "member_count"], as_dict=True)

@@ -58,11 +58,11 @@ module Lms
     def self.create_default_admin_user
       puts "Creating default admin user..."
 
-      admin = User.find_or_create_by!(email: 'admin@lms.local') do |user|
-        user.full_name = 'LMS Administrator'
-        user.username = 'admin'
-        user.password = 'password123' # Should be changed after setup
-        user.password_confirmation = 'password123'
+      admin = User.find_or_create_by!(email: "admin@lms.local") do |user|
+        user.full_name = "LMS Administrator"
+        user.username = "admin"
+        user.password = "password123" # Should be changed after setup
+        user.password_confirmation = "password123"
         user.is_admin = true
         user.email_verified = true
       end
@@ -79,23 +79,23 @@ module Lms
       puts "Creating default LMS settings..."
 
       settings = {
-        'site_name' => 'Learning Management System',
-        'site_description' => 'A comprehensive learning management system',
-        'default_currency' => 'USD',
-        'default_timezone' => 'UTC',
-        'enable_registration' => true,
-        'enable_public_courses' => true,
-        'max_upload_size' => 10.megabytes,
-        'enable_certifications' => true,
-        'enable_discussions' => true,
-        'enable_ratings' => true,
-        'enable_progress_tracking' => true,
-        'enable_email_notifications' => true,
-        'enable_scorm_support' => true,
-        'enable_live_classes' => false, # Requires Zoom setup
-        'enable_payments' => false, # Requires payment gateway setup
-        'persona_captured' => false,
-        'is_onboarding_complete' => false
+        "site_name" => "Learning Management System",
+        "site_description" => "A comprehensive learning management system",
+        "default_currency" => "USD",
+        "default_timezone" => "UTC",
+        "enable_registration" => true,
+        "enable_public_courses" => true,
+        "max_upload_size" => 10.megabytes,
+        "enable_certifications" => true,
+        "enable_discussions" => true,
+        "enable_ratings" => true,
+        "enable_progress_tracking" => true,
+        "enable_email_notifications" => true,
+        "enable_scorm_support" => true,
+        "enable_live_classes" => false, # Requires Zoom setup
+        "enable_payments" => false, # Requires payment gateway setup
+        "persona_captured" => false,
+        "is_onboarding_complete" => false
       }
 
       settings.each do |key, value|
@@ -112,16 +112,16 @@ module Lms
       puts "Creating batch sources..."
 
       sources = [
-        'Newsletter',
-        'LinkedIn',
-        'Twitter',
-        'Website',
-        'Friend/Colleague',
-        'Google Search',
-        'Social Media',
-        'Email Campaign',
-        'Event/Conference',
-        'Direct Referral'
+        "Newsletter",
+        "LinkedIn",
+        "Twitter",
+        "Website",
+        "Friend/Colleague",
+        "Google Search",
+        "Social Media",
+        "Email Campaign",
+        "Event/Conference",
+        "Direct Referral"
       ]
 
       sources.each do |source_name|
@@ -135,8 +135,8 @@ module Lms
       puts "Setting default certificate template..."
 
       # Create a default certificate template
-      template = CertificateTemplate.find_or_create_by!(name: 'Default Certificate') do |t|
-        t.template_type = 'html'
+      template = CertificateTemplate.find_or_create_by!(name: "Default Certificate") do |t|
+        t.template_type = "html"
         t.content = <<-HTML
 <div style="text-align: center; padding: 50px; border: 2px solid #333;">
   <h1>Certificate of Completion</h1>
@@ -160,23 +160,23 @@ module Lms
 
       templates = [
         {
-          name: 'Welcome Email',
-          subject: 'Welcome to {{site_name}}!',
-          body: 'Welcome {{user.full_name}}! Your account has been created successfully.'
+          name: "Welcome Email",
+          subject: "Welcome to {{site_name}}!",
+          body: "Welcome {{user.full_name}}! Your account has been created successfully."
         },
         {
-          name: 'Course Enrollment Confirmation',
-          subject: 'Enrolled in {{course.title}}',
-          body: 'You have been enrolled in {{course.title}}. Start learning now!'
+          name: "Course Enrollment Confirmation",
+          subject: "Enrolled in {{course.title}}",
+          body: "You have been enrolled in {{course.title}}. Start learning now!"
         },
         {
-          name: 'Certificate Issued',
-          subject: 'Certificate Issued for {{course.title}}',
-          body: 'Congratulations! Your certificate for {{course.title}} is now available.'
+          name: "Certificate Issued",
+          subject: "Certificate Issued for {{course.title}}",
+          body: "Congratulations! Your certificate for {{course.title}} is now available."
         },
         {
-          name: 'Assignment Graded',
-          subject: 'Assignment Graded: {{assignment.title}}',
+          name: "Assignment Graded",
+          subject: "Assignment Graded: {{assignment.title}}",
           body: 'Your assignment "{{assignment.title}}" has been graded. Score: {{score}}'
         }
       ]
@@ -185,7 +185,7 @@ module Lms
         NotificationTemplate.find_or_create_by!(name: template_data[:name]) do |template|
           template.subject = template_data[:subject]
           template.body = template_data[:body]
-          template.template_type = 'email'
+          template.template_type = "email"
           template.is_active = true
         end
       end
@@ -197,14 +197,14 @@ module Lms
       puts "Creating default course categories..."
 
       categories = [
-        { name: 'Technology', description: 'Programming, development, and tech courses' },
-        { name: 'Business', description: 'Business, management, and entrepreneurship' },
-        { name: 'Design', description: 'Graphic design, UX/UI, and creative courses' },
-        { name: 'Marketing', description: 'Digital marketing and advertising courses' },
-        { name: 'Data Science', description: 'Data analysis, machine learning courses' },
-        { name: 'Languages', description: 'Language learning courses' },
-        { name: 'Health & Fitness', description: 'Health, wellness, and fitness courses' },
-        { name: 'Personal Development', description: 'Self-improvement and personal growth' }
+        { name: "Technology", description: "Programming, development, and tech courses" },
+        { name: "Business", description: "Business, management, and entrepreneurship" },
+        { name: "Design", description: "Graphic design, UX/UI, and creative courses" },
+        { name: "Marketing", description: "Digital marketing and advertising courses" },
+        { name: "Data Science", description: "Data analysis, machine learning courses" },
+        { name: "Languages", description: "Language learning courses" },
+        { name: "Health & Fitness", description: "Health, wellness, and fitness courses" },
+        { name: "Personal Development", description: "Self-improvement and personal growth" }
       ]
 
       categories.each do |category_data|
@@ -229,25 +229,25 @@ module Lms
       puts "Creating default data..."
 
       # Create a sample course for demonstration
-      instructor = User.find_by(email: 'admin@lms.local')
+      instructor = User.find_by(email: "admin@lms.local")
       if instructor
-        course = Course.find_or_create_by!(title: 'Welcome to LMS') do |c|
-          c.short_introduction = 'Your first course on the Learning Management System'
-          c.description = 'This is a sample course to help you get started with the LMS platform.'
+        course = Course.find_or_create_by!(title: "Welcome to LMS") do |c|
+          c.short_introduction = "Your first course on the Learning Management System"
+          c.description = "This is a sample course to help you get started with the LMS platform."
           c.instructor = instructor
           c.published = true
           c.price = 0
         end
 
         # Create a sample chapter and lesson
-        chapter = CourseChapter.find_or_create_by!(title: 'Getting Started', course: course)
+        chapter = CourseChapter.find_or_create_by!(title: "Getting Started", course: course)
         lesson = CourseLesson.find_or_create_by!(
-          title: 'Welcome Lesson',
+          title: "Welcome Lesson",
           course_chapter: chapter,
           course: course
         ) do |l|
-          l.content = 'Welcome to your first lesson! This LMS platform provides comprehensive tools for online learning.'
-          l.content_type = 'text'
+          l.content = "Welcome to your first lesson! This LMS platform provides comprehensive tools for online learning."
+          l.content_type = "text"
         end
 
         puts "✅ Created sample course with #{course.course_chapters.count} chapters and #{course.course_lessons.count} lessons"

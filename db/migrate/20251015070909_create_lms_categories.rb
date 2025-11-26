@@ -23,7 +23,7 @@ class CreateLmsCategories < ActiveRecord::Migration[7.2]
     # Add indexes for performance and hierarchy queries
     add_index :lms_categories, :name, unique: true
     add_index :lms_categories, :parent_category
-    add_index :lms_categories, [:lft, :rght]
+    add_index :lms_categories, [ :lft, :rght ]
     add_index :lms_categories, :depth
     add_index :lms_categories, :published
     add_index :lms_categories, :course_count

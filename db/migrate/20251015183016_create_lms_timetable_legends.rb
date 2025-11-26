@@ -29,10 +29,10 @@ class CreateLmsTimetableLegends < ActiveRecord::Migration[7.0]
     add_index :lms_timetable_legends, :parent
     add_index :lms_timetable_legends, :parenttype
     add_index :lms_timetable_legends, :parentfield
-    add_index :lms_timetable_legends, [:parent, :parenttype, :parentfield], name: 'index_timetable_legends_on_parent_and_type_and_field'
+    add_index :lms_timetable_legends, [ :parent, :parenttype, :parentfield ], name: 'index_timetable_legends_on_parent_and_type_and_field'
     add_index :lms_timetable_legends, :creation
     add_index :lms_timetable_legends, :modified
-    add_index :lms_timetable_legends, [:reference_doctype, :label]
-    add_index :lms_timetable_legends, [:reference_doctype, :color]
+    add_index :lms_timetable_legends, [ :reference_doctype, :label ]
+    add_index :lms_timetable_legends, [ :reference_doctype, :color ]
   end
 end

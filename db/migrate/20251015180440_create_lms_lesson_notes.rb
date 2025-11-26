@@ -31,8 +31,8 @@ class CreateLmsLessonNotes < ActiveRecord::Migration[7.0]
     add_index :lms_lesson_notes, :color
     add_index :lms_lesson_notes, :creation
     add_index :lms_lesson_notes, :modified
-    add_index :lms_lesson_notes, [:member, :lesson], unique: true, name: 'index_lesson_note_on_member_and_lesson'
-    add_index :lms_lesson_notes, [:course, :member], name: 'index_lesson_note_on_course_and_member'
+    add_index :lms_lesson_notes, [ :member, :lesson ], unique: true, name: 'index_lesson_note_on_member_and_lesson'
+    add_index :lms_lesson_notes, [ :course, :member ], name: 'index_lesson_note_on_course_and_member'
 
     # Add foreign key constraints
     # TODO: Add foreign keys when tables exist:

@@ -1,0 +1,26 @@
+CREATE TABLE lms_questions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR,
+  question TEXT NOT NULL,
+  type VARCHAR DEFAULT 'Choices' NOT NULL,
+  multiple BOOLEAN DEFAULT 0,
+  option_1 VARCHAR,
+  is_correct_1 BOOLEAN DEFAULT 0,
+  explanation_1 VARCHAR,
+  option_2 VARCHAR,
+  is_correct_2 BOOLEAN DEFAULT 0,
+  explanation_2 VARCHAR,
+  option_3 VARCHAR,
+  is_correct_3 BOOLEAN DEFAULT 0,
+  explanation_3 VARCHAR,
+  option_4 VARCHAR,
+  is_correct_4 BOOLEAN DEFAULT 0,
+  explanation_4 VARCHAR,
+  possibility_1 VARCHAR,
+  possibility_2 VARCHAR,
+  possibility_3 VARCHAR,
+  possibility_4 VARCHAR,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL
+);
+CREATE INDEX index_lms_questions_on_type ON lms_questions (type);

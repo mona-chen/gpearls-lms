@@ -8,7 +8,7 @@ module FrappeApiHelper
   # @return [Hash] Response in Frappe format
   def format_response(data, status: nil)
     # Frappe expects responses to be wrapped in a message field
-    response = { 'message' => data }
+    response = { "message" => data }
     response.merge!(status: status) if status
     response
   end
@@ -30,11 +30,11 @@ module FrappeApiHelper
     format_response({ error: message }, status: status)
   end
 
-  def not_found_response(resource = 'Resource')
+  def not_found_response(resource = "Resource")
     format_response({ error: "#{resource} not found" }, status: :not_found)
   end
 
-  def unauthorized_response(message = 'Unauthorized')
+  def unauthorized_response(message = "Unauthorized")
     format_response({ error: message }, status: :unauthorized)
   end
 

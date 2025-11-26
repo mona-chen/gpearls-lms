@@ -9,15 +9,15 @@ module ApplicationCable
     private
 
     def find_verified_user
-      token = request.params[:token] || request.headers['Authorization']&.split(' ')&.last
+      token = request.params[:token] || request.headers["Authorization"]&.split(" ")&.last
       return reject_unauthorized_connection unless token
 
       begin
-        decoded = JWT.decode(token, ENV.fetch('DEVISE_JWT_SECRET_KEY', Rails.application.secret_key_base), true, { algorithm: 'HS256' })
+        decoded = JWT.decode(token, ENV.fetch("DEVISE_JWT_SECRET_KEY", Rails.application.secret_key_base), true, { algorithm: "HS256" })
         payload = decoded[0]
-        user = User.find_by(id: payload['sub'], jti: payload['jti'])
+        user = User.find_by(id: payload["sub"], jti: payload["jti"])
 
-        if user && payload['exp'] > Time.now.to_i
+        if user && payload["exp"] > Time.now.to_i
           user
         else
           reject_unauthorized_connection

@@ -78,9 +78,9 @@ class CreateUsers < ActiveRecord::Migration[7.2]
     add_index :users, :is_mentor
     add_index :users, :is_instructor
     add_index :users, :is_admin
-    add_index :users, [:role, :status]
-    add_index :users, [:status, :last_login_at]
-    add_index :users, [:is_instructor, :rating]
-    add_index :users, [:country, :city]
+    add_index :users, [ :role, :status ]
+    add_index :users, [ :status, :last_login_at ]
+    add_index :users, [ :is_instructor, :rating ]
+    add_index :users, [ :country, :city ]
   end
 end

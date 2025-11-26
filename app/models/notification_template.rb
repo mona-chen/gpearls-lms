@@ -99,7 +99,7 @@ class NotificationTemplate < ApplicationRecord
     # Add course creator
     recipients << course.instructor.email if course.instructor
     # Add administrators/moderators
-    User.where(role: ["System Manager", "Moderator"]).pluck(:email).each do |email|
+    User.where(role: [ "System Manager", "Moderator" ]).pluck(:email).each do |email|
       recipients << email
     end
     recipients.uniq
@@ -117,7 +117,7 @@ class NotificationTemplate < ApplicationRecord
   end
 
   def determine_user_recipients(user)
-    [user.email]
+    [ user.email ]
   end
 
   def should_send_to_recipient?(recipient)

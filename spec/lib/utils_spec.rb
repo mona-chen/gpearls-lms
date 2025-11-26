@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'LMS Utils', type: :lib do
   describe 'slugify function' do
     # Test cases matching Frappe test_utils.py
-    
+
     describe 'simple slugification' do
       it 'keeps simple slugs unchanged' do
         expect(slugify('hello-world')).to eq('hello-world')
@@ -40,22 +40,22 @@ RSpec.describe 'LMS Utils', type: :lib do
 
     describe 'duplicate handling' do
       it 'adds suffix for first duplicate' do
-        existing = ['hello-world']
+        existing = [ 'hello-world' ]
         expect(slugify('Hello World', existing)).to eq('hello-world-2')
       end
 
       it 'increments suffix for multiple duplicates' do
-        existing = ['hello-world', 'hello-world-2']
+        existing = [ 'hello-world', 'hello-world-2' ]
         expect(slugify('Hello World', existing)).to eq('hello-world-3')
       end
 
       it 'handles gaps in numbering' do
-        existing = ['hello-world', 'hello-world-3', 'hello-world-5']
+        existing = [ 'hello-world', 'hello-world-3', 'hello-world-5' ]
         expect(slugify('Hello World', existing)).to eq('hello-world-2')
       end
 
       it 'handles complex existing patterns' do
-        existing = ['test', 'test-2', 'test-3', 'test-10']
+        existing = [ 'test', 'test-2', 'test-3', 'test-10' ]
         expect(slugify('Test', existing)).to eq('test-4')
       end
     end
@@ -151,10 +151,10 @@ RSpec.describe 'LMS Utils', type: :lib do
       it 'returns lesson with progress information' do
         create(:enrollment, user: user, course: course)
         details = get_lesson_details(lesson, user)
-        
+
         expect(details[:lesson]).to eq(lesson)
         expect(details[:progress]).to be_present
-        expect(details[:completed]).to be_in([true, false])
+        expect(details[:completed]).to be_in([ true, false ])
       end
 
       it 'handles user without enrollment' do
@@ -182,7 +182,7 @@ RSpec.describe 'LMS Utils', type: :lib do
       it 'calculates correct progress percentage' do
         create(:enrollment, user: user, course: course)
         create(:lesson_progress, user: user, lesson: lesson1, status: 'Complete')
-        
+
         progress = get_progress(user, course)
         expect(progress).to eq(50) # 1 out of 2 lessons
       end
@@ -191,7 +191,7 @@ RSpec.describe 'LMS Utils', type: :lib do
         create(:enrollment, user: user, course: course)
         create(:lesson_progress, user: user, lesson: lesson1, status: 'Complete')
         create(:lesson_progress, user: user, lesson: lesson2, status: 'Complete')
-        
+
         progress = get_progress(user, course)
         expect(progress).to eq(100)
       end
@@ -211,14 +211,14 @@ RSpec.describe 'LMS Utils', type: :lib do
         create(:course_review, course: course, rating: 4)
         create(:course_review, course: course, rating: 5)
         create(:course_review, course: course, rating: 3)
-        
+
         rating = get_average_rating(course)
         expect(rating).to eq(4.0)
       end
 
       it 'handles single review' do
         create(:course_review, course: course, rating: 5)
-        
+
         rating = get_average_rating(course)
         expect(rating).to eq(5.0)
       end
@@ -250,7 +250,7 @@ RSpec.describe 'LMS Utils', type: :lib do
       it 'sorts reviews by rating descending' do
         reviews = get_sorted_reviews(course, sort_by: 'rating')
         ratings = reviews.pluck(:rating)
-        expect(ratings).to eq([5, 4, 3])
+        expect(ratings).to eq([ 5, 4, 3 ])
       end
 
       it 'sorts reviews by date descending' do
@@ -352,7 +352,7 @@ RSpec.describe 'LMS Utils', type: :lib do
 
   def slugify(text, existing = [])
     return '' if text.blank?
-    
+
     slug = text.to_s.downcase
                   .gsub(/[^\w\s-]/, '') # Remove special characters
                   .gsub(/\s+/, '-')     # Replace spaces with hyphens
@@ -392,7 +392,7 @@ RSpec.describe 'LMS Utils', type: :lib do
   def get_lesson_details(lesson, user)
     enrollment = user.enrollments.find_by(course: lesson.course)
     progress = enrollment&.lesson_progresses&.find_by(lesson: lesson)
-    
+
     {
       lesson: lesson,
       progress: progress&.progress || 0,

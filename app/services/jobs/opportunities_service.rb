@@ -14,14 +14,14 @@ module Jobs
       # Apply filters from request
       if @params[:filters].present?
         filters = @params[:filters].to_unsafe_h
-        opportunities = opportunities.where(status: filters['status']) if filters['status'].present?
-        opportunities = opportunities.where(job_type: filters['job_type']) if filters['job_type'].present?
-        opportunities = opportunities.where(location: filters['location']) if filters['location'].present?
+        opportunities = opportunities.where(status: filters["status"]) if filters["status"].present?
+        opportunities = opportunities.where(job_type: filters["job_type"]) if filters["job_type"].present?
+        opportunities = opportunities.where(location: filters["location"]) if filters["location"].present?
       end
 
       # Apply search
       if @params[:search].present?
-        opportunities = opportunities.where('title ILIKE ? OR description ILIKE ?',
+        opportunities = opportunities.where("title ILIKE ? OR description ILIKE ?",
                                          "%#{@params[:search]}%", "%#{@params[:search]}%")
       end
 
@@ -43,14 +43,14 @@ module Jobs
           requirements: job.requirements,
           salary_min: job.salary_min,
           salary_max: job.salary_max,
-          application_deadline: job.application_deadline&.strftime('%Y-%m-%d'),
-          creation: job.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: job.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+          application_deadline: job.application_deadline&.strftime("%Y-%m-%d"),
+          creation: job.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: job.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
           application_count: job.job_applications.count
         }
       end
 
-      { 'data' => opportunities_data }
+      { "data" => opportunities_data }
     end
   end
 end

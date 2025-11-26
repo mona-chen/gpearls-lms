@@ -13,7 +13,7 @@ FactoryBot.define do
 
     association :batch
     association :course
-    association :instructor, factory: [:user, :instructor]
+    association :instructor, factory: [ :user, :instructor ]
 
     trait :upcoming do
       date { Date.today + rand(1..30).days }
@@ -34,7 +34,7 @@ FactoryBot.define do
     end
 
     trait :for_student do
-      association :instructor, factory: [:user, :student]
+      association :instructor, factory: [ :user, :student ]
     end
 
     trait :with_zoom do

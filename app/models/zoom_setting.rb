@@ -1,7 +1,7 @@
 class ZoomSetting < ApplicationRecord
   # Associations
-  belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :updated_by, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: "User", optional: true
+  belongs_to :updated_by, class_name: "User", optional: true
 
   # Validations
   validates :account_name, presence: true, uniqueness: true
@@ -24,7 +24,7 @@ class ZoomSetting < ApplicationRecord
 
   # Instance methods
   def active?
-    enabled? && sync_status != 'error'
+    enabled? && sync_status != "error"
   end
 
   def credentials
@@ -72,10 +72,10 @@ class ZoomSetting < ApplicationRecord
 
   def sync_status_color
     case sync_status
-    when 'success' then 'green'
-    when 'error' then 'red'
-    when 'pending' then 'yellow'
-    else 'gray'
+    when "success" then "green"
+    when "error" then "red"
+    when "pending" then "yellow"
+    else "gray"
     end
   end
 
@@ -89,8 +89,8 @@ class ZoomSetting < ApplicationRecord
       user_id: user_id,
       user_email: user_email,
       enabled: enabled,
-      creation: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      modified: updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
@@ -114,12 +114,12 @@ class ZoomSetting < ApplicationRecord
 
   def encrypt(value)
     return nil if value.blank?
-    Rails.application.message_verifier('zoom_settings').generate(value)
+    Rails.application.message_verifier("zoom_settings").generate(value)
   end
 
   def decrypt(encrypted_value)
     return nil if encrypted_value.blank?
-    Rails.application.message_verifier('zoom_settings').verify(encrypted_value)
+    Rails.application.message_verifier("zoom_settings").verify(encrypted_value)
   rescue => e
     Rails.logger.error "Failed to decrypt Zoom setting: #{e.message}"
     nil

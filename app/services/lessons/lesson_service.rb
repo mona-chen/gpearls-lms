@@ -4,7 +4,7 @@ module Lessons
   class LessonService
     def self.get_info(lesson_id)
       lesson = ::Lesson.find_by(id: lesson_id)
-      return { error: 'Lesson not found' } unless lesson
+      return { error: "Lesson not found" } unless lesson
 
       # Get additional lesson data
       chapter = lesson.chapter
@@ -13,29 +13,29 @@ module Lessons
       {
         name: lesson.id,
         title: lesson.title,
-        description: lesson.description || '',
+        description: lesson.description || "",
         chapter: chapter&.title,
         chapter_id: chapter&.id,
         course: course&.title,
         course_id: course&.id,
-        content: lesson.content || '',
+        content: lesson.content || "",
         video_url: lesson.video_url,
         duration_minutes: lesson.duration_minutes || 0,
         order: lesson.order || 0,
         is_published: lesson.is_published || false,
-        created_at: lesson.created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-        modified_at: lesson.updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+        created_at: lesson.created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+        modified_at: lesson.updated_at&.strftime("%Y-%m-%d %H:%M:%S")
       }
     rescue => e
       {
-        error: 'Failed to get lesson info',
+        error: "Failed to get lesson info",
         details: e.message
       }
     end
 
     def self.get_creation_details(course_id, chapter_id, lesson_id)
       lesson = ::Lesson.find_by(id: lesson_id)
-      return { error: 'Lesson not found' } unless lesson
+      return { error: "Lesson not found" } unless lesson
 
       chapter = lesson.chapter
       course = lesson.course
@@ -47,10 +47,10 @@ module Lessons
         lesson: {
           name: lesson.id,
           title: lesson.title,
-          description: lesson.description || '',
+          description: lesson.description || "",
           chapter: chapter&.title,
           course: course&.title,
-          content: lesson.content || '',
+          content: lesson.content || "",
           video_url: lesson.video_url,
           duration_minutes: lesson.duration_minutes || 0,
           order: lesson.order || 0,
@@ -76,33 +76,33 @@ module Lessons
       }
     rescue => e
       {
-        error: 'Failed to get lesson creation details',
+        error: "Failed to get lesson creation details",
         details: e.message
       }
     end
 
     def self.create_lesson(params, user)
-      return { error: 'User not authenticated' } unless user
-      return { error: 'Course not found' } unless params[:course_id]
+      return { error: "User not authenticated" } unless user
+      return { error: "Course not found" } unless params[:course_id]
 
       course = ::Course.find_by(id: params[:course_id])
-      return { error: 'Course not found' } unless course
+      return { error: "Course not found" } unless course
 
       # Check if user has permission to create lessons in this course
       unless course.instructor == user || user.moderator?
-        return { error: 'Permission denied' }
+        return { error: "Permission denied" }
       end
 
       # Find or create chapter
       chapter = if params[:chapter_id]
                   ::Chapter.find_by(id: params[:chapter_id])
-                else
+      else
                   ::Chapter.create!(
                     title: params[:chapter_title] || "New Chapter",
                     course: course,
                     order: params[:chapter_order] || 1
                   )
-                end
+      end
 
       lesson = ::Lesson.create!(
         title: params[:title],
@@ -119,23 +119,23 @@ module Lessons
       {
         success: true,
         lesson: get_info(lesson.id),
-        message: 'Lesson created successfully'
+        message: "Lesson created successfully"
       }
     rescue => e
       {
-        error: 'Failed to create lesson',
+        error: "Failed to create lesson",
         details: e.message
       }
     end
 
     def self.update_lesson(lesson_id, params, user)
       lesson = ::Lesson.find_by(id: lesson_id)
-      return { error: 'Lesson not found' } unless lesson
-      return { error: 'User not authenticated' } unless user
+      return { error: "Lesson not found" } unless lesson
+      return { error: "User not authenticated" } unless user
 
       # Check permissions
       unless lesson.course.instructor == user || user.moderator?
-        return { error: 'Permission denied' }
+        return { error: "Permission denied" }
       end
 
       update_attrs = {}
@@ -151,34 +151,34 @@ module Lessons
       {
         success: true,
         lesson: get_info(lesson.id),
-        message: 'Lesson updated successfully'
+        message: "Lesson updated successfully"
       }
     rescue => e
       {
-        error: 'Failed to update lesson',
+        error: "Failed to update lesson",
         details: e.message
       }
     end
 
     def self.delete_lesson(lesson_id, user)
       lesson = ::Lesson.find_by(id: lesson_id)
-      return { error: 'Lesson not found' } unless lesson
-      return { error: 'User not authenticated' } unless user
+      return { error: "Lesson not found" } unless lesson
+      return { error: "User not authenticated" } unless user
 
       # Check permissions
       unless lesson.course.instructor == user || user.moderator?
-        return { error: 'Permission denied' }
+        return { error: "Permission denied" }
       end
 
       lesson.destroy
 
       {
         success: true,
-        message: 'Lesson deleted successfully'
+        message: "Lesson deleted successfully"
       }
     rescue => e
       {
-        error: 'Failed to delete lesson',
+        error: "Failed to delete lesson",
         details: e.message
       }
     end

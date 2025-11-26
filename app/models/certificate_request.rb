@@ -1,21 +1,21 @@
 class CertificateRequest < ApplicationRecord
   belongs_to :user
   belongs_to :course
-  belongs_to :evaluator, class_name: 'User', optional: true
+  belongs_to :evaluator, class_name: "User", optional: true
 
   validates :user, :course, presence: true
   validates :status, presence: true
   validates :rating, numericality: { in: 0..5 }, allow_nil: true
 
   enum :status, {
-    'Pending' => 0,
-    'Upcoming' => 1,
-    'Completed' => 2,
-    'Cancelled' => 3
+    "Pending" => 0,
+    "Upcoming" => 1,
+    "Completed" => 2,
+    "Cancelled" => 3
   }
 
   # Scopes matching Frappe Python patterns
-  scope :upcoming_evals, -> { where(status: 'Upcoming', date: Date.current..) }
+  scope :upcoming_evals, -> { where(status: "Upcoming", date: Date.current..) }
   scope :for_user, ->(user) { where(user: user) }
   scope :for_course, ->(course) { where(course: course) }
   scope :for_evaluator, ->(evaluator) { where(evaluator: evaluator) }
@@ -23,19 +23,19 @@ class CertificateRequest < ApplicationRecord
 
   # Instance methods
   def upcoming?
-    status == 'Upcoming' && date >= Date.current
+    status == "Upcoming" && date >= Date.current
   end
 
   def pending?
-    status == 'Pending'
+    status == "Pending"
   end
 
   def completed?
-    status == 'Completed'
+    status == "Completed"
   end
 
   def cancelled?
-    status == 'Cancelled'
+    status == "Cancelled"
   end
 
   def google_meet_link
@@ -64,9 +64,9 @@ class CertificateRequest < ApplicationRecord
   def to_frappe_format
     {
       name: id,
-      date: date&.strftime('%Y-%m-%d'),
-      start_time: start_time&.strftime('%H:%M:%S'),
-      end_time: end_time&.strftime('%H:%M:%S'),
+      date: date&.strftime("%Y-%m-%d"),
+      start_time: start_time&.strftime("%H:%M:%S"),
+      end_time: end_time&.strftime("%H:%M:%S"),
       course: course_id,
       evaluator: evaluator_id,
       google_meet_link: google_meet_link,

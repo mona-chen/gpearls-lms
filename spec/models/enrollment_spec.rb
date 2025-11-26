@@ -4,7 +4,7 @@ RSpec.describe Enrollment, type: :model do
   let(:course) { create(:course, title: 'Test Course') }
   let(:user) { create(:user, email: 'test01@test.com', first_name: 'Test') }
   let(:batch) { create(:batch, title: 'Test Batch', instructor: user) }
-  
+
   describe 'validations' do
     it 'is valid with valid attributes' do
       enrollment = build(:enrollment, course: course, user: user)
@@ -52,7 +52,7 @@ RSpec.describe Enrollment, type: :model do
 
   describe 'enrollment with batch (matching Frappe test_lms_enrollment.py)' do
     let(:mentor) { create(:user, email: 'mentor@test.com', first_name: 'Test Mentor') }
-    
+
     before do
       # Add mentor to course (similar to Frappe test setup)
       course.add_mentor(mentor.email) if course.respond_to?(:add_mentor)
@@ -121,7 +121,7 @@ RSpec.describe Enrollment, type: :model do
     it 'returns correct count of completed lessons' do
       create(:lesson_progress, user: user, lesson: lesson1, status: 'Complete')
       expect(enrollment.completed_lessons_count).to eq(1)
-      
+
       create(:lesson_progress, user: user, lesson: lesson2, status: 'Complete')
       expect(enrollment.completed_lessons_count).to eq(2)
     end

@@ -1,5 +1,5 @@
 class PaymentMailer < ApplicationMailer
-  default from: 'payments@lms.test'
+  default from: "payments@lms.test"
 
   def payment_confirmation(payment)
     @payment = payment
@@ -63,7 +63,7 @@ class PaymentMailer < ApplicationMailer
 
     mail(
       to: @user.email,
-      subject: 'Payment Method Added Successfully'
+      subject: "Payment Method Added Successfully"
     )
   end
 
@@ -73,7 +73,7 @@ class PaymentMailer < ApplicationMailer
 
     mail(
       to: @user.email,
-      subject: 'Subscription Renewal Failed'
+      subject: "Subscription Renewal Failed"
     )
   end
 
@@ -83,7 +83,7 @@ class PaymentMailer < ApplicationMailer
 
     mail(
       to: @user.email,
-      subject: 'Subscription Renewed Successfully'
+      subject: "Subscription Renewed Successfully"
     )
   end
 end

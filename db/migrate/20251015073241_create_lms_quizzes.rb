@@ -64,9 +64,9 @@ class CreateLmsQuizzes < ActiveRecord::Migration[7.2]
     add_index :lms_quizzes, :published_at
     # created_by_id index automatically created by references helper
     add_index :lms_quizzes, :sort_order
-    add_index :lms_quizzes, [:course_id, :status]
-    add_index :lms_quizzes, [:status, :start_date]
-    add_index :lms_quizzes, [:chapter_id, :status]
-    add_index :lms_quizzes, [:quiz_type, :status]
+    add_index :lms_quizzes, [ :course_id, :status ]
+    add_index :lms_quizzes, [ :status, :start_date ]
+    add_index :lms_quizzes, [ :chapter_id, :status ]
+    add_index :lms_quizzes, [ :quiz_type, :status ]
   end
 end

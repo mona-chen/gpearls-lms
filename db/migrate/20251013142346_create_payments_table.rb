@@ -16,8 +16,8 @@ class CreatePaymentsTable < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :payments, [:user_id, :status]
-    add_index :payments, [:payable_type, :payable_id], name: 'index_payments_on_payable'
+    add_index :payments, [ :user_id, :status ]
+    add_index :payments, [ :payable_type, :payable_id ], name: 'index_payments_on_payable'
     add_index :payments, :status
     add_index :payments, :payment_date
     add_index :payments, :transaction_id

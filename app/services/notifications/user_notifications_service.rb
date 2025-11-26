@@ -20,14 +20,14 @@ module Notifications
 
     def fetch_system_notifications
       # Fetch real system notifications from database
-      system_notifications = Notification.where(user: @user, notification_type: 'system')
+      system_notifications = Notification.where(user: @user, notification_type: "system")
                                        .order(created_at: :desc)
                                        .limit(5)
 
       if system_notifications.any?
-        system_notifications.map { |notification| format_notification(notification, 'System') }
+        system_notifications.map { |notification| format_notification(notification, "System") }
       else
-        [default_welcome_notification]
+        [ default_welcome_notification ]
       end
     end
 
@@ -43,12 +43,12 @@ module Notifications
 
       # Get real database notifications for courses
       db_notifications = Notification.where(user: @user)
-                                    .where.not(notification_type: 'system')
+                                    .where.not(notification_type: "system")
                                     .order(created_at: :desc)
                                     .limit(5)
 
       db_notifications.each do |notification|
-        context_name = notification.document_name || 'Course'
+        context_name = notification.document_name || "Course"
         notifications << format_notification(notification, context_name)
       end
 
@@ -64,8 +64,8 @@ module Notifications
         subject: "Welcome to LMS!",
         email_content: "Welcome to the Learning Management System. Start exploring courses today!",
         read: false,
-        creation: Date.today.strftime('%Y-%m-%d'),
-        modified: Date.today.strftime('%Y-%m-%d'),
+        creation: Date.today.strftime("%Y-%m-%d"),
+        modified: Date.today.strftime("%Y-%m-%d"),
         comment_type: "Info",
         reference_name: "Welcome Message"
       }
@@ -81,8 +81,8 @@ module Notifications
         subject: "Continue Learning: #{enrollment.course.title}",
         email_content: "You have made progress in #{enrollment.course.title}. Keep going!",
         read: false,
-        creation: (Date.today - rand(1..7).days).strftime('%Y-%m-%d'),
-        modified: (Date.today - rand(1..7).days).strftime('%Y-%m-%d'),
+        creation: (Date.today - rand(1..7).days).strftime("%Y-%m-%d"),
+        modified: (Date.today - rand(1..7).days).strftime("%Y-%m-%d"),
         comment_type: "Info",
         reference_name: enrollment.course.title
       }
@@ -98,8 +98,8 @@ module Notifications
         subject: notification.subject,
         email_content: notification.email_content,
         read: notification.read,
-        creation: notification.created_at.strftime('%Y-%m-%d'),
-        modified: notification.updated_at.strftime('%Y-%m-%d'),
+        creation: notification.created_at.strftime("%Y-%m-%d"),
+        modified: notification.updated_at.strftime("%Y-%m-%d"),
         comment_type: notification.type || "Info",
         reference_name: context_name
       }

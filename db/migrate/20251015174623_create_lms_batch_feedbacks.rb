@@ -34,7 +34,7 @@ class CreateLmsBatchFeedbacks < ActiveRecord::Migration[7.0]
     add_index :lms_batch_feedbacks, :value
     add_index :lms_batch_feedbacks, :creation
     add_index :lms_batch_feedbacks, :modified
-    add_index :lms_batch_feedbacks, [:member, :batch], unique: true, name: 'index_batch_feedback_on_member_and_batch'
+    add_index :lms_batch_feedbacks, [ :member, :batch ], unique: true, name: 'index_batch_feedback_on_member_and_batch'
 
     # Add foreign key constraints
     add_foreign_key :lms_batch_feedbacks, :users, column: :member

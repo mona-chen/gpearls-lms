@@ -8,14 +8,14 @@ class NotificationsChannel < ApplicationCable::Channel
   end
 
   def mark_as_read(data)
-    notification = Notification.find_by(id: data['notification_id'], user: current_user)
+    notification = Notification.find_by(id: data["notification_id"], user: current_user)
     if notification
       notification.update(read: true, read_at: Time.current)
       # Broadcast updated notification status
       ActionCable.server.broadcast(
         "notifications_#{current_user.id}",
-        type: 'notification_read',
-        notification: notification.as_json(include: [:user])
+        type: "notification_read",
+        notification: notification.as_json(include: [ :user ])
       )
     end
   end
@@ -26,7 +26,7 @@ class NotificationsChannel < ApplicationCable::Channel
 
     ActionCable.server.broadcast(
       "notifications_#{current_user.id}",
-      type: 'all_notifications_read',
+      type: "all_notifications_read",
       user_id: current_user.id
     )
   end

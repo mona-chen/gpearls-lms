@@ -23,8 +23,8 @@ class CreateUserPaymentMethods < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :user_payment_methods, [:user_id, :status]
-    add_index :user_payment_methods, [:user_id, :method_type]
+    add_index :user_payment_methods, [ :user_id, :status ]
+    add_index :user_payment_methods, [ :user_id, :method_type ]
     add_index :user_payment_methods, :payment_gateway_id unless index_exists?(:user_payment_methods, :payment_gateway_id)
     add_index :user_payment_methods, :customer_code
     add_index :user_payment_methods, :authorization_code

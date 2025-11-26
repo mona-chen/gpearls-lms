@@ -3,13 +3,13 @@ module Currency
     # Default conversion rates - in production, these would come from a currency API
     # All rates are relative to USD (base currency)
     CONVERSION_RATES = {
-      'USD' => 1.0,
-      'NGN' => 0.00065,  # 1 NGN = 0.00065 USD (approximate)
-      'GHS' => 0.083,    # 1 GHS = 0.083 USD (approximate)
-      'KES' => 0.0077,   # 1 KES = 0.0077 USD (approximate)
-      'ZAR' => 0.053,    # 1 ZAR = 0.053 USD (approximate)
-      'EUR' => 1.08,     # 1 EUR = 1.08 USD (approximate)
-      'GBP' => 1.27      # 1 GBP = 1.27 USD (approximate)
+      "USD" => 1.0,
+      "NGN" => 0.00065,  # 1 NGN = 0.00065 USD (approximate)
+      "GHS" => 0.083,    # 1 GHS = 0.083 USD (approximate)
+      "KES" => 0.0077,   # 1 KES = 0.0077 USD (approximate)
+      "ZAR" => 0.053,    # 1 ZAR = 0.053 USD (approximate)
+      "EUR" => 1.08,     # 1 EUR = 1.08 USD (approximate)
+      "GBP" => 1.27      # 1 GBP = 1.27 USD (approximate)
     }.freeze
 
     SUPPORTED_CURRENCIES = %w[USD NGN GHS KES ZAR EUR GBP].freeze

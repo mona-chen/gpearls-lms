@@ -50,13 +50,13 @@ module System
         filename = Time.current.to_i.to_s + "_" + (0...8).map { ("a".."z").to_a[rand(26)] }.join + file_extension
 
         # Create upload directory if it doesn't exist
-        upload_dir = Rails.root.join('public', 'uploads', 'files')
+        upload_dir = Rails.root.join("public", "uploads", "files")
         FileUtils.mkdir_p(upload_dir)
 
         file_path = File.join(upload_dir, filename)
 
         # Write file to disk
-        File.open(file_path, 'wb') do |f|
+        File.open(file_path, "wb") do |f|
           f.write(file.read)
         end
 
@@ -96,39 +96,39 @@ module System
       # Check file type
       allowed_types = [
         # Documents
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain',
-        'text/csv',
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
+        "text/csv",
 
         # Images
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/webp',
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
 
         # Archives
-        'application/zip',
-        'application/x-zip-compressed',
+        "application/zip",
+        "application/x-zip-compressed",
 
         # Code files
-        'text/x-python',
-        'text/x-java',
-        'text/javascript',
-        'text/html',
-        'text/css',
-        'application/json'
+        "text/x-python",
+        "text/x-java",
+        "text/javascript",
+        "text/html",
+        "text/css",
+        "application/json"
       ]
 
       # Also check file extension for additional security
       allowed_extensions = [
-        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv',
-        '.jpg', '.jpeg', '.png', '.gif', '.webp',
-        '.zip',
-        '.py', '.java', '.js', '.html', '.css', '.json'
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".csv",
+        ".jpg", ".jpeg", ".png", ".gif", ".webp",
+        ".zip",
+        ".py", ".java", ".js", ".html", ".css", ".json"
       ]
 
       file_extension = File.extname(filename).downcase
@@ -138,12 +138,11 @@ module System
       end
 
       # Check for malicious file names
-      if filename.include?('..') || filename.include?('/') || filename.include?('\\')
+      if filename.include?("..") || filename.include?("/") || filename.include?("\\")
         return { valid: false, error: "Invalid file name" }
       end
 
       { valid: true }
-    end
     end
 
     def self.create_file_record(uploaded_file, current_user)

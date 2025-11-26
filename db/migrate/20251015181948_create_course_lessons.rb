@@ -40,8 +40,8 @@ class CreateCourseLessons < ActiveRecord::Migration[7.0]
     add_index :course_lessons, :is_scorm_package
     add_index :course_lessons, :creation
     add_index :course_lessons, :modified
-    add_index :course_lessons, [:chapter, :title], name: 'index_course_lessons_on_chapter_and_title'
-    add_index :course_lessons, [:course, :title], name: 'index_course_lessons_on_course_and_title'
+    add_index :course_lessons, [ :chapter, :title ], name: 'index_course_lessons_on_chapter_and_title'
+    add_index :course_lessons, [ :course, :title ], name: 'index_course_lessons_on_course_and_title'
 
     # Add foreign key constraints
     add_foreign_key :course_lessons, :course_chapters, column: :chapter

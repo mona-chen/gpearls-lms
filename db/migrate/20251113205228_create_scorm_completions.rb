@@ -19,13 +19,13 @@ class CreateScormCompletions < ActiveRecord::Migration[7.0]
       t.datetime :started_at
       t.datetime :last_accessed_at
       t.datetime :completed_at
-      
+
       t.timestamps
     end
-    
-    add_index :scorm_completions, [:user_id, :scorm_package_id], unique: true, name: 'unique_user_scorm_completion'
-    add_index :scorm_completions, [:course_lesson_id], name: 'index_scorm_completions_on_lesson'
-    add_index :scorm_completions, [:completion_status], name: 'index_scorm_completions_on_status'
-    add_index :scorm_completions, [:last_accessed_at], name: 'index_scorm_completions_on_access_time'
+
+    add_index :scorm_completions, [ :user_id, :scorm_package_id ], unique: true, name: 'unique_user_scorm_completion'
+    add_index :scorm_completions, [ :course_lesson_id ], name: 'index_scorm_completions_on_lesson'
+    add_index :scorm_completions, [ :completion_status ], name: 'index_scorm_completions_on_status'
+    add_index :scorm_completions, [ :last_accessed_at ], name: 'index_scorm_completions_on_access_time'
   end
 end

@@ -14,7 +14,7 @@ FactoryBot.define do
     category { Faker::Educator.subject }
 
     association :course
-    association :instructor, factory: [:user, :instructor]
+    association :instructor, factory: [ :user, :instructor ]
 
     trait :active do
       start_date { 1.week.ago }

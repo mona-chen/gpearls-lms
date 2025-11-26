@@ -1,10 +1,14 @@
 class User < ApplicationRecord
-  # Include Devise modules for JWT support
-  devise :database_authenticatable, :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+  # Use bcrypt for password encryption (compatible with password_digest column)
+  has_secure_password
 
-  # Devise-like methods for compatibility
+  # JWT support
+  include Devise::JWT::RevocationStrategies::Denylist
+  devise :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+
+  # Password validation for compatibility
   def valid_password?(password)
-    authenticate(password).present?
+    authenticate(password)
   end
 
   def reset_password_token

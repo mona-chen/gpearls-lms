@@ -39,9 +39,9 @@ class CreateLmsBatchOlds < ActiveRecord::Migration[7.0]
     add_index :lms_batch_olds, :membership
     add_index :lms_batch_olds, :creation
     add_index :lms_batch_olds, :modified
-    add_index :lms_batch_olds, [:course, :status]
-    add_index :lms_batch_olds, [:course, :start_date]
-    add_index :lms_batch_olds, [:start_date, :start_time]
+    add_index :lms_batch_olds, [ :course, :status ]
+    add_index :lms_batch_olds, [ :course, :start_date ]
+    add_index :lms_batch_olds, [ :start_date, :start_time ]
 
     # Add foreign key constraints
     add_foreign_key :lms_batch_olds, :lms_courses, column: :course

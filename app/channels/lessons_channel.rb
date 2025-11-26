@@ -16,15 +16,15 @@ class LessonsChannel < ApplicationCable::Channel
       )
 
       progress.update(
-        progress: data['progress'],
-        completed: data['completed'] || false,
+        progress: data["progress"],
+        completed: data["completed"] || false,
         last_accessed_at: Time.current
       )
 
       # Broadcast progress update to other users in the lesson
       ActionCable.server.broadcast(
         "lesson_#{params[:lesson_id]}",
-        type: 'lesson_progress_updated',
+        type: "lesson_progress_updated",
         user_id: current_user.id,
         progress: progress.progress,
         completed: progress.completed,

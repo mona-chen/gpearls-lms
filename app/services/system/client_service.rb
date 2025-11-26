@@ -2,11 +2,11 @@ module System
   class ClientService
     def self.get(doctype: nil, filters: {}, name: nil)
       case doctype
-      when 'User'
+      when "User"
         get_user(name, filters)
-      when 'LMS Course'
+      when "LMS Course"
         get_course(name)
-      when 'LMS Batch'
+      when "LMS Batch"
         get_batch(name)
       else
         Rails.logger.warn "Unsupported doctype for frappe.client.get: #{doctype}"
@@ -16,11 +16,11 @@ module System
 
     def self.get_list(doctype:, filters: {})
       case doctype
-      when 'Course'
+      when "Course"
         get_course_list(filters)
-      when 'User'
+      when "User"
         get_user_list(filters)
-      when 'Batch'
+      when "Batch"
         get_batch_list(filters)
       else
         []
@@ -29,7 +29,7 @@ module System
 
     def self.get_single_value(doctype:, field:, filters: {})
       case doctype
-      when 'LMS Settings'
+      when "LMS Settings"
         get_lms_setting_value(field)
       else
         nil
@@ -38,15 +38,15 @@ module System
 
     def self.get_count(doctype:)
       case doctype
-      when 'User'
+      when "User"
         User.count
-      when 'LMS Course'
+      when "LMS Course"
         Course.count
-      when 'LMS Batch'
+      when "LMS Batch"
         Batch.count
-      when 'LMS Certificate'
+      when "LMS Certificate"
         Certificate.count
-      when 'Job Opportunity'
+      when "Job Opportunity"
         JobOpportunity.count
       else
         Rails.logger.warn "Unsupported doctype for frappe.client.get_count: #{doctype}"
@@ -56,7 +56,7 @@ module System
 
     def self.logout
       # This should be handled by the controller directly for session/cookie clearing
-      { 'message' => 'Logged out successfully', 'status' => 'success' }
+      { "message" => "Logged out successfully", "status" => "success" }
     end
 
     private
@@ -71,10 +71,10 @@ module System
         else
           user = User.find_by(email: name) || User.find_by(first_name: name) || User.find_by(last_name: name)
         end
-      elsif filters['username']
-        user = User.find_by(email: filters['username']) || User.find_by(username: filters['username'])
-      elsif filters['email']
-        user = User.find_by(email: filters['email'])
+      elsif filters["username"]
+        user = User.find_by(email: filters["username"]) || User.find_by(username: filters["username"])
+      elsif filters["email"]
+        user = User.find_by(email: filters["email"])
       end
 
       if user
@@ -84,12 +84,12 @@ module System
           first_name: user.first_name,
           last_name: user.last_name,
           full_name: user.full_name,
-          username: user.email&.split('@')&.first,
+          username: user.email&.split("@")&.first,
           user_image: user.user_image,
           enabled: user.enabled,
           user_type: user.user_type,
-          creation: user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: user.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+          creation: user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: user.updated_at.strftime("%Y-%m-%d %H:%M:%S")
         }
       else
         nil
@@ -106,9 +106,9 @@ module System
           short_introduction: course.short_introduction,
           category: course.category,
           tags: course.tags,
-          status: course.published ? 'Published' : 'Draft',
-          creation: course.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: course.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+          status: course.published ? "Published" : "Draft",
+          creation: course.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: course.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
           owner: course.instructor&.email
         }
       else
@@ -123,11 +123,11 @@ module System
           name: batch.id,
           batch_name: batch.name,
           description: batch.description,
-          start_date: batch.start_date&.strftime('%Y-%m-%d'),
-          end_date: batch.end_date&.strftime('%Y-%m-%d'),
-          status: batch.published ? 'Published' : 'Draft',
-          creation: batch.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-          modified: batch.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+          start_date: batch.start_date&.strftime("%Y-%m-%d"),
+          end_date: batch.end_date&.strftime("%Y-%m-%d"),
+          status: batch.published ? "Published" : "Draft",
+          creation: batch.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+          modified: batch.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
           owner: batch.instructor&.email
         }
       else
@@ -138,18 +138,18 @@ module System
     def self.get_lms_setting_value(field)
       # Mock settings values for common LMS settings
       case field
-      when 'allow_guest_access'
+      when "allow_guest_access"
         true
-      when 'prevent_skipping_videos'
+      when "prevent_skipping_videos"
         false
-      when 'contact_us_email'
-        'info@lms.com'
-      when 'contact_us_url'
-        '/contact'
-      when 'livecode_url'
-        'https://livecode.lms.com'
-      when 'default_language'
-        'en'
+      when "contact_us_email"
+        "info@lms.com"
+      when "contact_us_url"
+        "/contact"
+      when "livecode_url"
+        "https://livecode.lms.com"
+      when "default_language"
+        "en"
       else
         nil
       end
@@ -158,7 +158,7 @@ module System
     def self.get_course_list(filters)
       courses = Course.all
 
-      if filters['published']
+      if filters["published"]
         courses = courses.where(published: true)
       end
 
@@ -168,7 +168,7 @@ module System
           title: course.title,
           category: course.category,
           published: course.published,
-          creation: course.created_at.strftime('%Y-%m-%d %H:%M:%S')
+          creation: course.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }
       end
     end
@@ -176,8 +176,8 @@ module System
     def self.get_user_list(filters)
       users = User.all
 
-      if filters['enabled']
-        users = users.where(enabled: filters['enabled'])
+      if filters["enabled"]
+        users = users.where(enabled: filters["enabled"])
       end
 
       users.limit(20).map do |user|
@@ -194,7 +194,7 @@ module System
     def self.get_batch_list(filters)
       batches = Batch.all
 
-      if filters['published']
+      if filters["published"]
         batches = batches.where(published: true)
       end
 
@@ -202,7 +202,7 @@ module System
         {
           name: batch.id,
           title: batch.title,
-          start_date: batch.start_date&.strftime('%Y-%m-%d'),
+          start_date: batch.start_date&.strftime("%Y-%m-%d"),
           published: batch.published
         }
       end

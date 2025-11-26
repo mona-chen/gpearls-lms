@@ -19,7 +19,7 @@ namespace :lms do
   end
 
   desc "Setup LMS - runs both install and sync"
-  task setup: [:install, :sync] do
+  task setup: [ :install, :sync ] do
     puts "🎉 LMS Setup Completed!"
     puts ""
     puts "Next steps:"
@@ -41,7 +41,7 @@ namespace :lms do
       "Admin User" => User.where(is_admin: true).exists?,
       "LMS Roles" => Role.count > 0,
       "LMS Settings" => LmsSetting.count > 0,
-      "Setup Completed" => LmsSetting.get_value('setup_completed', false),
+      "Setup Completed" => LmsSetting.get_value("setup_completed", false),
       "Sample Course" => Course.exists?,
       "Email Templates" => NotificationTemplate.count > 0
     }
@@ -61,7 +61,7 @@ namespace :lms do
 
   desc "Reset LMS installation (WARNING: This will delete all data)"
   task reset: :environment do
-    if ENV['CONFIRM_RESET'] != 'yes'
+    if ENV["CONFIRM_RESET"] != "yes"
       puts "❌ DANGER: This will delete ALL LMS data!"
       puts "To proceed, run: CONFIRM_RESET=yes rails lms:reset"
       exit 1

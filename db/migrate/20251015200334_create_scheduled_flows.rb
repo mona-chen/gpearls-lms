@@ -33,11 +33,11 @@ class CreateScheduledFlows < ActiveRecord::Migration[7.2]
     add_index :scheduled_flows, :parent
     add_index :scheduled_flows, :parenttype
     add_index :scheduled_flows, :parentfield
-    add_index :scheduled_flows, [:parent, :parenttype, :parentfield], name: 'index_scheduled_flows_on_parent_and_type_and_field'
+    add_index :scheduled_flows, [ :parent, :parenttype, :parentfield ], name: 'index_scheduled_flows_on_parent_and_type_and_field'
     add_index :scheduled_flows, :creation
     add_index :scheduled_flows, :modified
-    add_index :scheduled_flows, [:date, :start_time], name: 'index_scheduled_flows_on_date_and_start_time'
-    add_index :scheduled_flows, [:date, :end_time], name: 'index_scheduled_flows_on_date_and_end_time'
+    add_index :scheduled_flows, [ :date, :start_time ], name: 'index_scheduled_flows_on_date_and_start_time'
+    add_index :scheduled_flows, [ :date, :end_time ], name: 'index_scheduled_flows_on_date_and_end_time'
 
     # TODO: Add foreign key when course_lessons table exists
     # add_foreign_key :scheduled_flows, :course_lessons, column: :lesson

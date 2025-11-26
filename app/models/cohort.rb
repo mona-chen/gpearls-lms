@@ -1,13 +1,13 @@
 class Cohort < ApplicationRecord
   belongs_to :course
-  belongs_to :instructor, class_name: 'User'
+  belongs_to :instructor, class_name: "User"
   has_many :cohort_subgroups, dependent: :destroy
   has_many :cohort_mentors, dependent: :destroy
   has_many :cohort_staffs, dependent: :destroy
   has_many :cohort_join_requests, dependent: :destroy
   has_many :cohort_web_pages, dependent: :destroy
   has_many :mentors, through: :cohort_mentors, source: :user
-  has_many :enrollments, class_name: 'Enrollment', foreign_key: 'cohort_id', dependent: :destroy
+  has_many :enrollments, class_name: "Enrollment", foreign_key: "cohort_id", dependent: :destroy
   has_many :users, through: :enrollments, source: :user
 
   # Validations
@@ -26,10 +26,10 @@ class Cohort < ApplicationRecord
   after_update :handle_status_changes
 
   # Scopes
-  scope :active, -> { where(status: 'Live') }
-  scope :upcoming, -> { where(status: 'Upcoming') }
-  scope :completed, -> { where(status: 'Completed') }
-  scope :cancelled, -> { where(status: 'Cancelled') }
+  scope :active, -> { where(status: "Live") }
+  scope :upcoming, -> { where(status: "Upcoming") }
+  scope :completed, -> { where(status: "Completed") }
+  scope :cancelled, -> { where(status: "Cancelled") }
   scope :by_course, ->(course) { where(course: course) }
   scope :by_instructor, ->(instructor) { where(instructor: instructor) }
   scope :with_mentor, ->(user) { joins(:cohort_mentors).where(cohort_mentors: { user: user }) }
@@ -76,7 +76,7 @@ class Cohort < ApplicationRecord
   end
 
   def is_admin?(user)
-    cohort_staffs.joins(:user).where(users: { email: user.email }, role: 'Admin').exists?
+    cohort_staffs.joins(:user).where(users: { email: user.email }, role: "Admin").exists?
   end
 
   def is_staff?(user)
@@ -104,8 +104,8 @@ class Cohort < ApplicationRecord
     {
       subgroups: cohort_subgroups.count,
       mentors: mentors.count,
-      students: enrollments.where(member_type: 'Student').count,
-      join_requests: cohort_join_requests.where(status: 'Pending').count,
+      students: enrollments.where(member_type: "Student").count,
+      join_requests: cohort_join_requests.where(status: "Pending").count,
       total_members: enrollments.count
     }
   end
@@ -124,7 +124,7 @@ class Cohort < ApplicationRecord
     cohort_mentors.where(user: user).destroy_all
   end
 
-  def add_staff(user, role: 'Staff')
+  def add_staff(user, role: "Staff")
     cohort_staffs.find_or_create_by!(
       user: user,
       role: role,
@@ -150,7 +150,7 @@ class Cohort < ApplicationRecord
       user: user,
       cohort_subgroup: subgroup,
       message: message,
-      status: 'Pending'
+      status: "Pending"
     )
   end
 
@@ -158,15 +158,15 @@ class Cohort < ApplicationRecord
     return false unless request.pending? && can_approve_requests?(request.user)
 
     ActiveRecord::Base.transaction do
-      request.update!(status: 'Accepted')
+      request.update!(status: "Accepted")
 
       # Create enrollment
       enrollments.create!(
         user: request.user,
         course: course,
         cohort_subgroup: request.cohort_subgroup,
-        member_type: 'Student',
-        role: 'Member'
+        member_type: "Student",
+        role: "Member"
       )
 
       # Send notification
@@ -180,7 +180,7 @@ class Cohort < ApplicationRecord
     return false unless request.pending? && can_approve_requests?(request.user)
 
     request.update!(
-      status: 'Rejected',
+      status: "Rejected",
       rejection_reason: reason
     )
 
@@ -195,7 +195,7 @@ class Cohort < ApplicationRecord
   end
 
   def get_students
-    get_members(member_type: 'Student')
+    get_members(member_type: "Student")
   end
 
   def add_student(user, subgroup: nil)
@@ -208,29 +208,29 @@ class Cohort < ApplicationRecord
       user: user,
       course: course,
       cohort_subgroup: target_subgroup,
-      member_type: 'Student',
-      role: 'Member'
+      member_type: "Student",
+      role: "Member"
     )
   end
 
   def remove_student(user)
-    enrollments.where(user: user, member_type: 'Student').destroy_all
+    enrollments.where(user: user, member_type: "Student").destroy_all
   end
 
   def active?
-    status == 'Live'
+    status == "Live"
   end
 
   def upcoming?
-    status == 'Upcoming'
+    status == "Upcoming"
   end
 
   def completed?
-    status == 'Completed'
+    status == "Completed"
   end
 
   def cancelled?
-    status == 'Cancelled'
+    status == "Cancelled"
   end
 
   def to_frappe_format
@@ -243,14 +243,14 @@ class Cohort < ApplicationRecord
       instructor: instructor&.email,
       instructor_name: instructor&.full_name,
       status: status,
-      begin_date: begin_date&.strftime('%Y-%m-%d'),
-      end_date: end_date&.strftime('%Y-%m-%d'),
+      begin_date: begin_date&.strftime("%Y-%m-%d"),
+      end_date: end_date&.strftime("%Y-%m-%d"),
       duration: duration,
       description: description,
       url: get_url,
       stats: get_stats,
-      creation: created_at&.strftime('%Y-%m-%d %H:%M:%S'),
-      modified: updated_at&.strftime('%Y-%m-%d %H:%M:%S')
+      creation: created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+      modified: updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 
@@ -296,7 +296,7 @@ class Cohort < ApplicationRecord
     return if slug.blank?
 
     unless slug.match?(/\A[a-z0-9-]+\z/)
-      errors.add(:slug, 'can only contain lowercase letters, numbers, and hyphens')
+      errors.add(:slug, "can only contain lowercase letters, numbers, and hyphens")
     end
   end
 
@@ -304,7 +304,7 @@ class Cohort < ApplicationRecord
     return unless begin_date && end_date
 
     if end_date < begin_date
-      errors.add(:end_date, 'cannot be before the begin date')
+      errors.add(:end_date, "cannot be before the begin date")
     end
   end
 
@@ -319,19 +319,19 @@ class Cohort < ApplicationRecord
     end
 
     if today < begin_date
-      self.status = 'Upcoming'
+      self.status = "Upcoming"
     elsif today >= begin_date && today <= end_date
-      self.status = 'Live'
+      self.status = "Live"
     else
-      self.status = 'Completed'
+      self.status = "Completed"
     end
   end
 
   def create_default_subgroup
     cohort_subgroups.create!(
-      title: 'Main Group',
-      slug: 'main',
-      description: 'Default subgroup for all cohort members',
+      title: "Main Group",
+      slug: "main",
+      description: "Default subgroup for all cohort members",
       invite_code: generate_invite_code
     )
   end
@@ -346,11 +346,11 @@ class Cohort < ApplicationRecord
   def handle_status_changes
     if saved_change_to_status
       case status
-      when 'Live'
+      when "Live"
         notify_cohort_started
-      when 'Completed'
+      when "Completed"
         notify_cohort_completed
-      when 'Cancelled'
+      when "Cancelled"
         notify_cohort_cancelled
       end
     end
