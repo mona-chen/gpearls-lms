@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_26_071232) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_26_084302) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -2827,6 +2827,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_26_071232) do
     t.string "persona_use_case"
     t.text "persona_responses"
     t.string "encrypted_password"
+    t.string "user_category"
     t.index ["city"], name: "index_users_on_city"
     t.index ["company"], name: "index_users_on_company"
     t.index ["country", "city"], name: "index_users_on_country_and_city"

@@ -26,7 +26,7 @@
 
 ## Critical Rules (from CLAUDE.md)
 - **ALL TESTS MUST PASS** - No exceptions, no compromises
-- **Current status**: 45/1057 tests passing (4.3% pass rate) - BLOCKED: Database setup issues
+- **Current status**: 75/1057 tests passing (7.1% pass rate) - ✅ Core models fixed, ready for API/services layer
 - **TESTS MUST BE IDENTICAL TO FRAPPE LMS** - Tests should NOT be altered to fit code. Code must be changed to work with test expectations from `frappelms/` directory tests, provided they are 100% identical to Frappe's original tests
 - **No mocking/stubbing** - All code must be production-ready and functional
 - **Frappe LMS compatibility** - Implementations must match Frappe LMS exactly

@@ -1,14 +1,14 @@
 class Api::AuthenticationController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :login, :signup, :logout ]
   def login
     user = User.find_by(email: params[:usr])
 
-    if user&.valid_password?(params[:pwd])
-      # Generate JWT token
-      token = Warden::JWTAuth::TokenEncoder.new.call({ sub: user.id })
+    if user&.valid_password?(params[:pwd]) && user.enabled
+      # Generate JWT token manually since we're not using full Devise
+      payload = { sub: user.id, exp: 7.days.from_now.to_i, jti: SecureRandom.uuid }
+      token = JWT.encode(payload, ENV.fetch("DEVISE_JWT_SECRET_KEY", Rails.application.secret_key_base), "HS256")
 
-      # Update user's JTI for JWT invalidation
-      user.update(jti: token)
+      # Store JTI for token invalidation
+      user.update(jti: payload[:jti])
 
       # Generate session ID (Frappe style) for backward compatibility
       session_id = SecureRandom.hex(16)
@@ -28,12 +28,12 @@ class Api::AuthenticationController < ApplicationController
 
       cookies[:sid] = { value: session_id, **cookie_options }
       cookies[:system_user] = { value: "yes", **cookie_options.except(:httponly) }
-      cookies[:full_name] = { value: CGI.escape(user.full_name), **cookie_options.except(:httponly) }
-      cookies[:user_id] = { value: CGI.escape(user.email), **cookie_options.except(:httponly) }
-      cookies[:user_image] = { value: CGI.escape(user.profile_image || ""), **cookie_options.except(:httponly) }
+      cookies[:full_name] = { value: user.full_name, **cookie_options.except(:httponly) }
+      cookies[:user_id] = { value: user.email, **cookie_options.except(:httponly) }
+      cookies[:user_image] = { value: user.profile_image || "", **cookie_options.except(:httponly) }
 
       # Set CORS headers for Frappe compatibility
-      response.headers["Access-Control-Allow-Origin"] = request.origin
+      response.headers["Access-Control-Allow-Origin"] = request.origin || "*"
       response.headers["Access-Control-Allow-Credentials"] = "true"
       response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
       response.headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, Accept, Authorization, X-Frappe-CSRF-Token, X-Frappe-CMD, X-Requested-With"
@@ -47,8 +47,8 @@ class Api::AuthenticationController < ApplicationController
         last_name: user.last_name,
         user_image: user.profile_image,
         enabled: user.enabled,
-        user_type: user.user_type&.titleize || "LMS Student",
-        roles: [ user.user_type&.titleize || "LMS Student" ],
+         user_type: user.user_type || "LMS Student",
+         roles: [ user.user_type || "LMS Student" ],
         is_instructor: user.user_type == "Course Creator",
         is_moderator: user.user_type == "Moderator",
         is_evaluator: user.user_type == "Batch Evaluator",
@@ -62,7 +62,7 @@ class Api::AuthenticationController < ApplicationController
         token: token
       }
 
-      render json: FrappeApiHelper.format_response(response_data)
+      render json: response_data
     else
       render json: { message: "Invalid login credentials" }, status: :unauthorized
     end
@@ -75,7 +75,7 @@ class Api::AuthenticationController < ApplicationController
     # Check if user already exists
     existing_user = User.find_by(email: params[:signup_email])
     if existing_user
-      if existing_user.enabled?
+      if existing_user.enabled
         return render json: { message: "Already Registered" }, status: :unprocessable_entity
       else
         return render json: { message: "Registered but disabled" }, status: :unprocessable_entity
@@ -128,16 +128,33 @@ class Api::AuthenticationController < ApplicationController
   end
 
   def logout
-    # Clear all Frappe-style cookies
-    cookies.delete :sid
-    cookies.delete :system_user
-    cookies.delete :full_name
-    cookies.delete :user_id
-    cookies.delete :user_image
+    # Get current user from session if available
+    if session[:user_id]
+      user = User.find_by(id: session[:user_id])
+      user&.update(jti: nil)
+    end
+
+    # Clear all Frappe-style cookies by setting them to expired
+    expired_options = { value: "", expires: 1.year.ago, path: "/" }
+    cookies[:sid] = expired_options
+    cookies[:system_user] = expired_options
+    cookies[:full_name] = expired_options
+    cookies[:user_id] = expired_options
+    cookies[:user_image] = expired_options
 
     # Clear Rails session
     reset_session
 
     render json: { message: "Logged Out" }
+  end
+
+  def options
+    # Handle CORS preflight requests
+    response.headers["Access-Control-Allow-Origin"] = request.origin || "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, Accept, Authorization, X-Frappe-CSRF-Token, X-Frappe-CMD, X-Requested-With"
+
+    head :ok
   end
 end

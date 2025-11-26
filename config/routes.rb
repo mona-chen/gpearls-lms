@@ -15,9 +15,9 @@ Rails.application.routes.draw do
   match "login", to: "sessions#handle_options", via: [ :options ]
 
   # API authentication routes
-  post "api/login", to: "api/authentication#login"
-  post "api/logout", to: "api/authentication#logout"
-  post "api/signup", to: "api/authentication#signup"
+  match "api/login", to: "api/authentication#login", via: [ :post, :options ]
+  match "api/logout", to: "api/authentication#logout", via: [ :post, :options ]
+  match "api/signup", to: "api/authentication#signup", via: [ :post, :options ]
 
   # User management
   get "api/user", to: "api/users#get_user_info"

@@ -9,6 +9,11 @@ export default defineConfig({
   plugins: [
     Icons({
       compiler: 'vue3',
+      iconSource: {
+        collections: {
+          lucide: () => import('@iconify-json/lucide/icons.json').then(i => i.default),
+        },
+      },
     }),
     vue({
       script: {

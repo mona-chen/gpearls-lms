@@ -74,5 +74,10 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   # Allow requests from specified hosts
+  # Allow common development hosts
+  config.hosts << "localhost"
+  config.hosts << "127.0.0.1"
+  config.hosts << "0.0.0.0"
   config.hosts << "3000.slime.ruut.chat"
+  config.hosts << "8080.slime.ruut.chat"
 end

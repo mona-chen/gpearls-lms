@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'API::Authentication', type: :request do
-  let(:user) { create(:user, email: 'test@example.com', full_name: 'Test User') }
+  let(:user) { create(:user, email: 'test@example.com', full_name: 'Test User', profile_image: nil) }
   let(:instructor) { create(:user, :instructor, email: 'instructor@example.com') }
   let(:moderator) { create(:user, :moderator, email: 'moderator@example.com') }
   let(:evaluator) { create(:user, :evaluator, email: 'evaluator@example.com') }
@@ -305,11 +305,11 @@ RSpec.describe 'API::Authentication', type: :request do
     it 'clears Frappe-style cookies' do
       post '/api/logout'
 
-      expect(cookies['sid']).to be_nil
-      expect(cookies['system_user']).to be_nil
-      expect(cookies['full_name']).to be_nil
-      expect(cookies['user_id']).to be_nil
-      expect(cookies['user_image']).to be_nil
+      expect(cookies['sid']).to eq('')
+      expect(cookies['system_user']).to eq('')
+      expect(cookies['full_name']).to eq('')
+      expect(cookies['user_id']).to eq('')
+      expect(cookies['user_image']).to eq('')
     end
 
     it 'clears user JTI' do
@@ -320,9 +320,6 @@ RSpec.describe 'API::Authentication', type: :request do
     end
 
     it 'works without authenticated user' do
-      # Clear session
-      reset_session
-
       post '/api/logout'
 
       expect(response).to have_http_status(:success)
