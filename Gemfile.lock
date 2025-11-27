@@ -433,7 +433,7 @@ GEM
     sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
     stringio (3.1.7)
-    stripe (8.7.0)
+    stripe (18.0.1)
     thor (1.4.0)
     timeout (0.4.3)
     tsort (0.2.0)
@@ -509,7 +509,7 @@ DEPENDENCIES
   sidekiq (~> 7.0)
   sidekiq-status (~> 1.0)
   sqlite3 (~> 1.4)
-  stripe (~> 8.0)
+  stripe (~> 18.0)
   tzinfo-data
   webmock (~> 3.18)
 

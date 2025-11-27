@@ -39,7 +39,7 @@ gem "sidekiq-status", "~> 1.0"
 
 # Payment Processing
 gem "paystack", "~> 0.1"
-gem "stripe", "~> 8.0"
+gem "stripe", "~> 18.0"
 gem "razorpay", "~> 2.0"
 
 # CORS support
