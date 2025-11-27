@@ -16,7 +16,7 @@ gem "devise-jwt", "~> 0.10"
 gem "cancancan", "~> 3.5"
 
 # File Storage & Processing
-gem "aws-sdk-s3", "~> 1.120"
+gem "aws-sdk-s3", "~> 1.203"
 gem "image_processing", "~> 1.2"
 
 # Background Processing & Caching
