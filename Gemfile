@@ -35,7 +35,7 @@ gem "public_activity", "~> 2.0"
 
 # Background Processing
 gem "sidekiq", "~> 7.0"
-gem "sidekiq-status", "~> 1.0"
+gem "sidekiq-status", "~> 4.0"
 
 # Payment Processing
 gem "paystack", "~> 0.1"
