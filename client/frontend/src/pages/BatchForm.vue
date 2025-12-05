@@ -344,6 +344,7 @@ import {
 	getMetaInfo,
 	updateMetaInfo,
 	validateFile,
+	escapeHTML,
 } from '@/utils'
 
 const router = useRouter()
@@ -488,7 +489,7 @@ const editBatch = createResource({
 })
 
 const imageResource = createResource({
-	url: 'lms.api.get_file_info',
+	url: 'lms.lms.api.get_file_info',
 	makeParams(values) {
 		return {
 			file_url: values.image,
@@ -500,7 +501,19 @@ const imageResource = createResource({
 	},
 })
 
+const validateFields = () => {
+	Object.keys(batch).forEach((key) => {
+		if (
+			!['description', 'batch_details'].includes(key) &&
+			typeof batch[key] === 'string'
+		) {
+			batch[key] = escapeHTML(batch[key])
+		}
+	})
+}
+
 const saveBatch = () => {
+	validateFields()
 	if (batchDetail.data) {
 		editBatchDetails()
 	} else {
@@ -575,7 +588,7 @@ const deleteBatch = () => {
 }
 
 const trashBatch = (close) => {
-	call('lms.api.delete_batch', {
+	call('lms.lms.api.delete_batch', {
 		batch: props.batchName,
 	}).then(() => {
 		toast.success(__('Batch deleted successfully'))

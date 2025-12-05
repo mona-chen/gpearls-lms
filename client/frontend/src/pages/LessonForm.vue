@@ -142,7 +142,6 @@ const renderEditor = (holder) => {
 	return new EditorJS({
 		holder: holder,
 		tools: getEditorTools(true),
-		autofocus: true,
 		defaultBlock: 'markdown',
 		onChange: async (api, event) => {
 			enablePlyr()
@@ -159,7 +158,7 @@ const lesson = reactive({
 })
 
 const lessonDetails = createResource({
-	url: 'lms.utils.get_lesson_creation_details',
+	url: 'lms.lms.utils.get_lesson_creation_details',
 	params: {
 		course: props.courseName,
 		chapter: props.chapterNumber,

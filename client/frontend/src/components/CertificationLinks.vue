@@ -67,7 +67,7 @@ const props = defineProps({
 })
 
 const certification = createResource({
-	url: 'lms.api.get_certification_details',
+	url: 'lms.lms.api.get_certification_details',
 	params: {
 		course: props.courseName,
 	},

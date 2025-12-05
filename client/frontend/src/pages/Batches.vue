@@ -136,7 +136,7 @@ const setFiltersFromQuery = () => {
 
 const batches = createListResource({
 	doctype: 'LMS Batch',
-	url: 'lms.utils.get_batches',
+	url: 'lms.lms.utils.get_batches',
 	cache: ['batches', user.data?.name],
 	pageLength: pageLength.value,
 	start: start.value,
@@ -244,12 +244,11 @@ const setQueryParams = () => {
 		}
 	})
 
-	let queryString = ''
-	if (queries.toString()) {
-		queryString = `?${queries.toString()}`
-	}
-
-	history.replaceState({}, '', `${location.pathname}${queryString}`)
+	history.replaceState(
+		{},
+		'',
+		`${location.pathname}${queries.size > 0 ? `?${queries.toString()}` : ''}`
+	)
 }
 
 const updateCategories = (data) => {

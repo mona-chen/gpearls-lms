@@ -11,14 +11,7 @@ class Certification < ApplicationRecord
   validates :docstatus, presence: true
   validates :certificate_number, uniqueness: true, allow_nil: true
 
-  enum docstatus: {
-    "Draft" => "0",
-    "Submitted" => "1",
-    "Under Review" => "2",
-    "Approved" => "3",
-    "Rejected" => "4",
-    "Issued" => "5"
-  }
+  enum :docstatus, "Draft" => 0, "Submitted" => 1, "Under Review" => 2, "Approved" => 3, "Rejected" => 4, "Issued" => 5
 
   # Alias for Frappe compatibility
   alias_attribute :status, :docstatus

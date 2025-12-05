@@ -8,17 +8,17 @@ import { createDialog } from '@/utils/dialogs'
 import translationPlugin from './translation'
 import { usersStore } from './stores/user'
 import { initSocket } from './socket'
-import { FrappeUI, setConfig, frappeRequest, pageMetaPlugin } from 'frappe-ui'
+// import { FrappeUI, setConfig, frappeRequest, pageMetaPlugin } from 'frappe-ui'
 
 let pinia = createPinia()
 let app = createApp(App)
-setConfig('resourceFetcher', frappeRequest)
+// setConfig('resourceFetcher', frappeRequest)
 
-app.use(FrappeUI)
+// // app.use(FrappeUI)
 app.use(pinia)
 app.use(router)
 app.use(translationPlugin)
-app.use(pageMetaPlugin)
+// app.use(pageMetaPlugin)
 app.provide('$dayjs', dayjs)
 app.provide('$socket', initSocket())
 app.mount('#app')
@@ -29,22 +29,3 @@ app.provide('$allUsers', allUsers)
 
 app.config.globalProperties.$user = userResource
 app.config.globalProperties.$dialog = createDialog
-
-// Add global error handler
-app.config.errorHandler = (err, vm, info) => {
-  console.error('Vue Error:', err)
-  console.error('Component:', vm)
-  console.error('Info:', info)
-
-  // Prevent error from breaking the app
-  if (err && err.message) {
-    console.warn('Handled Vue error:', err.message)
-  }
-}
-
-// Add global warning handler
-app.config.warnHandler = (msg, vm, trace) => {
-  console.warn('Vue Warning:', msg)
-  console.warn('Component:', vm)
-  console.warn('Trace:', trace)
-}

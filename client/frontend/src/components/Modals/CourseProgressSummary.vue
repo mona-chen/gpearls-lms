@@ -164,7 +164,7 @@ const props = defineProps<{
 const memberCount = ref<number>(props.enrollments || 0)
 
 const chartDetails = createResource({
-	url: 'lms.api.get_course_progress_distribution',
+	url: 'lms.lms.api.get_course_progress_distribution',
 	params: {
 		course: props.courseName,
 	},

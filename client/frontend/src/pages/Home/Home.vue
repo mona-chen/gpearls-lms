@@ -5,27 +5,28 @@
 		<Breadcrumbs :items="[{ label: __('Home'), route: { name: 'Home' } }]" />
 	</header> -->
 	<div class="w-full px-5 pt-5 pb-10">
-		<div class="flex items-center justify-between">
-			<div class="space-y-2">
+		<div class="space-y-2">
+			<div class="flex items-center justify-between">
 				<div class="text-xl font-bold text-ink-gray-9">
 					{{ __('Hey') }}, {{ user.data?.full_name }} 👋
 				</div>
-				<div class="text-lg text-ink-gray-6">
-					{{ subtitle }}
+				<div>
+					<TabButtons v-if="isAdmin" v-model="currentTab" :buttons="tabs" />
+					<div
+						v-else
+						@click="showStreakModal = true"
+						class="bg-surface-amber-2 px-2 py-1 rounded-md cursor-pointer"
+					>
+						<span> 🔥 </span>
+						<span class="text-ink-gray-9">
+							{{ streakInfo.data?.current_streak }}
+						</span>
+					</div>
 				</div>
 			</div>
-			<div>
-				<TabButtons v-if="isAdmin" v-model="currentTab" :buttons="tabs" />
-				<div
-					v-else
-					@click="showStreakModal = true"
-					class="bg-surface-amber-2 px-2 py-1 rounded-md cursor-pointer"
-				>
-					<span> 🔥 </span>
-					<span>
-						{{ streakInfo.data?.current_streak }}
-					</span>
-				</div>
+
+			<div class="text-lg text-ink-gray-6 leading-6">
+				{{ subtitle }}
 			</div>
 		</div>
 
@@ -59,7 +60,7 @@ const currentTab = ref<'student' | 'instructor'>('instructor')
 const showStreakModal = ref(false)
 
 onMounted(() => {
-	call('lms.utils.get_upcoming_evals').then((data: any) => {
+	call('lms.lms.utils.get_upcoming_evals').then((data: any) => {
 		evalCount.value = data.length
 	})
 })
@@ -73,22 +74,22 @@ const isAdmin = computed(() => {
 })
 
 const myLiveClasses = createResource({
-	url: 'lms.utils.get_my_live_classes',
+	url: 'lms.lms.utils.get_my_live_classes',
 	auto: !isAdmin.value ? true : false,
 })
 
 const adminLiveClasses = createResource({
-	url: 'lms.utils.get_admin_live_classes',
+	url: 'lms.lms.utils.get_admin_live_classes',
 	auto: isAdmin.value ? true : false,
 })
 
 const adminEvals = createResource({
-	url: 'lms.utils.get_admin_evals',
+	url: 'lms.lms.utils.get_admin_evals',
 	auto: isAdmin.value ? true : false,
 })
 
 const streakInfo = createResource({
-	url: 'lms.utils.get_streak_info',
+	url: 'lms.lms.utils.get_streak_info',
 	auto: true,
 })
 

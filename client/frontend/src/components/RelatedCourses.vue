@@ -33,7 +33,7 @@ const props = defineProps({
 })
 
 const relatedCourses = createResource({
-	url: 'lms.utils.get_related_courses',
+	url: 'lms.lms.utils.get_related_courses',
 	cache: ['related_courses', props.courseName],
 	makeParams() {
 		return {

@@ -14,12 +14,12 @@ const routes = [
 		name: 'Courses',
 		component: () => import('@/pages/Courses.vue'),
 	},
-	{
-		path: '/courses/:courseName',
-		name: 'CourseDetail',
-		component: () => import('@/pages/CourseDetail.vue'),
-		props: true,
-	},
+	// {
+	// 	path: '/courses/:courseName',
+	// 	name: 'CourseDetail',
+	// 	component: () => import('@/pages/CourseDetail.vue'),
+	// 	props: true,
+	// },
 	{
 		path: '/courses/:courseName/learn/:chapterNumber-:lessonNumber',
 		name: 'Lesson',
@@ -110,6 +110,12 @@ const routes = [
 		path: '/job-openings/:job',
 		name: 'JobDetail',
 		component: () => import('@/pages/JobDetail.vue'),
+		props: true,
+	},
+	{
+		path: '/job-openings/:job/applications',
+		name: 'JobApplications',
+		component: () => import('@/pages/JobApplications.vue'),
 		props: true,
 	},
 	{
@@ -245,11 +251,27 @@ let router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-	const { getUserInfo } = usersStore()
+	const { userResource } = usersStore()
 	let { isLoggedIn } = sessionStore()
 	const { allowGuestAccess } = useSettings()
 
-	// For now, bypass authentication - Rails API will handle it
+	try {
+		if (isLoggedIn) {
+			await userResource.promise
+		}
+	} catch (error) {
+		isLoggedIn = false
+	}
+
+	if (!isLoggedIn) {
+		if (to.name == 'Home') router.push({ name: 'Courses' })
+
+		await allowGuestAccess.promise
+		if (!allowGuestAccess.data) {
+			window.location.href = '/login'
+			return
+		}
+	}
 	return next()
 })
 

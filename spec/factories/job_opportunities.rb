@@ -8,8 +8,8 @@ FactoryBot.define do
     company_name { "MyString" }
     company_logo { "MyString" }
     company_website { "MyString" }
+    company_email_address { "jobs@company.com" }
     description { "MyText" }
-    published { false }
-    user { nil }
+     published { false }
   end
 end

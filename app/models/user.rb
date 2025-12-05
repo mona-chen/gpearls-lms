@@ -6,6 +6,11 @@ class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::Denylist
   devise :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
+  # Ensure JWT subject is integer
+  def jwt_subject
+    id
+  end
+
   # Password validation for compatibility
   def valid_password?(password)
     authenticate(password)

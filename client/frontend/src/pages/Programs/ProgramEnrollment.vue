@@ -119,7 +119,7 @@ const props = defineProps<{
 }>()
 
 const program = createResource({
-	url: 'lms.utils.get_program_details',
+	url: 'lms.lms.utils.get_program_details',
 	makeParams(values: any) {
 		return {
 			program_name: props.programName,
@@ -138,7 +138,7 @@ watch(
 )
 
 const enrollInProgram = (close: () => void) => {
-	call('lms.utils.enroll_in_program', {
+	call('lms.lms.utils.enroll_in_program', {
 		program: props.programName,
 	})
 		.then(() => {

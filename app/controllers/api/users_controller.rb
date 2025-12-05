@@ -2,6 +2,9 @@ class Api::UsersController < Api::BaseController
   skip_before_action :authenticate_user!, only: [ :get_user_info ]
 
   def get_user_info
+    # Manually authenticate for this endpoint since we skip the before_action
+    authenticate_user_from_session!
+
     if current_user
       user = current_user.session_user
       user["is_fc_site"] = false

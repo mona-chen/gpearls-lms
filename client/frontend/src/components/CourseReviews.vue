@@ -99,7 +99,7 @@ const hasReviewed = createResource({
 })
 
 const reviews = createResource({
-	url: 'lms.utils.get_reviews',
+	url: 'lms.lms.utils.get_reviews',
 	cache: ['course_reviews', props.courseName],
 	makeParams() {
 		return {

@@ -76,7 +76,7 @@ module Batches
         }
       end
 
-      { "data" => batches_data }
+      batches_data
     end
 
     # NEW: Get batches created by a specific user (instructor)

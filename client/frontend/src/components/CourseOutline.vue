@@ -215,7 +215,7 @@ const props = defineProps({
 })
 
 const outline = createResource({
-	url: 'lms.utils.get_course_outline',
+	url: 'lms.lms.utils.get_course_outline',
 	cache: ['course_outline', props.courseName],
 	makeParams() {
 		return {
@@ -241,7 +241,7 @@ watch(
 )
 
 const deleteLesson = createResource({
-	url: 'lms.api.delete_lesson',
+	url: 'lms.lms.api.delete_lesson',
 	makeParams(values) {
 		return {
 			lesson: values.lesson,
@@ -255,7 +255,7 @@ const deleteLesson = createResource({
 })
 
 const updateLessonIndex = createResource({
-	url: 'lms.api.update_lesson_index',
+	url: 'lms.lms.api.update_lesson_index',
 	makeParams(values) {
 		return {
 			lesson: values.lesson,
@@ -270,7 +270,7 @@ const updateLessonIndex = createResource({
 })
 
 const updateChapterIndex = createResource({
-	url: 'lms.api.update_chapter_index',
+	url: 'lms.lms.api.update_chapter_index',
 	makeParams(values) {
 		return {
 			chapter: values.chapter,
@@ -337,7 +337,7 @@ const updateChapterOrder = (e) => {
 }
 
 const deleteChapter = createResource({
-	url: 'lms.api.delete_chapter',
+	url: 'lms.lms.api.delete_chapter',
 	makeParams(values) {
 		return {
 			chapter: values.chapter,

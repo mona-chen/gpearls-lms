@@ -29,10 +29,10 @@ class Api::CompatibilityController < ApplicationController
       end
     rescue => e
       Rails.logger.error "Error in Frappe method #{method_path}: #{e.message}"
-      render json: {
-        "message" => "Internal server error: #{e.message}",
-        "status" => "error"
-      }, status: 500
+       render json: {
+         "message" => "Error: #{e.message}",
+         "status" => "error"
+       }, status: :internal_server_error
     end
   end
 
@@ -41,9 +41,6 @@ class Api::CompatibilityController < ApplicationController
   def route_to_frappe_method(method_path)
     # Convert ActionController::Parameters to regular hash for services
     safe_params = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params.to_h
-
-    # Ensure all nested parameters are also converted
-    safe_params = deep_convert_params(safe_params)
 
     case method_path
     # LMS API methods
@@ -388,7 +385,11 @@ class Api::CompatibilityController < ApplicationController
 
     # LMS Utils methods - Exact Frappe function replicas
     when "lms.utils.get_my_courses"
-       Courses::MyCoursesService.call(current_user)
+       if Current.user
+         Courses::MyCoursesService.call(Current.user)
+       else
+         { error: "Not authenticated", status: :unauthorized }
+       end
     when "lms.utils.get_created_courses"
        if Current.user
          Courses::CoursesService.get_created_courses(Current.user)
@@ -409,7 +410,11 @@ class Api::CompatibilityController < ApplicationController
       course = Course.find_by(id: safe_params[:course])
       Courses::CourseReviewService.get_reviews(course)
     when "lms.utils.save_current_lesson"
-       Frappe::LmsUtilsService.save_current_lesson(safe_params[:course], safe_params[:lesson])
+       if Current.user
+         Frappe::LmsUtilsService.save_current_lesson(safe_params[:course], safe_params[:lesson])
+       else
+         { error: "Not authenticated", status: :unauthorized }
+       end
     when "lms.utils.get_lesson_info"
        Lessons::LessonService.get_info(safe_params[:lesson])
     when "lms.utils.mark_lesson_progress"
@@ -417,7 +422,11 @@ class Api::CompatibilityController < ApplicationController
     when "lms.utils.track_video_watch_duration"
        Lessons::VideoService.track_duration(safe_params, Current.user)
     when "lms.utils.get_my_batches"
-       Batches::MyBatchesService.call(Current.user)
+       if Current.user
+         Batches::MyBatchesService.call(Current.user)
+       else
+         { error: "Not authenticated", status: :unauthorized }
+       end
     when "lms.utils.get_created_batches"
        if Current.user
          Batches::BatchesService.get_created_batches(Current.user)
@@ -445,7 +454,34 @@ class Api::CompatibilityController < ApplicationController
     when "lms.api.get_certification_categories"
       Certifications::CertificationCategoriesService.call
     when "lms.api.get_certified_participants"
-       Certifications::CertifiedParticipantsService.call(params)
+        Certifications::CertifiedParticipantsService.call(params)
+    when "lms.lms.api.get_pwa_manifest"
+       manifest = {
+         name: "Gpearls LMS",
+         short_name: "LMS",
+         description: "Easy to use, 100% open source Learning Management System",
+         start_url: "/lms",
+         display: "standalone",
+         background_color: "#ffffff",
+         theme_color: "#1a73e8",
+         icons: [
+           {
+             src: "/manifest/manifest-icon-192.maskable.png",
+             sizes: "192x192",
+             type: "image/png",
+             purpose: "maskable any"
+           },
+           {
+             src: "/manifest/manifest-icon-512.maskable.png",
+             sizes: "512x512",
+             type: "image/png",
+             purpose: "maskable any"
+           }
+         ]
+       }
+       # Return manifest with proper content type header
+       response.headers["Content-Type"] = "application/manifest+json"
+       manifest
     when "lms.api.get_members"
        # Get members with search functionality
        search = safe_params[:search] || ""
@@ -582,7 +618,11 @@ class Api::CompatibilityController < ApplicationController
          { error: "Not authenticated", status: :unauthorized }
        end
     when "lms.utils.get_streak_info"
-      Analytics::StreakInfoService.call(Current.user)
+       if Current.user
+         Analytics::StreakInfoService.call(Current.user)
+       else
+         { error: "Not authenticated", status: :unauthorized }
+       end
     when "lms.utils.get_my_live_classes"
        Frappe::LmsUtilsService.get_my_live_classes
     when "lms.utils.get_admin_live_classes"
@@ -748,12 +788,8 @@ class Api::CompatibilityController < ApplicationController
   end
 
   def get_my_live_classes
-    render json: {
-      "data" => {
-        message: "Live classes feature coming soon",
-        data: []
-      }
-    }
+    live_classes = Frappe::LmsUtilsService.get_my_live_classes
+    render json: live_classes
   end
 
   def get_streak_info
@@ -935,7 +971,7 @@ class Api::CompatibilityController < ApplicationController
       }
     end
 
-    render json: { "data" => batches_data }
+    render json: batches_data
   end
 
 
@@ -978,16 +1014,16 @@ class Api::CompatibilityController < ApplicationController
   def save_current_lesson
     return { error: "Not authenticated" } unless current_user
 
-    course_name = params[:course]
-    lesson_name = params[:lesson]
+    course_id = params[:course]
+    lesson_id = params[:lesson]
 
-    return { error: "Missing parameters" } unless course_name && lesson_name
+    return { error: "Missing parameters" } unless course_id
 
-    enrollment = Enrollment.find_by(user: current_user, course_id: course_name)
-    return { error: "Enrollment not found" } unless enrollment
+    enrollment = Enrollment.find_by(user: current_user, course_id: course_id)
+    return { error: "Enrollment not found", status: :ok } unless enrollment
 
-    enrollment.update(current_lesson: lesson_name)
-    { "data" => { success: true } }
+    enrollment.update(current_lesson: lesson_id)
+    { success: true }
   end
 
   def get_tags

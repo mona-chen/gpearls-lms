@@ -16,7 +16,7 @@ module Users
         user_image: @user.user_image || "",
         full_name: @user.full_name,
         user_type: @user.user_type || "LMS Student",
-        username: @user.username,
+         username: @user.email.split("@").first,
         roles: user_roles,
         is_instructor: @user.instructor?,
         is_moderator: @user.moderator?,

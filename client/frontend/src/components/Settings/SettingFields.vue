@@ -96,7 +96,7 @@
 						size="sm"
 						:label="__(field.label)"
 						:description="__(field.description)"
-						v-model="data[field.name]"
+						v-model="field.value"
 					/>
 
 					<FormControl

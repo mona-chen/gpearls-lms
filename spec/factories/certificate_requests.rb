@@ -10,7 +10,6 @@ FactoryBot.define do
 
     association :user
     association :course
-    association :evaluator, factory: [ :user, :evaluator ], optional: true
 
     trait :pending do
       status { 'Pending' }

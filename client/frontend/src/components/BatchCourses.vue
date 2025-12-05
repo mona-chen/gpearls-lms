@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="flex items-center justify-between mb-4">
-			<div class="text-lg font-semibold text-ink-gray-9">
+			<div class="font-medium text-ink-gray-9">
 				{{ __('Courses') }}
 			</div>
 			<Button v-if="canSeeAddButton()" @click="openCourseModal()">
@@ -102,7 +102,7 @@ const props = defineProps({
 })
 
 const courses = createResource({
-	url: 'lms.utils.get_batch_courses',
+	url: 'lms.lms.utils.get_batch_courses',
 	params: {
 		batch: props.batch,
 	},
@@ -134,7 +134,7 @@ const getCoursesColumns = () => {
 }
 
 const deleteCourses = createResource({
-	url: 'lms.api.delete_documents',
+	url: 'lms.lms.api.delete_documents',
 	makeParams(values) {
 		return {
 			doctype: 'Batch Course',

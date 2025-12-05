@@ -9,12 +9,12 @@
 		>
 			<UserDropdown :isCollapsed="sidebarStore.isSidebarCollapsed" />
 			<div class="flex flex-col" v-if="sidebarSettings.data">
-				<SidebarLink
-					v-for="link in sidebarLinks"
-					:link="link"
-					:isCollapsed="sidebarStore.isSidebarCollapsed"
-					class="mx-2 my-0.5"
-				/>
+				<div v-for="link in sidebarLinks" class="mx-2 my-0.5">
+					<SidebarLink
+						:link="link"
+						:isCollapsed="sidebarStore.isSidebarCollapsed"
+					/>
+				</div>
 			</div>
 			<div
 				v-if="sidebarSettings.data?.web_pages?.length || isModerator"
@@ -54,15 +54,18 @@
 					class="flex flex-col transition-all duration-300 ease-in-out"
 					:class="!sidebarStore.isWebpagesCollapsed ? 'block' : 'hidden'"
 				>
-					<SidebarLink
+					<div
 						v-for="link in sidebarSettings.data.web_pages"
-						:link="link"
-						:isCollapsed="sidebarStore.isSidebarCollapsed"
 						class="mx-2 my-0.5"
-						:showControls="isModerator ? true : false"
-						@openModal="openPageModal"
-						@deletePage="deletePage"
-					/>
+					>
+						<SidebarLink
+							:link="link"
+							:isCollapsed="sidebarStore.isSidebarCollapsed"
+							:showControls="isModerator ? true : false"
+							@openModal="openPageModal"
+							@deletePage="deletePage"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -314,54 +317,68 @@ const addNotifications = () => {
 }
 
 const addQuizzes = () => {
-	if (isInstructor.value || isModerator.value) {
-		sidebarLinks.value.splice(4, 0, {
-			label: 'Quizzes',
-			icon: 'CircleHelp',
-			to: 'Quizzes',
-			activeFor: [
-				'Quizzes',
-				'QuizForm',
-				'QuizSubmissionList',
-				'QuizSubmission',
-			],
-		})
-	}
+	if (!isInstructor.value && !isModerator.value) return
+
+	const quizzesLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Quizzes'
+	)
+	if (quizzesLinkExists) return
+
+	sidebarLinks.value.splice(4, 0, {
+		label: 'Quizzes',
+		icon: 'CircleHelp',
+		to: 'Quizzes',
+		activeFor: ['Quizzes', 'QuizForm', 'QuizSubmissionList', 'QuizSubmission'],
+	})
 }
 
 const addAssignments = () => {
-	if (isInstructor.value || isModerator.value) {
-		sidebarLinks.value.splice(5, 0, {
-			label: 'Assignments',
-			icon: 'Pencil',
-			to: 'Assignments',
-			activeFor: [
-				'Assignments',
-				'AssignmentForm',
-				'AssignmentSubmissionList',
-				'AssignmentSubmission',
-			],
-		})
-	}
+	if (!isInstructor.value && !isModerator.value) return
+
+	const assignmentsLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Assignments'
+	)
+	if (assignmentsLinkExists) return
+
+	sidebarLinks.value.splice(5, 0, {
+		label: 'Assignments',
+		icon: 'Pencil',
+		to: 'Assignments',
+		activeFor: [
+			'Assignments',
+			'AssignmentForm',
+			'AssignmentSubmissionList',
+			'AssignmentSubmission',
+		],
+	})
 }
 
 const addProgrammingExercises = () => {
-	if (isInstructor.value || isModerator.value) {
-		sidebarLinks.value.splice(3, 0, {
-			label: 'Programming Exercises',
-			icon: 'Code',
-			to: 'ProgrammingExercises',
-			activeFor: [
-				'ProgrammingExercises',
-				'ProgrammingExerciseForm',
-				'ProgrammingExerciseSubmissions',
-				'ProgrammingExerciseSubmission',
-			],
-		})
-	}
+	if (!isInstructor.value && !isModerator.value) return
+	const programmingExercisesLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Programming Exercises'
+	)
+	if (programmingExercisesLinkExists) return
+
+	sidebarLinks.value.splice(3, 0, {
+		label: 'Programming Exercises',
+		icon: 'Code',
+		to: 'ProgrammingExercises',
+		activeFor: [
+			'ProgrammingExercises',
+			'ProgrammingExerciseForm',
+			'ProgrammingExerciseSubmissions',
+			'ProgrammingExerciseSubmission',
+		],
+	})
 }
 
 const addPrograms = async () => {
+	const programsLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Programs'
+	)
+	if (programsLinkExists) return
+
 	let canAddProgram = await checkIfCanAddProgram()
 	if (!canAddProgram) return
 	let activeFor = ['Programs', 'ProgramDetail']
@@ -376,26 +393,36 @@ const addPrograms = async () => {
 }
 
 const addContactUsDetails = () => {
-	if (settingsStore.contactUsEmail?.data || settingsStore.contactUsURL?.data) {
-		sidebarLinks.value.push({
-			label: 'Contact Us',
-			icon: settingsStore.contactUsURL?.data ? 'Headset' : 'Mail',
-			to: settingsStore.contactUsURL?.data
-				? settingsStore.contactUsURL.data
-				: `mailto:${settingsStore.contactUsEmail?.data}`,
-		})
-	}
+	if (!settingsStore.contactUsEmail?.data && !settingsStore.contactUsURL?.data)
+		return
+
+	const contactUsLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Contact Us'
+	)
+	if (contactUsLinkExists) return
+
+	sidebarLinks.value.push({
+		label: 'Contact Us',
+		icon: settingsStore.contactUsURL?.data ? 'Headset' : 'Mail',
+		to: settingsStore.contactUsURL?.data
+			? settingsStore.contactUsURL.data
+			: settingsStore.contactUsEmail?.data,
+	})
 }
 
 const checkIfCanAddProgram = async () => {
 	if (isModerator.value || isInstructor.value) {
 		return true
 	}
-	const programs = await call('lms.utils.get_programs')
+	const programs = await call('lms.lms.utils.get_programs')
 	return programs.enrolled.length > 0 || programs.published.length > 0
 }
 
 const addHome = () => {
+	const homeLinkExists = sidebarLinks.value.some(
+		(link) => link.label === 'Home'
+	)
+	if (homeLinkExists) return
 	sidebarLinks.value.unshift({
 		label: 'Home',
 		icon: 'Home',
@@ -411,7 +438,7 @@ const openPageModal = (link) => {
 
 const deletePage = (link) => {
 	createResource({
-		url: 'lms.api.delete_sidebar_item',
+		url: 'lms.lms.api.delete_sidebar_item',
 		makeParams(values) {
 			return {
 				webpage: link.web_page,
@@ -446,13 +473,13 @@ const toggleWebPages = () => {
 const getFirstCourse = async () => {
 	let firstCourse = localStorage.getItem('firstCourse')
 	if (firstCourse) return firstCourse
-	return await call('lms.onboarding.get_first_course')
+	return await call('lms.lms.onboarding.get_first_course')
 }
 
 const getFirstBatch = async () => {
 	let firstBatch = localStorage.getItem('firstBatch')
 	if (firstBatch) return firstBatch
-	return await call('lms.onboarding.get_first_batch')
+	return await call('lms.lms.onboarding.get_first_batch')
 }
 
 const steps = reactive([

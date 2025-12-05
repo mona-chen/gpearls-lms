@@ -165,7 +165,7 @@ const openForm = (accountID: string) => {
 }
 
 const removeAccount = (selections, unselectAll) => {
-	call('lms.api.delete_documents', {
+	call('lms.lms.api.delete_documents', {
 		doctype: 'LMS Zoom Settings',
 		documents: Array.from(selections),
 	})

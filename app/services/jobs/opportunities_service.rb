@@ -50,7 +50,7 @@ module Jobs
         }
       end
 
-      { "data" => opportunities_data }
+      opportunities_data
     end
   end
 end

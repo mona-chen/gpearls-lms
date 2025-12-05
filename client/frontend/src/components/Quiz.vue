@@ -55,8 +55,8 @@
 
 		<div v-if="quiz.data.duration" class="flex flex-col space-x-1 my-4">
 			<div class="mb-2">
-				<span class=""> {{ __('Time') }}: </span>
-				<span class="font-semibold">
+				<span class="text-ink-gray-9"> {{ __('Time') }}: </span>
+				<span class="font-semibold text-ink-gray-9">
 					{{ formatTimer(timer) }}
 				</span>
 			</div>
@@ -165,14 +165,14 @@
 								</div>
 							</div>
 							<span
-								class="ml-2"
+								class="ml-2 text-ink-gray-9"
 								v-html="questionDetails.data[`option_${index}`]"
 							>
 							</span>
 						</label>
 						<div
 							v-if="questionDetails.data[`explanation_${index}`]"
-							class="mt-2 text-xs"
+							class="mt-2 text-xs text-ink-gray-7"
 							v-show="showAnswers.length"
 						>
 							{{ questionDetails.data[`explanation_${index}`] }}
@@ -260,7 +260,7 @@
 					)
 				}}
 			</div>
-			<div v-else>
+			<div v-else class="text-ink-gray-7">
 				{{
 					__(
 						'You got {0}% correct answers with a score of {1} out of {2}'
@@ -465,7 +465,7 @@ watch(
 )
 
 const quizSubmission = createResource({
-	url: 'lms.doctype.lms_quiz.lms_quiz.quiz_summary',
+	url: 'lms.lms.doctype.lms_quiz.lms_quiz.quiz_summary',
 	makeParams(values) {
 		return {
 			quiz: quiz.data.name,
@@ -475,7 +475,7 @@ const quizSubmission = createResource({
 })
 
 const questionDetails = createResource({
-	url: 'lms.utils.get_question_details',
+	url: 'lms.lms.utils.get_question_details',
 	makeParams(values) {
 		return {
 			question: currentQuestion.value,
@@ -535,7 +535,7 @@ const checkAnswer = () => {
 	}
 
 	createResource({
-		url: 'lms.doctype.lms_quiz.lms_quiz.check_answer',
+		url: 'lms.lms.doctype.lms_quiz.lms_quiz.check_answer',
 		params: {
 			question: currentQuestion.value,
 			type: questionDetails.data.type,
@@ -664,7 +664,7 @@ const markLessonProgress = () => {
 	let lessonIndex = pathname.pop().split('-')
 
 	if (lessonIndex.length == 2) {
-		call('lms.api.mark_lesson_progress', {
+		call('lms.lms.api.mark_lesson_progress', {
 			course: pathname[3],
 			chapter_number: lessonIndex[0],
 			lesson_number: lessonIndex[1],

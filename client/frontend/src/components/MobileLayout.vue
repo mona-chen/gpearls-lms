@@ -165,6 +165,14 @@ const addAssignments = () => {
 	})
 }
 
+const addProgrammingExercises = () => {
+	otherLinks.value.push({
+		label: 'Programming Exercises',
+		icon: 'Code',
+		to: 'ProgrammingExercises',
+	})
+}
+
 const addPrograms = async () => {
 	let canAddProgram = await checkIfCanAddProgram()
 	if (!canAddProgram) return
@@ -183,7 +191,7 @@ const checkIfCanAddProgram = async () => {
 	if (isModerator.value || isInstructor.value) {
 		return true
 	}
-	const programs = await call('lms.utils.get_programs')
+	const programs = await call('lms.lms.utils.get_programs')
 	return programs.enrolled.length > 0 || programs.published.length > 0
 }
 

@@ -23,7 +23,7 @@ module System
         }
       ]
 
-      { data: apps }
+      apps
     end
   end
 end

@@ -31,6 +31,8 @@ module System
       case doctype
       when "LMS Settings"
         get_lms_setting_value(field)
+      when "User"
+        get_user_single_value(field, filters)
       else
         nil
       end
@@ -133,6 +135,11 @@ module System
       else
         nil
       end
+    end
+
+    def self.get_user_single_value(field, filters)
+      user = User.find_by(filters)
+      user&.send(field.to_sym)
     end
 
     def self.get_lms_setting_value(field)

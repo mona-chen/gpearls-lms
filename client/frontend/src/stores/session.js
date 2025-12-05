@@ -43,7 +43,7 @@ export const sessionStore = defineStore('lms-session', () => {
 	})
 
 	const branding = createResource({
-		url: 'lms.api.get_branding',
+		url: 'lms.lms.api.get_branding',
 		cache: 'brand',
 		auto: true,
 		onSuccess(data) {
@@ -54,16 +54,6 @@ export const sessionStore = defineStore('lms-session', () => {
 		},
 	})
 
-	const livecodeURL = createResource({
-		url: 'frappe.client.get_single_value',
-		params: {
-			doctype: 'LMS Settings',
-			field: 'livecode_url',
-		},
-		cache: 'livecodeURL',
-		auto: user.value ? true : false,
-	})
-
 	return {
 		user,
 		isLoggedIn,
@@ -71,6 +61,5 @@ export const sessionStore = defineStore('lms-session', () => {
 		logout,
 		brand,
 		branding,
-		livecodeURL,
 	}
 })

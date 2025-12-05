@@ -75,7 +75,7 @@ module Courses
       elsif progress > 0
         "In Progress"
       else
-        "Not Started"
+        "Approved" # Course is approved/enrolled but not started
       end
     end
 

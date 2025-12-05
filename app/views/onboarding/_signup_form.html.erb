@@ -12,6 +12,11 @@
             <input type="email" id="signup_email" class="form-control"
             placeholder="<%= t('signup.email_placeholder') %>" required>
         </div>
+        <div class="form-group">
+            <label class="form-label sr-only" for="signup_password"> Password </label>
+            <input type="password" id="signup_password" class="form-control"
+            placeholder="Password" required minlength="6">
+        </div>
 
         <% if LmsSetting.user_category_enabled? %>
         <div class="form-group">
@@ -85,36 +90,48 @@
         e.preventDefault();
         const email = (document.getElementById('signup_email').value || '').trim();
         const fullName = (document.getElementById('signup_fullname').value || '').trim();
+        const password = (document.getElementById('signup_password').value || '').trim();
 
-        if (!email || !validateEmail(email) || !fullName) {
-            showStatus('<%= t('signup.valid_email_name_required') %>', 'red');
+        if (!email || !validateEmail(email) || !fullName || !password) {
+            showStatus('Please fill in all required fields', 'red');
+            return false;
+        }
+
+        if (password.length < 6) {
+            showStatus('Password must be at least 6 characters long', 'red');
             return false;
         }
 
         const formData = {
             email: email,
             full_name: fullName,
+            password: password,
             verify_terms: document.getElementById('signup-terms')?.checked ? 1 : 0,
             user_category: document.getElementById('user_category')?.value || ''
         };
 
-        fetch('/api/method/lms.lms.user.sign_up', {
+        fetch('/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify({
+                signup_email: formData.email,
+                full_name: formData.full_name,
+                password: formData.password,
+                user_category: formData.user_category
+            })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message && data.message.success) {
-                showStatus('<%= t('signup.success') %>', 'green');
-                // Redirect to login or dashboard
+            if (data.message && data.user_id) {
+                showStatus('Your Account has been successfully created! Please check your email for verification.', 'green');
+                // Redirect to login
                 setTimeout(() => {
                     window.location.href = '/login';
                 }, 2000);
             } else {
-                showStatus(data.message || '<%= t('signup.error') %>', 'red');
+                showStatus(data.message || 'Failed to create account', 'red');
             }
         })
         .catch(error => {
@@ -131,7 +148,19 @@
     }
 
     function showStatus(message, color) {
-        // Implement status display logic
-        console.log(message, color);
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+
+        // Hide both messages first
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        if (color === 'red') {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        } else {
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
     }
 </script>

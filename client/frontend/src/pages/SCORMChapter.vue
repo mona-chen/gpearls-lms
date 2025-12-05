@@ -138,7 +138,7 @@ const saveDataToLMS = (key, value) => {
 }
 
 const saveProgress = (scormDetails = null) => {
-	call('lms.doctype.course_lesson.course_lesson.save_progress', {
+	call('lms.lms.doctype.course_lesson.course_lesson.save_progress', {
 		lesson: chapter.doc.lessons[0].lesson,
 		course: props.courseName,
 		scorm_details: scormDetails,

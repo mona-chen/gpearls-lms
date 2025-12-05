@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # Frontend routes - serve the LMS frontend
+  root to: "frontend#index"
+  get "*path", to: "frontend#index", constraints: ->(req) { !req.path.start_with?("/api") && !req.path.start_with?("/assets") && !req.path.start_with?("/rails") }
+
   # Setup wizard (must be before other routes)
   get "setup", to: "setup_wizard#index", as: :setup_wizard
   patch "setup", to: "setup_wizard#update"
@@ -7,12 +11,9 @@ Rails.application.routes.draw do
   devise_for :users
   devise_for :users, skip: [ :sessions, :registrations ]
 
-  # Session-based authentication routes (Frappe compatible)
-  get "login", to: "sessions#new"
-  get "signup", to: "sessions#signup"
-  post "login", to: "sessions#create"
-  post "logout", to: "sessions#destroy"
-  match "login", to: "sessions#handle_options", via: [ :options ]
+  # Basic authentication routes for Frappe compatibility
+  get "login", to: "auth#login_page"
+  get "signup", to: "auth#signup_page"
 
   # API authentication routes
   match "api/login", to: "api/authentication#login", via: [ :post, :options ]
@@ -39,8 +40,8 @@ Rails.application.routes.draw do
    # Lessons
    post "api/courses/:course_id/chapters/:chapter_id/lessons", to: "api/courses#create_lesson"
 
-   # Generic Frappe-style API endpoints for frontend compatibility
-   post "api/method/*method_path", to: "api/compatibility#handle_method", constraints: { method_path: /.+/ }
+    # Generic Frappe-style API endpoints for frontend compatibility
+    match "api/method/*method_path", to: "api/compatibility#handle_method", constraints: { method_path: /.+/ }, via: [ :get, :post ]
 
   # Course outline and lessons
   get "api/course-outline/:course", to: "api/course_outline#show"

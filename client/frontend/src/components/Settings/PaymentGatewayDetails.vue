@@ -64,7 +64,7 @@ const props = defineProps<{
 }>()
 
 const paymentGateway = createResource({
-	url: 'lms.api.get_payment_gateway_details',
+	url: 'lms.lms.api.get_payment_gateway_details',
 	makeParams(values: any) {
 		return {
 			payment_gateway: props.gatewayID,
@@ -85,7 +85,7 @@ const allGateways = createListResource({
 })
 
 const gatewayFields = createResource({
-	url: 'lms.api.get_new_gateway_fields',
+	url: 'lms.lms.api.get_new_gateway_fields',
 	makeParams(values: any) {
 		return {
 			doctype: values.doctype,

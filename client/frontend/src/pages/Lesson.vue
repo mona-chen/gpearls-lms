@@ -451,7 +451,7 @@ onBeforeUnmount(() => {
 })
 
 const lesson = createResource({
-	url: 'lms.utils.get_lesson',
+	url: 'lms.lms.utils.get_lesson',
 	makeParams(values) {
 		return {
 			course: props.courseName,
@@ -526,7 +526,7 @@ const markProgress = () => {
 }
 
 const progress = createResource({
-	url: 'lms.doctype.course_lesson.course_lesson.save_progress',
+	url: 'lms.lms.doctype.course_lesson.course_lesson.save_progress',
 	makeParams() {
 		return {
 			lesson: lesson.data.name,
@@ -626,7 +626,7 @@ const trackVideoWatchDuration = () => {
 	if (!lesson.data.membership) return
 	let videoDetails = getVideoDetails()
 	videoDetails = videoDetails.concat(getPlyrSourceDetails())
-	call('lms.api.track_video_watch_duration', {
+	call('lms.lms.api.track_video_watch_duration', {
 		lesson: lesson.data.name,
 		videos: videoDetails,
 	})

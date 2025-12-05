@@ -14,7 +14,10 @@
 			</Button>
 		</div>
 		<div v-if="upcoming_evals.data?.length">
-			<div class="grid gap-4" :class="forHome ? 'grid-cols-2' : 'grid-cols-3'">
+			<div
+				class="grid gap-4"
+				:class="forHome ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-3'"
+			>
 				<div v-for="evl in upcoming_evals.data">
 					<div class="border text-ink-gray-7 rounded-md p-3">
 						<div class="flex justify-between mb-3">
@@ -148,7 +151,7 @@ const props = defineProps({
 })
 
 const upcoming_evals = createResource({
-	url: 'lms.utils.get_upcoming_evals',
+	url: 'lms.lms.utils.get_upcoming_evals',
 	params: {
 		courses: props.courses.map((course) => course.course),
 		batch: props.batch,
@@ -182,7 +185,7 @@ const cancelEvaluation = (evl) => {
 				theme: 'red',
 				variant: 'solid',
 				onClick(close) {
-					call('lms.api.cancel_evaluation', { evaluation: evl }).then(
+					call('lms.lms.api.cancel_evaluation', { evaluation: evl }).then(
 						() => {
 							upcoming_evals.reload()
 						}

@@ -1,4 +1,6 @@
 class CertificateRequest < ApplicationRecord
+  attr_accessor :batch_name
+
   belongs_to :user
   belongs_to :course
   belongs_to :evaluator, class_name: "User", optional: true

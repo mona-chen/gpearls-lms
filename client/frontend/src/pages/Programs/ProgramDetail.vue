@@ -104,7 +104,7 @@ const checkIfEnrolled = () => {
 }
 
 const program = createResource({
-	url: 'lms.utils.get_program_details',
+	url: 'lms.lms.utils.get_program_details',
 	params: {
 		program_name: props.programName,
 	},

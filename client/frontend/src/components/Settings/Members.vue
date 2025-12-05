@@ -159,7 +159,7 @@ const props = defineProps({
 })
 
 const members = createResource({
-	url: 'lms.api.get_members',
+	url: 'lms.lms.api.get_members',
 	makeParams: () => {
 		return {
 			search: search.value,

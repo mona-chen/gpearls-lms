@@ -6,19 +6,22 @@ module Users
 
     def call
       users = User.where(status: "Active")
-                  .select(:id, :full_name, :profile_image)
+                  .select(:id, :email, :username, :first_name, :last_name, :full_name, :profile_image)
 
-      # Return hash format matching Frappe: {user_id: {name, full_name, user_image}}
-      users_hash = {}
-      users.each do |user|
-        users_hash[user.id] = {
+      # Return array format matching Frappe test expectations
+      users_array = users.map do |user|
+        {
           name: user.id,
+          email: user.email,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
           full_name: user.full_name,
           user_image: user.profile_image
         }
       end
 
-      users_hash
+      { data: users_array }
     end
   end
 end

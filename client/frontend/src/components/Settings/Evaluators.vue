@@ -151,7 +151,7 @@ const evaluators = createListResource({
 })
 
 const addEvaluator = (close: () => void) => {
-	call('lms.api.add_an_evaluator', {
+	call('lms.lms.api.add_an_evaluator', {
 		email: email.value,
 	})
 		.then(() => {
@@ -186,7 +186,7 @@ const openProfile = (username: string) => {
 }
 
 const deleteEvaluator = (evaluator: string) => {
-	call('lms.api.delete_evaluator', {
+	call('lms.lms.api.delete_evaluator', {
 		evaluator: evaluator,
 	})
 		.then(() => {

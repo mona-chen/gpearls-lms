@@ -42,7 +42,7 @@ module Certifications
         }
       end
 
-      { "data" => participants_data }
+      participants_data
     end
   end
 end

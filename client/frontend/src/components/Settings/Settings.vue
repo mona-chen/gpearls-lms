@@ -2,7 +2,9 @@
 	<Dialog v-model="show" :options="{ size: '5xl' }">
 		<template #body>
 			<div class="flex h-[calc(100vh_-_8rem)]">
-				<div class="flex w-52 shrink-0 flex-col bg-surface-gray-2 p-2">
+				<div
+					class="flex w-52 shrink-0 flex-col bg-surface-gray-2 p-2 overflow-y-auto"
+				>
 					<h1 class="mb-3 px-2 pt-2 text-lg font-semibold text-ink-gray-9">
 						{{ __('Settings') }}
 					</h1>
@@ -14,25 +16,20 @@
 							<span>{{ __(tab.label) }}</span>
 						</div>
 						<nav class="space-y-1">
-							<SidebarLink
-								v-for="item in tab.items"
-								:link="item"
-								:key="item.label"
-								class="w-full"
-								:class="
-									activeTab?.label == item.label
-										? 'bg-surface-selected shadow-sm'
-										: 'hover:bg-surface-gray-2'
-								"
-								@click="activeTab = item"
-							/>
+							<div v-for="item in tab.items" @click="activeTab = item">
+								<SidebarLink
+									:link="item"
+									:key="item.label"
+									:activeTab="activeTab?.label"
+								/>
+							</div>
 						</nav>
 					</div>
 				</div>
 				<div
 					v-if="activeTab && data.doc"
 					:key="activeTab.label"
-					class="flex flex-1 flex-col px-10 py-8 bg-surface-modal"
+					class="flex flex-1 flex-col p-8 bg-surface-modal"
 				>
 					<component
 						v-if="activeTab.template"
@@ -81,7 +78,8 @@ import Categories from '@/components/Settings/Categories.vue'
 import EmailTemplates from '@/components/Settings/EmailTemplates.vue'
 import BrandSettings from '@/components/Settings/BrandSettings.vue'
 import PaymentGateways from '@/components/Settings/PaymentGateways.vue'
-import Transactions from '@/components/Settings/Transactions.vue'
+import Coupons from '@/components/Settings/Coupons/Coupons.vue'
+import Transactions from '@/components/Settings/Transactions/Transactions.vue'
 import ZoomSettings from '@/components/Settings/ZoomSettings.vue'
 import Badges from '@/components/Settings/Badges.vue'
 
@@ -235,6 +233,12 @@ const tabsStructure = computed(() => {
 					icon: 'Landmark',
 					template: markRaw(Transactions),
 					description: 'View all your payment transactions',
+				},
+				{
+					label: 'Coupons',
+					icon: 'Ticket',
+					template: markRaw(Coupons),
+					description: 'Manage discount coupons for courses and batches',
 				},
 			],
 		},

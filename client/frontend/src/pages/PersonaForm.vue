@@ -75,19 +75,11 @@ const submitPersona = () => {
 		role: persona.role,
 		use_case: persona.useCase,
 	}
-	call('lms.api.capture_user_persona', {
+	call('lms.lms.api.capture_user_persona', {
 		responses: JSON.stringify(responses),
 	}).then(() => {
-		// Also set persona_captured flag in LMS Settings
-		call('frappe.client.set_value', {
-			doctype: 'LMS Settings',
-			name: null,
-			fieldname: 'persona_captured',
-			value: 1,
-		}).then(() => {
-			router.push({
-				name: 'Courses',
-			})
+		router.push({
+			name: 'Courses',
 		})
 	})
 }

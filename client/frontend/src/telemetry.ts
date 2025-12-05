@@ -1,3 +1,4 @@
+// import '../../../frappe/frappe/public/js/lib/posthog.js'
 import { createResource } from 'frappe-ui'
 
 declare global {
@@ -20,45 +21,42 @@ interface CaptureOptions {
   }
 }
 
-// Mock posthog for Rails backend
-let posthog = {
-  init: (projectId: string, config: any) => {
-    console.log('Posthog mock: initialized', projectId, config)
-  },
-  capture: (event: string, properties: any) => {
-    console.log('Posthog mock: capture', event, properties)
-  },
-  identify: (userId: any) => {
-    console.log('Posthog mock: identify', userId)
-  },
-  people: {
-    set: (properties: any) => {
-      console.log('Posthog mock: people.set', properties)
-    }
-  }
-}
+let posthog: typeof window.posthog = window.posthog
 
-// Mock Posthog Settings for Rails backend
-let posthogSettings = {
-  data: {
-    posthog_project_id: '',
-    posthog_host: '',
-    enable_telemetry: false,
-    telemetry_site_age: 0
-  },
-  fetch: () => {
-    console.log('Posthog mock: settings fetched')
-  }
-}
+// Posthog Settings
+let posthogSettings = createResource({
+  url: 'lms.lms.telemetry.get_posthog_settings',
+  cache: 'posthog_settings',
+  onSuccess: (ps: PosthogSettings) => initPosthog(ps),
+})
 
 let isTelemetryEnabled = () => {
-  return false // Disabled for Rails backend
+  if (!posthogSettings.data) return false
+
+  return (
+    posthogSettings.data.enable_telemetry &&
+    posthogSettings.data.posthog_project_id &&
+    posthogSettings.data.posthog_host
+  )
 }
 
 // Posthog Initialization
 function initPosthog(ps: PosthogSettings) {
   if (!isTelemetryEnabled()) return
-  console.log('Posthog mock: would initialize with', ps)
+
+  posthog.init(ps.posthog_project_id, {
+    api_host: ps.posthog_host,
+    person_profiles: 'identified_only',
+    autocapture: false,
+    capture_pageview: true,
+    capture_pageleave: true,
+    enable_heatmaps: false,
+    disable_session_recording: false,
+    loaded: (ph: typeof posthog) => {
+      window.posthog = ph
+      ph.identify(window.location.hostname)
+    },
+  })
 }
 
 // Posthog Functions
@@ -67,21 +65,19 @@ function capture(
   options: CaptureOptions = { data: { user: '' } },
 ) {
   if (!isTelemetryEnabled()) return
-  console.log('Posthog mock: would capture lms_' + event, options)
+  window.posthog.capture(`lms_${event}`, options)
 }
 
 function startRecording() {
-  console.log('Posthog mock: would start recording')
 }
 
 function stopRecording() {
-  console.log('Posthog mock: would stop recording')
 }
 
 // Posthog Plugin
 function posthogPlugin(app: any) {
     app.config.globalProperties.posthog = posthog
-    console.log('Posthog mock: plugin installed')
+    if (!window.posthog?.length) posthogSettings.fetch()
 }
 
 export {

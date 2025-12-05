@@ -139,7 +139,8 @@ function submitEvaluation(close) {
 			close()
 		},
 		onError(err) {
-			toast.warning(__(err.messages?.[0] || err))
+			console.log(err.messages?.[0] || err)
+			toast.warning(__(err.messages?.[0] || err), { duration: 10000 })
 		},
 	})
 }
@@ -163,7 +164,7 @@ const getCourses = () => {
 }
 
 const slots = createResource({
-	url: 'lms.doctype.course_evaluator.course_evaluator.get_schedule',
+	url: 'lms.lms.doctype.course_evaluator.course_evaluator.get_schedule',
 	makeParams(values) {
 		return {
 			course: values.course,

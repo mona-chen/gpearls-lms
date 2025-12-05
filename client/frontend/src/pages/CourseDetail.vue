@@ -25,9 +25,7 @@
 								{{ course.data.rating }}
 							</span>
 						</Tooltip>
-						<span v-if="parseInt(course.data.rating) > 0" class="mx-3"
-							>&middot;</span
-						>
+						<span v-if="parseInt(course.data.rating) > 0" class="mx-3">&middot;</span>
 						<Tooltip
 							v-if="course.data.enrollment_count"
 							:text="__('Enrolled Students')"
@@ -38,9 +36,7 @@
 								{{ course.data.enrollment_count_formatted }}
 							</span>
 						</Tooltip>
-						<span v-if="course.data.enrollment_count" class="mx-3"
-							>&middot;</span
-						>
+						<span v-if="course.data.enrollment_count" class="mx-3">&middot;</span>
 						<div class="flex items-center">
 							<span
 								class="h-6 mr-1"
@@ -126,7 +122,7 @@ const props = defineProps({
 })
 
 const course = createResource({
-	url: 'lms.utils.get_course_details',
+	url: 'lms.lms.utils.get_course_details',
 	cache: ['course', props.courseName],
 	makeParams() {
 		return {
@@ -144,7 +140,12 @@ watch(
 )
 
 watch(course, () => {
-	if (!isInstructor() && !course.data?.published && !course.data?.upcoming) {
+	if (
+		!isInstructor() &&
+		!user.data?.is_moderator &&
+		!course.data?.published &&
+		!course.data?.upcoming
+	) {
 		router.push({
 			name: 'Courses',
 		})

@@ -30,14 +30,14 @@
 				<div class="notification text-ink-gray-7" v-html="log.subject"></div>
 			</div>
 			<div class="flex items-center space-x-2">
-				<Link
+				<a
 					v-if="log.link"
-					:to="log.link"
+					:href="log.link"
 					@click="(e) => handleMarkAsRead(e, log.name)"
 					class="text-ink-gray-5 font-medium text-sm hover:text-ink-gray-7"
 				>
 					{{ __('View') }}
-				</Link>
+				</a>
 				<Button
 					variant="ghost"
 					v-if="!log.read"
@@ -60,7 +60,6 @@ import {
 	createListResource,
 	createResource,
 	Breadcrumbs,
-	Link,
 	TabButtons,
 	Button,
 	usePageMeta,
@@ -92,7 +91,7 @@ const notifications = computed(() => {
 
 const unReadNotifications = createListResource({
 	doctype: 'Notification Log',
-	url: 'lms.api.get_notifications',
+	url: 'lms.lms.api.get_notifications',
 	filters: {
 		for_user: user.data?.name,
 		read: 0,
@@ -103,7 +102,7 @@ const unReadNotifications = createListResource({
 
 const readNotifications = createListResource({
 	doctype: 'Notification Log',
-	url: 'lms.api.get_notifications',
+	url: 'lms.lms.api.get_notifications',
 	filters: {
 		for_user: user.data?.name,
 		read: 1,
@@ -113,7 +112,7 @@ const readNotifications = createListResource({
 })
 
 const markAsRead = createResource({
-	url: 'lms.api.mark_as_read',
+	url: 'lms.lms.api.mark_as_read',
 	makeParams(values) {
 		return {
 			name: values.name,
@@ -126,7 +125,7 @@ const markAsRead = createResource({
 })
 
 const markAllAsRead = createResource({
-	url: 'lms.api.mark_all_as_read',
+	url: 'lms.lms.api.mark_all_as_read',
 	onSuccess(data) {
 		unReadNotifications.reload()
 		readNotifications.reload()

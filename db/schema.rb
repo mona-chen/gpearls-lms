@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_26_084302) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_27_235159) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -1738,6 +1738,21 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_26_084302) do
     t.index ["status"], name: "index_lms_mentor_requests_on_status"
   end
 
+  create_table "lms_messages", force: :cascade do |t|
+    t.string "topic"
+    t.text "reply"
+    t.integer "author_id", null: false
+    t.integer "course_id", null: false
+    t.integer "lesson_id", null: false
+    t.boolean "is_pinned"
+    t.boolean "is_featured"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_lms_messages_on_author_id"
+    t.index ["course_id"], name: "index_lms_messages_on_course_id"
+    t.index ["lesson_id"], name: "index_lms_messages_on_lesson_id"
+  end
+
   create_table "lms_options", force: :cascade do |t|
     t.string "name", null: false
     t.string "owner", null: false
@@ -1946,7 +1961,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_26_084302) do
   end
 
   create_table "lms_questions", force: :cascade do |t|
-    t.string "name"
     t.text "question", null: false
     t.string "type", default: "Choices", null: false
     t.boolean "multiple", default: false
@@ -3072,6 +3086,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_26_084302) do
   add_foreign_key "lms_mentor_requests", "lms_courses", column: "course"
   add_foreign_key "lms_mentor_requests", "users", column: "member"
   add_foreign_key "lms_mentor_requests", "users", column: "reviewed_by"
+  add_foreign_key "lms_messages", "authors"
+  add_foreign_key "lms_messages", "courses"
+  add_foreign_key "lms_messages", "lessons"
   add_foreign_key "lms_payments", "lms_badges", column: "discount_applied_id"
   add_foreign_key "lms_payments", "lms_batches", column: "batch_id"
   add_foreign_key "lms_payments", "lms_courses", column: "course_id"

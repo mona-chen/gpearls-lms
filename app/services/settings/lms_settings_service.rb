@@ -11,10 +11,10 @@ module Settings
     def call
       if @field.present?
         # Return raw value like Frappe Cloud (not wrapped in object)
-        settings[@field] || false
+        settings[@field.to_sym] || false
       else
-        # Return full settings object wrapped in message
-        { message: settings }
+        # Return full settings object
+        settings
       end
     end
 

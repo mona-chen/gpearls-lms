@@ -220,7 +220,7 @@ function enrollStudent() {
 			window.location.href = `/login?redirect-to=${window.location.pathname}`
 		}, 500)
 	} else {
-		call('lms.doctype.lms_enrollment.lms_enrollment.create_membership', {
+		call('lms.lms.doctype.lms_enrollment.lms_enrollment.create_membership', {
 			course: props.course.data.name,
 		})
 			.then(() => {
@@ -267,7 +267,7 @@ const canGetCertificate = computed(() => {
 })
 
 const certificate = createResource({
-	url: 'lms.doctype.lms_certificate.lms_certificate.create_certificate',
+	url: 'lms.lms.doctype.lms_certificate.lms_certificate.create_certificate',
 	makeParams(values) {
 		return {
 			course: values.course,

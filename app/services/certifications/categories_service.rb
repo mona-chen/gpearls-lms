@@ -35,7 +35,7 @@ module Certifications
         }
       end
 
-      { "data" => categories_data }
+      categories_data
     end
   end
 end

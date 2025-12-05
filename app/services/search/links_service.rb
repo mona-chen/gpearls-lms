@@ -10,7 +10,7 @@ module Search
 
     def call
       query = @params[:q]
-      return { "data" => [] } if query.blank?
+      return [] if query.blank?
 
       results = []
 
@@ -60,7 +60,7 @@ module Search
         end
       end
 
-      { "data" => results }
+      results
     end
   end
 end

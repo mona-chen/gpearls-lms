@@ -130,6 +130,9 @@
 						@change="(val) => (answer = val)"
 						:editable="true"
 						:fixedMenu="true"
+						:uploadArgs="{
+							private: true,
+						}"
 						editorClass="prose-sm max-w-none border-b border-x bg-surface-gray-2 rounded-b-md py-1 px-2 min-h-[7rem]"
 					/>
 				</div>
@@ -272,7 +275,7 @@ const newSubmission = createResource({
 })
 
 const imageResource = createResource({
-	url: 'lms.api.get_file_info',
+	url: 'lms.lms.api.get_file_info',
 	makeParams(values) {
 		return {
 			file_url: values.image,
@@ -391,7 +394,7 @@ const markLessonProgress = () => {
 		let chapterNumber = router.currentRoute.value.params.chapterNumber
 		let lessonNumber = router.currentRoute.value.params.lessonNumber
 
-		call('lms.api.mark_lesson_progress', {
+		call('lms.lms.api.mark_lesson_progress', {
 			course: courseName,
 			chapter_number: chapterNumber,
 			lesson_number: lessonNumber,
